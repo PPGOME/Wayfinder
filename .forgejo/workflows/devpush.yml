@@ -49,10 +49,10 @@ jobs:
             exit 1
           fi
           
-          RAW_NAME=$(unzip -p "$COMPILED_JAR" plugin.yml 2>/dev/null | grep -i '^name:' | head -n 1 | awk -F: '{print $2}' | tr -d ' "\'\r')
+          RAW_NAME=$(unzip -p "$COMPILED_JAR" plugin.yml 2>/dev/null | grep -i '^name:' | head -n 1 | awk -F: '{print $2}' | tr -d ' "\r' | tr -d "'")
           
           if [ -z "$RAW_NAME" ]; then
-            RAW_NAME=$(unzip -p "$COMPILED_JAR" paper-plugin.yml 2>/dev/null | grep -i '^name:' | head -n 1 | awk -F: '{print $2}' | tr -d ' "\'\r')
+            RAW_NAME=$(unzip -p "$COMPILED_JAR" paper-plugin.yml 2>/dev/null | grep -i '^name:' | head -n 1 | awk -F: '{print $2}' | tr -d ' "\r' | tr -d "'")
           fi
           
           if [ -z "$RAW_NAME" ]; then

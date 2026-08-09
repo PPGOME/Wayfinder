@@ -22,8 +22,11 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
+      - name: Grant Execute Permission for Maven Wrapper
+        run: chmod +x mvnw
+
       - name: Build Plugin
-        run: mvn clean package -B
+        run: ./mvnw clean package -B
 
       - name: Package Plugin
         run: |

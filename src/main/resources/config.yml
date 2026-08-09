@@ -1,0 +1,50 @@
+prefix: "<blue><b>[</b><aqua>Wayfinder</aqua><b>]"
+
+modules:
+  home: true
+  place: true
+  teleport: true
+  warp: true
+  waypoint: true
+
+# All message options support the <prefix> tag to add the plugin's prefix, as defined above.
+messages:
+  # All messages for "/place"
+  place:
+    normal:
+      reachedDestination: "<green>You've reached your destination: <place>!"
+      routingTo: "<green>Now routing to: <place>."
+    editing:
+      category:
+        name: "<prefix> <green>Type what you want the name of this category to be into chat."
+      place:
+        name: "<prefix> <green>Type what you want the name of this place to be into chat."
+        builders: "<prefix> <green>Type the names of the builders of this place into chat, separated by commas. Doesn't have to be player names."
+        expires: "<prefix> <green>Type the time until this place expires (i.e. 1d3h20m)."
+  home:
+    editing:
+      name: "<prefix> <green>Type what you want the name of this home to be into chat."
+
+gui:
+  title:
+    place:
+      # The main screen displayed when "/place" is run.
+      main: "<aqua>PvE Places"
+      # The category creation screen.
+      categoryBuilder: "<green>Category Builder"
+      # The place creation screen.
+      placeBuilder: "<green>Place Builder"
+      # The category list displayed when adding a place to categories.
+      # Supports the <place> tag to add the place being modified.
+      categoryList: "<yellow>Selecting categories for <place>"
+      # The place list displayed after clicking on a category.
+      # Supports the <category> tag to add the category being browsed.
+      placeList: "<green>Places in <category>"
+    home:
+      # The home creation/editor screen.
+      homeBuilder: "<green>New home"
+
+place:
+  enableNetherPortals: true
+  enableEndPortals: true
+  enablePlayers: true

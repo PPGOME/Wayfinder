@@ -1,0 +1,25 @@
+name: Wayfinder
+version: '1.0-SNAPSHOT'
+main: me.ppgome.wayfinder.Wayfinder
+api-version: '1.21'
+prefix: Wayfinder
+authors: [ PPGOME ]
+description: Helping lost travellers find their way
+
+permissions:
+  wayfinder.admin:
+    description: "The root node for all admin permissions"
+    default: op
+    children:
+      wayfinder.admin.place:
+        description: "Allows for the creation, editing, and deletion of places"
+
+commands:
+  place:
+    description: "The root command for the place system"
+    usage: "/place [placeName]"
+    permission: wayfinder.player.place
+  home:
+    description: "The root command for the home system"
+    usage: "/place [p:[playerName]/homeName]"
+    permission: wayfinder.player.home

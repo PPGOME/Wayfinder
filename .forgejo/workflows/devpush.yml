@@ -12,7 +12,7 @@ jobs:
     runs-on: docker
     container:
       image: catthehacker/ubuntu:act-latest
-      options: -v /path/on/host/destination:/mnt/host_destination
+      options: -v /plugin:/plugin
 
     steps:
       - name: Checkout Repository
@@ -64,8 +64,7 @@ jobs:
           
           LOWER_NAME=$(echo "$RAW_NAME" | tr '[:upper:]' '[:lower:]')
           
-          # Target the mounted host path defined in container.options
-          DEST_DIR="/mnt/host_destination"
+          DEST_DIR="/plugin"
           
           mkdir -p "$DEST_DIR"
           cp -f "$COMPILED_JAR" "${DEST_DIR}/${LOWER_NAME}.jar"
@@ -74,4 +73,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: plugin-artifact
-          path: /mnt/host_destination/*.jar
+          path: /plugin/*.jar

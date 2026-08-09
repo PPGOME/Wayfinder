@@ -33,6 +33,7 @@ jobs:
 
       - name: Package Plugin
         run: |
+          set -e
           SEARCH_DIRS=()
           [ -d "target" ] && SEARCH_DIRS+=("target")
           [ -d "build/libs" ] && SEARCH_DIRS+=("build/libs")
@@ -52,6 +53,8 @@ jobs:
             exit 1
           fi
           
+          echo "Found JAR: $COMPILED_JAR"
+          
           RAW_NAME=$(unzip -p "$COMPILED_JAR" plugin.yml 2>/dev/null | grep -i '^name:' | head -n 1 | awk -F: '{print $2}' | tr -d ' "\r' | tr -d "'")
           
           if [ -z "$RAW_NAME" ]; then
@@ -63,11 +66,15 @@ jobs:
           fi
           
           LOWER_NAME=$(echo "$RAW_NAME" | tr '[:upper:]' '[:lower:]')
-          
           DEST_DIR="/plugin"
+          TARGET_FILE="${DEST_DIR}/${LOWER_NAME}.jar"
           
+          echo "Target destination inside container: $TARGET_FILE"
           mkdir -p "$DEST_DIR"
-          cp -f "$COMPILED_JAR" "${DEST_DIR}/${LOWER_NAME}.jar"
+          cp -vf "$COMPILED_JAR" "$TARGET_FILE"
+          
+          echo "Verifying container mount contents:"
+          ls -la "$DEST_DIR"
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v3

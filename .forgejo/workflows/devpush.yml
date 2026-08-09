@@ -10,6 +10,9 @@ on:
 jobs:
   build:
     runs-on: docker
+    container:
+      image: alpine:latest
+      options: -v /path/on/host/destination:/mnt/host_destination
 
     steps:
       - name: Checkout Repository

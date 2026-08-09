@@ -65,6 +65,8 @@ jobs:
             RAW_NAME=$(basename "$COMPILED_JAR" .jar)
           fi
           
+          findmnt -T /plugins
+          
           LOWER_NAME=$(echo "$RAW_NAME" | tr '[:upper:]' '[:lower:]')
           DEST_DIR="/plugins"
           TARGET_FILE="${DEST_DIR}/${LOWER_NAME}.jar"

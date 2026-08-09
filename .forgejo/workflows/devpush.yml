@@ -60,7 +60,7 @@ jobs:
           fi
           
           LOWER_NAME=$(echo "$RAW_NAME" | tr '[:upper:]' '[:lower:]')
-          DEST_DIR="./plugins"
+          DEST_DIR="/plugins"
           
           mkdir -p "$DEST_DIR"
           cp -f "$COMPILED_JAR" "${DEST_DIR}/${LOWER_NAME}.jar"

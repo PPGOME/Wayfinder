@@ -1,0 +1,60 @@
+name: Build and Package Plugin
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Grant Execute Permission for Gradlew
+        run: chmod +x gradlew
+
+      - name: Build Plugin
+        run: ./gradlew build
+
+      - name: Package Plugin
+        run: |
+          COMPILED_JAR=$(find build/libs target -maxdepth 2 -type f -name "*.jar" ! -name "*-plain.jar" ! -name "*-sources.jar" ! -name "*-javadoc.jar" | head -n 1)
+
+          if [ -z "$COMPILED_JAR" ]; then
+            echo "::error::No compiled .jar found!"
+            exit 1
+          fi
+
+          RAW_NAME=$(unzip -p "$COMPILED_JAR" plugin.yml 2>/dev/null | grep -i '^name:' | head -n 1 | awk -F: '{print $2}' | tr -d ' "\'\r')
+
+          if [ -z "$RAW_NAME" ]; then
+            RAW_NAME=$(unzip -p "$COMPILED_JAR" paper-plugin.yml 2>/dev/null | grep -i '^name:' | head -n 1 | awk -F: '{print $2}' | tr -d ' "\'\r')
+          fi
+
+          if [ -z "$RAW_NAME" ]; then
+            RAW_NAME=$(basename "$COMPILED_JAR" .jar)
+          fi
+
+          LOWER_NAME=$(echo "$RAW_NAME" | tr '[:upper:]' '[:lower:]')
+          DEST_DIR="./plugins"
+
+          mkdir -p "$DEST_DIR"
+          cp -f "$COMPILED_JAR" "${DEST_DIR}/${LOWER_NAME}.jar"
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugin-artifact
+          path: plugins/*.jar

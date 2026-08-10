@@ -1,0 +1,17 @@
+name: DevSync
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  run-shared-ci:
+    runs-on: docker
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Shared Sync
+        uses: NerdNu/Shared-Actions/devsync@v1
+        with:
+          node-version: "20"

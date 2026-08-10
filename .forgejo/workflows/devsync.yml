@@ -16,4 +16,4 @@ jobs:
           path: .forgejo/actions/Shared-Actions
 
       - name: Run Shared Sync
-        uses: ./.forgejo/actions/Shared-Actions
+        uses: ./.forgejo/actions/Shared-Actions/devsync

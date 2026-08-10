@@ -38,7 +38,6 @@ public class TrafficTracker {
 
     private void recordStep(Location location) {
         GridCell cell = new GridCell(location.getWorld().getName(), location.getBlockX() / GRID_SIZE, location.getBlockZ() / GRID_SIZE);
-        //Test...
     }
 
     private boolean isLinearRoadMovement(Location previous, Location current) {

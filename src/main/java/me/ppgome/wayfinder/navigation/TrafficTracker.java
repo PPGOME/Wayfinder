@@ -34,6 +34,7 @@ public class TrafficTracker {
                 }
             }
         }, 20, 20);
+        // Test
     }
 
     private void recordStep(Location location) {

@@ -10,8 +10,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          repository: NerdNu/Shared-Actions
+          token: #{{ secrets.EXTRA_ACTION_TOKEN }}
+          path: .forgejo/actions/Shared-Actions
 
       - name: Run Shared Sync
-        uses: NerdNu/Shared-Actions/devsync@v1
-        with:
-          node-version: "20"
+        uses: ./.forgejo/actions/Shared-Actions

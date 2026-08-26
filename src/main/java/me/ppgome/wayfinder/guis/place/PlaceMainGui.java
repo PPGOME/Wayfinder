@@ -69,7 +69,6 @@ public class PlaceMainGui extends WGui {
                                     } else {
                                         openNext(player, config, cache, new PlaceListGui(tempCat));
                                     }
-                                    // TODO: Open new GUI
                                 }));
             }
         }
@@ -83,8 +82,6 @@ public class PlaceMainGui extends WGui {
 
         // Stop clicks from doing anything normally
         GuiUtils.defaultCancel(gui);
-
-        // TODO: Other buttons
 
         if(player.hasPermission("wayfinder.admin.place")) {
             gui.setItem(isFiveRows ? 36 : 45,

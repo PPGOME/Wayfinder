@@ -4,6 +4,7 @@ import me.ppgome.wayfinder.commands.CommandHandler;
 import me.ppgome.wayfinder.commands.CommandRegistry;
 import me.ppgome.wayfinder.commands.home.HomeCommand;
 import me.ppgome.wayfinder.commands.place.PlaceCommand;
+import me.ppgome.wayfinder.commands.warp.WarpCommand;
 import me.ppgome.wayfinder.database.DatabaseHandler;
 import me.ppgome.wayfinder.database.place.Category;
 import org.bukkit.command.Command;
@@ -25,6 +26,7 @@ public final class Wayfinder extends JavaPlugin {
 
     private PlaceCommand placeCommand;
     private HomeCommand homeCommand;
+    private WarpCommand warpCommand;
 
     @Override
     public void onEnable() {
@@ -51,12 +53,14 @@ public final class Wayfinder extends JavaPlugin {
     private void initializeCommands() {
         placeCommand = new PlaceCommand(this);
         homeCommand = new HomeCommand(this);
+        warpCommand = new WarpCommand(this);
     }
 
     private void registerCommands() {
         commandRegistry = new CommandRegistry();
         commandRegistry.register("place", placeCommand);
         commandRegistry.register("home", homeCommand);
+        commandRegistry.register("warp", warpCommand);
     }
 
     @Override

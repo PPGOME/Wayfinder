@@ -1,8 +1,10 @@
 package me.ppgome.wayfinder.database;
 
+import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.inventory.ItemStack;
 
 public class Warp {
 
@@ -24,6 +26,11 @@ public class Warp {
     @DatabaseField(canBeNull = false)
     private String world;
 
+    @DatabaseField(dataType = DataType.BYTE_ARRAY, canBeNull = false)
+    private byte[] item;
+
+    private ItemStack itemStack;
+
     // -----------------------------------------------------------------------------------------------------------------
 
     public Warp() {}
@@ -39,6 +46,12 @@ public class Warp {
 
     // -----------------------------------------------------------------------------------------------------------------
 
+    public void loadItem() {
+        this.itemStack = ItemStack.deserializeBytes(item);
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
     public String getName() {
         return name;
     }
@@ -49,6 +62,22 @@ public class Warp {
 
     public Location getLocation() {
         return new Location(Bukkit.getWorld(world), x, y, z);
+    }
+
+    public byte[] getItem() {
+        return item;
+    }
+
+    public void setItem(byte[] item) {
+        this.item = item;
+    }
+
+    public ItemStack getItemStack() {
+        return itemStack;
+    }
+
+    public void setItemStack(ItemStack itemStack) {
+        this.itemStack = itemStack;
     }
 
 }

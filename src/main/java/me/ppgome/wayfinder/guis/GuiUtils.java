@@ -7,6 +7,7 @@ import dev.triumphteam.gui.guis.Gui;
 import dev.triumphteam.gui.guis.GuiItem;
 import me.ppgome.wayfinder.Wayfinder;
 import me.ppgome.wayfinder.database.Home;
+import me.ppgome.wayfinder.database.Warp;
 import me.ppgome.wayfinder.database.place.Place;
 import me.ppgome.wayfinder.navigation.ParticleNavigator;
 import me.ppgome.wayfinder.text.TextUtils;
@@ -122,6 +123,17 @@ public class GuiUtils {
         });
     }
 
+    public static void addWarpItem(WGui wGui, Gui gui, int slot, Warp warp, Player player) {
+        gui.setItem(slot, GuiUtils.makeWarpItem(warp));
+        gui.addSlotAction(slot, event -> {
+            if(event.isShiftClick()) {
+                wGui.openNext(player, wGui.config, wGui.cache, new EditOrDeleteGui<>(warp));
+            } else {
+                player.teleport(warp.getLocation());
+            }
+        });
+    }
+
     public static void addHomeItem(WGui wGui, Gui gui, int slot, Home home, Player player) {
         gui.setItem(slot, GuiUtils.makeHomeItem(home));
         gui.addSlotAction(slot, event -> {
@@ -137,6 +149,12 @@ public class GuiUtils {
         return ItemBuilder.from(place.getItemStack())
                 .name(TextUtils.stripDecoration(place.getName()).color(NamedTextColor.YELLOW))
                 .lore(Component.text(place.getBuilder()))
+                .asGuiItem();
+    }
+
+    public static GuiItem makeWarpItem(Warp warp) {
+        return ItemBuilder.from(warp.getItemStack())
+                .name(TextUtils.stripDecoration(warp.getName()).color(NamedTextColor.YELLOW))
                 .asGuiItem();
     }
 

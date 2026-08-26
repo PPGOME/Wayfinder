@@ -127,7 +127,21 @@ public class Cache {
 
     // Warps -----------------------------------------------------------------------------------------------------------
 
+    public void addWarp(Warp warp) {
+        warps.put(warp.getName(), warp);
+    }
 
+    public Warp getWarp(String name) {
+        return warps.get(name);
+    }
+
+    public Map<String, Warp> getAllWarps() {
+        return warps;
+    }
+
+    public void removeWarp(String name) {
+        warps.remove(name);
+    }
 
     // Overworld Nether Portals ----------------------------------------------------------------------------------------
 

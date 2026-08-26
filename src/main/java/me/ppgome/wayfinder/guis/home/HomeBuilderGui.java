@@ -1,6 +1,6 @@
 package me.ppgome.wayfinder.guis.home;
 
-import dev.triumphteam.gui.builder.item.ItemBuilder;
+import dev.triumphteam.gui.builder.item.PaperItemBuilder;
 import dev.triumphteam.gui.guis.Gui;
 import dev.triumphteam.gui.guis.GuiItem;
 import me.ppgome.wayfinder.Wayfinder;
@@ -22,7 +22,7 @@ import java.util.*;
 public class HomeBuilderGui extends WGui implements AcceptsChatGui {
 
     private Component name;
-    private GuiItem guiItem = ItemBuilder.from(Material.GRAY_STAINED_GLASS_PANE)
+    private GuiItem guiItem = PaperItemBuilder.from(Material.GRAY_STAINED_GLASS_PANE)
             .name(TextUtils.stripDecoration(Component.text("Icon (click with item)")))
             .asGuiItem();
 
@@ -39,7 +39,7 @@ public class HomeBuilderGui extends WGui implements AcceptsChatGui {
     public HomeBuilderGui(Home home) {
         this.home = home;
         this.name = Component.text(home.getName());
-        this.guiItem = ItemBuilder.from(home.getItemStack()).asGuiItem();
+        this.guiItem = PaperItemBuilder.from(home.getItemStack()).asGuiItem();
     }
 
     @Override
@@ -87,7 +87,7 @@ public class HomeBuilderGui extends WGui implements AcceptsChatGui {
      *
      */
     private void setName() {
-        gui.setItem(10, ItemBuilder.from(Material.NAME_TAG)
+        gui.setItem(10, PaperItemBuilder.from(Material.NAME_TAG)
                 .name(name)
                 .asGuiItem(event -> {
                     event.setCancelled(true);
@@ -119,7 +119,7 @@ public class HomeBuilderGui extends WGui implements AcceptsChatGui {
      *
      */
     private void confirmButton() {
-        gui.setItem(14, ItemBuilder.from(Material.EMERALD)
+        gui.setItem(14, PaperItemBuilder.from(Material.EMERALD)
                 .name(TextUtils.stripDecoration("Confirm!").color(NamedTextColor.GREEN))
                 .asGuiItem(event -> {
                     event.setCancelled(true);
@@ -153,7 +153,7 @@ public class HomeBuilderGui extends WGui implements AcceptsChatGui {
      *
      */
     private void cancelButton() {
-        gui.setItem(16, ItemBuilder.from(Material.BARRIER)
+        gui.setItem(16, PaperItemBuilder.from(Material.BARRIER)
                 .name(TextUtils.stripDecoration("Cancel").color(NamedTextColor.RED))
                 .asGuiItem(event -> {
                     WGui hopBackTo;

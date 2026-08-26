@@ -1,6 +1,6 @@
 package me.ppgome.wayfinder.guis.place;
 
-import dev.triumphteam.gui.builder.item.ItemBuilder;
+import dev.triumphteam.gui.builder.item.PaperItemBuilder;
 import dev.triumphteam.gui.guis.Gui;
 import me.ppgome.wayfinder.Cache;
 import me.ppgome.wayfinder.WConfig;
@@ -61,7 +61,7 @@ public class PlaceMainGui extends WGui {
             for(int i = 0; i < categoryList.size(); i++) {
                 Category tempCat = categoryList.get(i);
                 gui.setItem(categorySlots[i],
-                        ItemBuilder.from(tempCat.getItemStack())
+                        PaperItemBuilder.from(tempCat.getItemStack())
                                 .name(TextUtils.stripDecoration(tempCat.getName()))
                                 .asGuiItem(event -> {
                                     if(event.isShiftClick()) {
@@ -85,13 +85,13 @@ public class PlaceMainGui extends WGui {
 
         if(player.hasPermission("wayfinder.admin.place")) {
             gui.setItem(isFiveRows ? 36 : 45,
-                    ItemBuilder.from(Material.COMPASS)
+                    PaperItemBuilder.from(Material.COMPASS)
                             .name(Component.text("New Place"))
                             .asGuiItem(event -> {
                                 openNext(player, config, cache, new PlaceBuilderGui());
                             }));
             gui.setItem(isFiveRows ? 44 : 53,
-                    ItemBuilder.from(Material.CHEST)
+                    PaperItemBuilder.from(Material.CHEST)
                             .name(Component.text("New Category"))
                             .asGuiItem(event -> {
                                 openNext(player, config, cache, new CategoryBuilderGui());

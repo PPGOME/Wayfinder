@@ -1,6 +1,6 @@
 package me.ppgome.wayfinder.guis;
 
-import dev.triumphteam.gui.builder.item.ItemBuilder;
+import dev.triumphteam.gui.builder.item.PaperItemBuilder;
 import dev.triumphteam.gui.components.GuiType;
 import dev.triumphteam.gui.guis.Gui;
 import me.ppgome.wayfinder.database.Home;
@@ -30,7 +30,7 @@ public class EditOrDeleteGui<T> extends WGui {
                 .type(GuiType.HOPPER)
                 .create();
 
-        gui.setItem(0, ItemBuilder.from(Material.EMERALD)
+        gui.setItem(0, PaperItemBuilder.from(Material.EMERALD)
                 .name(Component.text("Edit", NamedTextColor.GREEN))
                 .asGuiItem(event -> {
                     if(beingEdited instanceof Category category) {
@@ -42,7 +42,7 @@ public class EditOrDeleteGui<T> extends WGui {
                     }
                 }));
 
-        gui.setItem(2, ItemBuilder.from(Material.FLINT_AND_STEEL)
+        gui.setItem(2, PaperItemBuilder.from(Material.FLINT_AND_STEEL)
                 .name(Component.text("Delete", NamedTextColor.RED))
                 .asGuiItem(event -> {
                     if(beingEdited instanceof Category category) cache.removeCategory(category);
@@ -54,7 +54,7 @@ public class EditOrDeleteGui<T> extends WGui {
                     openLast();
                 }));
 
-        gui.setItem(4, ItemBuilder.from(Material.BARRIER)
+        gui.setItem(4, PaperItemBuilder.from(Material.BARRIER)
                 .name(Component.text("Cancel", NamedTextColor.YELLOW))
                 .asGuiItem(event -> openLast()));
 

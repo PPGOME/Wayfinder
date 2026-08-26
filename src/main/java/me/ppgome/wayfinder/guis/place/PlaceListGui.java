@@ -1,6 +1,6 @@
 package me.ppgome.wayfinder.guis.place;
 
-import dev.triumphteam.gui.builder.item.ItemBuilder;
+import dev.triumphteam.gui.builder.item.PaperItemBuilder;
 import dev.triumphteam.gui.guis.Gui;
 import dev.triumphteam.gui.guis.GuiItem;
 import me.ppgome.wayfinder.database.place.Category;
@@ -73,7 +73,7 @@ public class PlaceListGui extends WGui {
     //------------------------------------------------------------------------------------------------------------------
 
     private void cancelButton() {
-        gui.setItem(49, ItemBuilder.from(Material.BARRIER)
+        gui.setItem(49, PaperItemBuilder.from(Material.BARRIER)
                 .name(TextUtils.stripDecoration("Cancel").color(NamedTextColor.RED))
                 .asGuiItem(event -> this.openLast()));
     }

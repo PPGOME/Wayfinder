@@ -1,6 +1,6 @@
 package me.ppgome.wayfinder.guis.place;
 
-import dev.triumphteam.gui.builder.item.ItemBuilder;
+import dev.triumphteam.gui.builder.item.PaperItemBuilder;
 import dev.triumphteam.gui.guis.Gui;
 import me.ppgome.wayfinder.database.place.Category;
 import me.ppgome.wayfinder.guis.GuiUtils;
@@ -54,7 +54,7 @@ public class PlaceBuilderCategoryGui extends WGui {
                 slot++;
             }
             String catName = category.getName();
-            gui.setItem(slot, ItemBuilder.from(category.getItemStack())
+            gui.setItem(slot, PaperItemBuilder.from(category.getItemStack())
                     .name(Component.text(catName, categoryColour(catName))
                             .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE)).asGuiItem());
             gui.addSlotAction(slot, event -> {
@@ -85,7 +85,7 @@ public class PlaceBuilderCategoryGui extends WGui {
      *
      */
     private void confirmButton() {
-        gui.setItem(30, ItemBuilder.from(Material.EMERALD)
+        gui.setItem(30, PaperItemBuilder.from(Material.EMERALD)
                 .name(TextUtils.stripDecoration("Confirm!").color(NamedTextColor.GREEN))
                 .asGuiItem(event -> {
                     event.setCancelled(true);

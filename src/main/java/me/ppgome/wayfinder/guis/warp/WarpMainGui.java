@@ -1,6 +1,6 @@
 package me.ppgome.wayfinder.guis.place;
 
-import dev.triumphteam.gui.builder.item.ItemBuilder;
+import dev.triumphteam.gui.builder.item.PaperItemBuilder;
 import dev.triumphteam.gui.guis.Gui;
 import me.ppgome.wayfinder.Cache;
 import me.ppgome.wayfinder.WConfig;
@@ -63,7 +63,7 @@ public class WarpMainGui extends WGui {
 
         if(player.hasPermission("wayfinder.admin.warp")) {
             gui.setItem(49,
-                    ItemBuilder.from(Material.COMPASS)
+                    PaperItemBuilder.from(Material.COMPASS)
                             .name(Component.text("New Warp"))
                             .asGuiItem(event -> {
                                 openNext(player, config, cache, new PlaceBuilderGui());

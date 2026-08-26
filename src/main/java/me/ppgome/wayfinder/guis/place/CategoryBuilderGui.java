@@ -1,6 +1,6 @@
 package me.ppgome.wayfinder.guis.place;
 
-import dev.triumphteam.gui.builder.item.ItemBuilder;
+import dev.triumphteam.gui.builder.item.PaperItemBuilder;
 import dev.triumphteam.gui.guis.Gui;
 import dev.triumphteam.gui.guis.GuiItem;
 import me.ppgome.wayfinder.database.place.Category;
@@ -20,7 +20,7 @@ import java.util.UUID;
 public class CategoryBuilderGui extends WGui implements AcceptsChatGui {
 
     private Component name;
-    private GuiItem guiItem = ItemBuilder.from(Material.GRAY_STAINED_GLASS_PANE)
+    private GuiItem guiItem = PaperItemBuilder.from(Material.GRAY_STAINED_GLASS_PANE)
             .name(TextUtils.stripDecoration(Component.text("Click with item to add...")))
             .asGuiItem();
     private Category category;
@@ -33,7 +33,7 @@ public class CategoryBuilderGui extends WGui implements AcceptsChatGui {
     public CategoryBuilderGui(Category category) {
         this.name = TextUtils.parseMiniMessage(category.getName())
                 .append(Component.text(" - Can't edit!", NamedTextColor.RED));
-        this.guiItem = ItemBuilder.from(category.getItemStack()).asGuiItem();
+        this.guiItem = PaperItemBuilder.from(category.getItemStack()).asGuiItem();
         this.category = category;
     }
 
@@ -71,7 +71,7 @@ public class CategoryBuilderGui extends WGui implements AcceptsChatGui {
         /*
         Confirm button
          */
-        gui.setItem(14, ItemBuilder.from(Material.EMERALD)
+        gui.setItem(14, PaperItemBuilder.from(Material.EMERALD)
                 .name(TextUtils.stripDecoration("Confirm!").color(NamedTextColor.GREEN))
                 .asGuiItem(event -> {
                     event.setCancelled(true);
@@ -97,7 +97,7 @@ public class CategoryBuilderGui extends WGui implements AcceptsChatGui {
         /*
         Cancel button
          */
-        gui.setItem(16, ItemBuilder.from(Material.BARRIER)
+        gui.setItem(16, PaperItemBuilder.from(Material.BARRIER)
                 .name(TextUtils.stripDecoration("Cancel").color(NamedTextColor.RED))
                 .asGuiItem(event -> {
                     WGui hopBackTo;
@@ -135,7 +135,7 @@ public class CategoryBuilderGui extends WGui implements AcceptsChatGui {
     }
 
     private void setNameTag() {
-        gui.setItem(10, ItemBuilder.from(Material.NAME_TAG)
+        gui.setItem(10, PaperItemBuilder.from(Material.NAME_TAG)
                 .name(name)
                 .asGuiItem(event -> {
                     if(category == null) {

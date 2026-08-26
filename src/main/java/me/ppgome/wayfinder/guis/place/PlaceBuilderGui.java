@@ -1,6 +1,6 @@
 package me.ppgome.wayfinder.guis.place;
 
-import dev.triumphteam.gui.builder.item.ItemBuilder;
+import dev.triumphteam.gui.builder.item.PaperItemBuilder;
 import dev.triumphteam.gui.guis.Gui;
 import dev.triumphteam.gui.guis.GuiItem;
 import me.ppgome.wayfinder.Wayfinder;
@@ -25,7 +25,7 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
     private Component name;
     private Component builder;
     private Map<String, Category> categories;
-    private GuiItem guiItem = ItemBuilder.from(Material.GRAY_STAINED_GLASS_PANE)
+    private GuiItem guiItem = PaperItemBuilder.from(Material.GRAY_STAINED_GLASS_PANE)
             .name(TextUtils.stripDecoration(Component.text("Icon (click with item)")))
             .asGuiItem();
     private boolean pinned;
@@ -54,7 +54,7 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
         this.builder = Component.text(place.getBuilder());
         this.categories = new HashMap<>();
         for(Category category : place.getCategories()) this.categories.put(category.getName(), category);
-        this.guiItem = ItemBuilder.from(place.getItemStack()).asGuiItem();
+        this.guiItem = PaperItemBuilder.from(place.getItemStack()).asGuiItem();
         this.pinned = place.isPinned();
         this.expires = place.getExpires();
     }
@@ -119,7 +119,7 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
      *
      */
     private void setName() {
-        gui.setItem(10, ItemBuilder.from(Material.NAME_TAG)
+        gui.setItem(10, PaperItemBuilder.from(Material.NAME_TAG)
                 .name(name)
                 .asGuiItem(event -> {
                     if(place == null) {
@@ -138,7 +138,7 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
      *
      */
     private void setBuilders() {
-        gui.setItem(12, ItemBuilder.from(Material.PLAYER_HEAD)
+        gui.setItem(12, PaperItemBuilder.from(Material.PLAYER_HEAD)
                 .name(builder)
                 .asGuiItem(event -> {
                     event.setCancelled(true);
@@ -173,7 +173,7 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
         for(Category category : categories.values()) {
             catButtonLore.add(Component.text(category.getName()));
         }
-        gui.setItem(16, ItemBuilder.from(Material.CHEST)
+        gui.setItem(16, PaperItemBuilder.from(Material.CHEST)
                 .name(Component.text("Categories"))
                 .lore(catButtonLore)
                 .asGuiItem(event -> {
@@ -205,7 +205,7 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
         Material material = pinned ? Material.LIME_CANDLE : Material.RED_CANDLE;
         Component text = pinned ? Component.text("Will be pinned to main page", NamedTextColor.GREEN) :
                 Component.text("Won't be pinned to main page", NamedTextColor.RED);
-        return ItemBuilder.from(material)
+        return PaperItemBuilder.from(material)
                 .name(text)
                 .asGuiItem();
     }
@@ -215,7 +215,7 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
      */
     private void setExpires() {
         TextComponent text = Component.text("Expires: " + (expires == 0 ? "Never!" : TextUtils.millisecondsToReadableTime(expires)));
-        gui.setItem(30, ItemBuilder.from(Material.CLOCK)
+        gui.setItem(30, PaperItemBuilder.from(Material.CLOCK)
                 .name(text)
                 .asGuiItem(event -> {
                     if(place == null) {
@@ -234,7 +234,7 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
      *
      */
     private void confirmButton() {
-        gui.setItem(32, ItemBuilder.from(Material.EMERALD)
+        gui.setItem(32, PaperItemBuilder.from(Material.EMERALD)
                 .name(TextUtils.stripDecoration("Confirm!").color(NamedTextColor.GREEN))
                 .asGuiItem(event -> {
                     event.setCancelled(true);
@@ -300,7 +300,7 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
      *
      */
     private void cancelButton() {
-        gui.setItem(34, ItemBuilder.from(Material.BARRIER)
+        gui.setItem(34, PaperItemBuilder.from(Material.BARRIER)
                 .name(TextUtils.stripDecoration("Cancel").color(NamedTextColor.RED))
                 .asGuiItem(event -> {
                     WGui hopBackTo;

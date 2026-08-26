@@ -2,7 +2,7 @@ package me.ppgome.wayfinder.guis;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
-import dev.triumphteam.gui.builder.item.ItemBuilder;
+import dev.triumphteam.gui.builder.item.PaperItemBuilder;
 import dev.triumphteam.gui.guis.Gui;
 import dev.triumphteam.gui.guis.GuiItem;
 import me.ppgome.wayfinder.Wayfinder;
@@ -86,7 +86,7 @@ public class GuiUtils {
      */
     public static void insertGrayPanes(Gui gui, int firstSlot, int lastSlot) {
 
-        GuiItem pane = ItemBuilder.from(Material.GRAY_STAINED_GLASS_PANE).name(Component.text(" ")).asGuiItem();
+        GuiItem pane = PaperItemBuilder.from(Material.GRAY_STAINED_GLASS_PANE).name(Component.text(" ")).asGuiItem();
 
         for(int i = firstSlot; i <= lastSlot; i++) {
             if(isBorder(i)) continue;
@@ -100,13 +100,13 @@ public class GuiUtils {
     }
 
     public static void fillWhitePanes(Gui gui) {
-        gui.getFiller().fill(ItemBuilder.from(Material.WHITE_STAINED_GLASS_PANE)
+        gui.getFiller().fill(PaperItemBuilder.from(Material.WHITE_STAINED_GLASS_PANE)
                 .name(Component.text(" "))
                 .asGuiItem());
     }
 
     public static void fillWhitePanesEditor(Gui gui) {
-        gui.getFiller().fill(ItemBuilder.from(Material.WHITE_STAINED_GLASS_PANE)
+        gui.getFiller().fill(PaperItemBuilder.from(Material.WHITE_STAINED_GLASS_PANE)
                 .name(Component.text(" "))
                 .asGuiItem(event -> event.setCancelled(true)));
     }
@@ -146,20 +146,20 @@ public class GuiUtils {
     }
 
     public static GuiItem makePlaceItem(Place place) {
-        return ItemBuilder.from(place.getItemStack())
+        return PaperItemBuilder.from(place.getItemStack())
                 .name(TextUtils.stripDecoration(place.getName()).color(NamedTextColor.YELLOW))
                 .lore(Component.text(place.getBuilder()))
                 .asGuiItem();
     }
 
     public static GuiItem makeWarpItem(Warp warp) {
-        return ItemBuilder.from(warp.getItemStack())
+        return PaperItemBuilder.from(warp.getItemStack())
                 .name(TextUtils.stripDecoration(warp.getName()).color(NamedTextColor.YELLOW))
                 .asGuiItem();
     }
 
     public static GuiItem makeHomeItem(Home home) {
-        return ItemBuilder.from(home.getItemStack())
+        return PaperItemBuilder.from(home.getItemStack())
                 .name(TextUtils.stripDecoration(home.getName()).color(NamedTextColor.YELLOW))
                 .asGuiItem();
     }

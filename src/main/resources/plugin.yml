@@ -23,3 +23,7 @@ commands:
     description: "The root command for the home system"
     usage: "/place [p:[playerName]/homeName]"
     permission: wayfinder.player.home
+  warp:
+    description: "The root command for the warp system"
+    usage: "/warp [warpName]"
+    permission: wayfinder.player.warp

@@ -8,7 +8,10 @@ jobs:
   run-shared-ci:
     runs-on: docker
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+    
+      - name: Checkout shared actions
         uses: actions/checkout@v4
         with:
           repository: NerdNu/Shared-Actions

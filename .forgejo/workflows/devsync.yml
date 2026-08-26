@@ -6,7 +6,7 @@ on:
 
 jobs:
   run-shared-ci:
-    runs-on: docker
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4

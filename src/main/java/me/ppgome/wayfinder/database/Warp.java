@@ -26,6 +26,9 @@ public class Warp {
     @DatabaseField(canBeNull = false)
     private String world;
 
+    @DatabaseField(canBeNull = true)
+    private String builder;
+
     @DatabaseField(dataType = DataType.BYTE_ARRAY, canBeNull = false)
     private byte[] item;
 
@@ -35,13 +38,14 @@ public class Warp {
 
     public Warp() {}
 
-    public Warp(String name, String permission, Location location) {
+    public Warp(String name, String permission, Location location, String builder) {
         this.name = name;
         this.permission = permission;
         this.x = location.x();
         this.y = location.y();
         this.z = location.z();
         this.world = location.getWorld().getName();
+        this.builder = builder;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -62,6 +66,21 @@ public class Warp {
 
     public Location getLocation() {
         return new Location(Bukkit.getWorld(world), x, y, z);
+    }
+
+    public void setLocation(Location location) {
+        this.x = location.getX();
+        this.y = location.getY();
+        this.z = location.getZ();
+        this.world = location.getWorld().getName();
+    }
+
+    public String getBuilder() {
+        return builder;
+    }
+
+    public void setBuilder(String builder) {
+        this.builder = builder;
     }
 
     public byte[] getItem() {

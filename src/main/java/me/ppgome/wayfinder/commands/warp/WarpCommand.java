@@ -4,7 +4,7 @@ import me.ppgome.wayfinder.Cache;
 import me.ppgome.wayfinder.WConfig;
 import me.ppgome.wayfinder.Wayfinder;
 import me.ppgome.wayfinder.commands.CommandHandler;
-import me.ppgome.wayfinder.guis.place.PlaceMainGui;
+import me.ppgome.wayfinder.guis.warp.WarpMainGui;
 import org.bukkit.entity.Player;
 
 public class WarpCommand implements CommandHandler {
@@ -25,7 +25,7 @@ public class WarpCommand implements CommandHandler {
             cache.reopenGui(player);
             return true;
         }
-        new PlaceMainGui(config, cache).display(player);
+        new me.ppgome.wayfinder.guis.warp.WarpMainGui(config, cache).display(player);
         return true;
     }
 

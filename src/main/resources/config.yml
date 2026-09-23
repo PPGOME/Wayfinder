@@ -24,6 +24,12 @@ messages:
   home:
     editing:
       name: "<prefix> <green>Type what you want the name of this home to be into chat."
+  warp:
+    normal:
+    editing:
+      name: "<prefix> <green>Type what you want the name of this warp to be into chat."
+      builders: "<prefix> <green>Type the names of the builders of this warp into chat, separated by commas. Doesn't have to be player names."
+      permission: "<prefix> <green>Type the permission needed to access this warp (i.e. wayfinder.warp.player for players, wayfinder.warp.mod for moderators)."
 
 gui:
   title:
@@ -43,6 +49,12 @@ gui:
     home:
       # The home creation/editor screen.
       homeBuilder: "<green>New home"
+    warp:
+      # The main screen displayed when "/warp" is run.
+      main: "<aqua>PvE Warps"
+      # The warp creation screen.
+      builder: "<green>Warp Builder"
+
 
 place:
   enableNetherPortals: true

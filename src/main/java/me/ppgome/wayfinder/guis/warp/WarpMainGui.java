@@ -1,26 +1,21 @@
-package me.ppgome.wayfinder.guis.place;
+package me.ppgome.wayfinder.guis.warp;
 
 import dev.triumphteam.gui.builder.item.PaperItemBuilder;
 import dev.triumphteam.gui.guis.Gui;
 import me.ppgome.wayfinder.Cache;
 import me.ppgome.wayfinder.WConfig;
 import me.ppgome.wayfinder.database.Warp;
-import me.ppgome.wayfinder.database.place.Category;
-import me.ppgome.wayfinder.database.place.Place;
-import me.ppgome.wayfinder.guis.EditOrDeleteGui;
 import me.ppgome.wayfinder.guis.GuiUtils;
 import me.ppgome.wayfinder.guis.WGui;
-import me.ppgome.wayfinder.text.TextUtils;
+import me.ppgome.wayfinder.guis.place.PlaceBuilderGui;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class WarpMainGui extends WGui {
 
@@ -66,7 +61,7 @@ public class WarpMainGui extends WGui {
                     PaperItemBuilder.from(Material.COMPASS)
                             .name(Component.text("New Warp"))
                             .asGuiItem(event -> {
-                                openNext(player, config, cache, new PlaceBuilderGui());
+                                openNext(player, config, cache, new WarpBuilderGui());
                             }));
         }
 

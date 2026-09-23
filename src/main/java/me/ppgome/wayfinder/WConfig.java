@@ -28,6 +28,13 @@ public class WConfig {
     //   Editing
     public String HOME_HOME_EDITING_NAME;
 
+    // Warp
+    // Normal
+    // Editing
+    public String WARP_WARP_EDITING_NAME;
+    public String WARP_WARP_EDITING_BUILDERS;
+    public String WARP_WARP_EDITING_PERMISSION;
+
     /*
     GUI
      */
@@ -40,6 +47,10 @@ public class WConfig {
 
     // Home
     public String GUI_HOME_HOME_BUILDER;
+
+    // Warp
+    public String GUI_WARP_MAIN;
+    public String GUI_WARP_BUILDER;
 
     public WConfig(Wayfinder plugin) {
         this.plugin = plugin;
@@ -82,6 +93,15 @@ public class WConfig {
         root = "messages.home.editing.";
         HOME_HOME_EDITING_NAME = config.getString(root + "name", errorMessage);
 
+        // Warp
+        //  Normal
+
+        //  Editing
+        root = "messages.warp.edting.";
+        WARP_WARP_EDITING_NAME = config.getString(root + "name", errorMessage);
+        WARP_WARP_EDITING_BUILDERS = config.getString(root + "builders", errorMessage);
+        WARP_WARP_EDITING_PERMISSION = config.getString(root + "permission", errorMessage);
+
         /*
         GUI
          */
@@ -96,6 +116,11 @@ public class WConfig {
         // Home
         root = "gui.title.home";
         GUI_HOME_HOME_BUILDER = config.getString(root + "homeBuilder", "New home");
+
+        // Warp
+        root = "gui.title.warp";
+        GUI_WARP_MAIN = config.getString(root + "main", "Warps");
+        GUI_WARP_BUILDER = config.getString(root + "build", "Warp builder");
 
     }
 

@@ -140,7 +140,9 @@ public class Cache {
     }
 
     public void removeWarp(String name) {
+        Warp warp =  getWarp(name);
         warps.remove(name);
+        database.getWarpTable().delete(warp);
     }
 
     // Overworld Nether Portals ----------------------------------------------------------------------------------------

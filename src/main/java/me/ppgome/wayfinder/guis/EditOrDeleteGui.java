@@ -4,11 +4,13 @@ import dev.triumphteam.gui.builder.item.PaperItemBuilder;
 import dev.triumphteam.gui.components.GuiType;
 import dev.triumphteam.gui.guis.Gui;
 import me.ppgome.wayfinder.database.Home;
+import me.ppgome.wayfinder.database.Warp;
 import me.ppgome.wayfinder.database.place.Category;
 import me.ppgome.wayfinder.database.place.Place;
 import me.ppgome.wayfinder.guis.home.HomeBuilderGui;
 import me.ppgome.wayfinder.guis.place.CategoryBuilderGui;
 import me.ppgome.wayfinder.guis.place.PlaceBuilderGui;
+import me.ppgome.wayfinder.guis.warp.WarpBuilderGui;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -39,6 +41,8 @@ public class EditOrDeleteGui<T> extends WGui {
                         openNext(player, config, cache, new PlaceBuilderGui(place));
                     } else if(beingEdited instanceof Home home) {
                         openNext(player, config, cache, new HomeBuilderGui(home));
+                    } else if(beingEdited instanceof Warp warp) {
+                        openNext(player, config, cache, new WarpBuilderGui(warp));
                     }
                 }));
 
@@ -49,6 +53,7 @@ public class EditOrDeleteGui<T> extends WGui {
                     else if(beingEdited instanceof Place place) cache.removePlace(place.getName());
                     else if(beingEdited instanceof Home home) cache.getPlayerMeta(player.getUniqueId())
                             .removeHome(home.getName());
+                    else if(beingEdited instanceof Warp warp) cache.removeWarp(warp.getName());
 
                     lastGui.nullify();
                     openLast();

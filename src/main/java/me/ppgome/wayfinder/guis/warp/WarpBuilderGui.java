@@ -33,7 +33,6 @@ public class WarpBuilderGui extends WGui implements AcceptsChatGui {
     private Warp warp;
     private boolean suppressCloseEvent = false;
     FieldType fieldType;
-    CategorizedPlaceTable categorizedPlaceTable = Wayfinder.PLUGIN.getDatabase().getCategorizedPlaceTable();
     WarpTable warpTable = Wayfinder.PLUGIN.getDatabase().getWarpTable();
 
     enum FieldType {
@@ -43,6 +42,7 @@ public class WarpBuilderGui extends WGui implements AcceptsChatGui {
     public WarpBuilderGui() {
         this.name = Component.text("Click here to name...");
         this.builder = Component.text("Click here to add a builder (or more)");
+        this.permission = Component.text("Click here to add a permission (or more)");
     }
 
     public WarpBuilderGui(Warp warp) {
@@ -89,6 +89,8 @@ public class WarpBuilderGui extends WGui implements AcceptsChatGui {
             this.name = entry;
         } else if(fieldType == FieldType.BUILDERS) {
             this.builder = entry;
+        } else if(fieldType == FieldType.PERMISSION) {
+            this.permission = entry;
         }
         fieldType = null;
     }
@@ -173,7 +175,7 @@ public class WarpBuilderGui extends WGui implements AcceptsChatGui {
      *
      */
     private void confirmButton() {
-        gui.setItem(32, PaperItemBuilder.from(Material.EMERALD)
+        gui.setItem(30, PaperItemBuilder.from(Material.EMERALD)
                 .name(TextUtils.stripDecoration("Confirm!").color(NamedTextColor.GREEN))
                 .asGuiItem(event -> {
                     event.setCancelled(true);
@@ -210,7 +212,7 @@ public class WarpBuilderGui extends WGui implements AcceptsChatGui {
      *
      */
     private void cancelButton() {
-        gui.setItem(34, PaperItemBuilder.from(Material.BARRIER)
+        gui.setItem(32, PaperItemBuilder.from(Material.BARRIER)
                 .name(TextUtils.stripDecoration("Cancel").color(NamedTextColor.RED))
                 .asGuiItem(event -> {
                     WGui hopBackTo;

@@ -34,7 +34,7 @@ public class WayfinderCommand implements CommandHandler {
                 player.sendMessage(PlaceholderParser.of(config.RELOAD_SUCCESS).prefix(config.PREFIX).parse());
             }
         }
-        return false;
+        return true;
     }
 
     @Override

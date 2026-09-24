@@ -14,6 +14,7 @@ messages:
     normal:
       reachedDestination: "<green>You've reached your destination: <place>!"
       routingTo: "<green>Now routing to: <place>."
+      doesNotExist: "<red>This place doesn't exist."
     editing:
       category:
         name: "<prefix> <green>Type what you want the name of this category to be into chat."
@@ -21,15 +22,20 @@ messages:
         name: "<prefix> <green>Type what you want the name of this place to be into chat."
         builders: "<prefix> <green>Type the names of the builders of this place into chat, separated by commas. Doesn't have to be player names."
         expires: "<prefix> <green>Type the time until this place expires (i.e. 1d3h20m)."
+  # All messages for "/home"
   home:
     editing:
       name: "<prefix> <green>Type what you want the name of this home to be into chat."
+  # All messages for "/warp"
   warp:
     normal:
+      doesNotExist: "<gradient:#b554ff:#ff5555>Wooshy noises...</gradient> <color:#ff5555>That warp doesn't seem to exist.</color>"
+      arrived: "<gradient:#b554ff:#ff73e8>Wooshy noises...</gradient> <color:#87ff69>You've arrived!</color>"
     editing:
       name: "<prefix> <green>Type what you want the name of this warp to be into chat."
       builders: "<prefix> <green>Type the names of the builders of this warp into chat, separated by commas. Doesn't have to be player names."
       permission: "<prefix> <green>Type the permission needed to access this warp (i.e. wayfinder.warp.player for players, wayfinder.warp.mod for moderators)."
+  # All messages for "/wayfinder reload"
   reload:
     success: "<prefix> <green>The configuration has been reloaded successfully!"
 

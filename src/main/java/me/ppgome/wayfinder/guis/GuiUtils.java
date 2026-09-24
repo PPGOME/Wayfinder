@@ -10,6 +10,7 @@ import me.ppgome.wayfinder.database.Home;
 import me.ppgome.wayfinder.database.Warp;
 import me.ppgome.wayfinder.database.place.Place;
 import me.ppgome.wayfinder.navigation.ParticleNavigator;
+import me.ppgome.wayfinder.text.PlaceholderParser;
 import me.ppgome.wayfinder.text.TextUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -20,7 +21,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -130,6 +130,7 @@ public class GuiUtils {
                 wGui.openNext(player, wGui.config, wGui.cache, new EditOrDeleteGui<>(warp));
             } else {
                 player.teleport(warp.getLocation());
+                player.sendMessage(PlaceholderParser.of(wGui.config.WARP_WARP_SUCCESS).prefix(wGui.config.PREFIX).parse());
             }
         });
     }

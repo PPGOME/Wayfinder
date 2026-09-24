@@ -5,6 +5,7 @@ import me.ppgome.wayfinder.WConfig;
 import me.ppgome.wayfinder.Wayfinder;
 import me.ppgome.wayfinder.commands.CommandHandler;
 import me.ppgome.wayfinder.database.Warp;
+import me.ppgome.wayfinder.text.PlaceholderParser;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -26,11 +27,22 @@ public class WarpCommand implements CommandHandler {
 
     @Override
     public boolean execute(Player player, String name, String[] args) {
-        if(cache.isEditingGui(player.getUniqueId())) {
-            cache.reopenGui(player);
-            return true;
+        if(args.length == 0) {
+            if(cache.isEditingGui(player.getUniqueId())) {
+                cache.reopenGui(player);
+                return true;
+            }
+            new me.ppgome.wayfinder.guis.warp.WarpMainGui(config, cache).display(player);
+        } else {
+            String warpName = String.join(" ", args);
+            Warp warp = cache.getWarp(warpName);
+            if(warp == null) {
+                player.sendMessage(PlaceholderParser.of(config.WARP_WARP_DOESNT_EXIST).prefix(config.PREFIX).parse());
+            } else {
+                player.teleport(warp.getLocation());
+                player.sendMessage(PlaceholderParser.of(config.WARP_WARP_SUCCESS).prefix(config.PREFIX).parse());
+            }
         }
-        new me.ppgome.wayfinder.guis.warp.WarpMainGui(config, cache).display(player);
         return true;
     }
 

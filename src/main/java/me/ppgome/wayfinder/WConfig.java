@@ -30,6 +30,8 @@ public class WConfig {
 
     // Warp
     // Normal
+    public String WARP_WARP_SUCCESS;
+    public String WARP_WARP_DOESNT_EXIST;
     // Editing
     public String WARP_WARP_EDITING_NAME;
     public String WARP_WARP_EDITING_BUILDERS;
@@ -54,6 +56,11 @@ public class WConfig {
     // Warp
     public String GUI_WARP_MAIN;
     public String GUI_WARP_BUILDER;
+
+    // Place default categories
+    public boolean ENABLE_NETHER_PORTALS;
+    public boolean ENABLE_END_PORTALS;
+    public boolean ENABLE_PLAYERS;
 
     public WConfig(Wayfinder plugin) {
         this.plugin = plugin;
@@ -98,6 +105,9 @@ public class WConfig {
 
         // Warp
         //  Normal
+        root = "messages.warp.normal.";
+        WARP_WARP_SUCCESS = config.getString(root + "success", errorMessage);
+        WARP_WARP_DOESNT_EXIST = config.getString(root + "doesNotExist", errorMessage);
 
         //  Editing
         root = "messages.warp.editing.";
@@ -129,6 +139,12 @@ public class WConfig {
         root = "gui.title.warp";
         GUI_WARP_MAIN = config.getString(root + "main", "Warps");
         GUI_WARP_BUILDER = config.getString(root + "build", "Warp builder");
+
+        // Place default categories
+        root = "place.";
+        ENABLE_NETHER_PORTALS = config.getBoolean(root + "enableNetherPortals", true);
+        ENABLE_END_PORTALS = config.getBoolean(root + "enableEndPortals", true);
+        ENABLE_PLAYERS = config.getBoolean(root + "enablePlayers", true);
 
     }
 

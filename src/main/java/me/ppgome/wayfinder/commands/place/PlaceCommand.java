@@ -24,11 +24,15 @@ public class PlaceCommand implements CommandHandler {
 
     @Override
     public boolean execute(Player player, String name, String[] args) {
-        if(cache.isEditingGui(player.getUniqueId())) {
-            cache.reopenGui(player);
-            return true;
+        if(args.length == 0) {
+            if(cache.isEditingGui(player.getUniqueId())) {
+                cache.reopenGui(player);
+                return true;
+            }
+            new PlaceMainGui(config, cache).display(player);
+        } else {
+
         }
-        new PlaceMainGui(config, cache).display(player);
         return true;
     }
 

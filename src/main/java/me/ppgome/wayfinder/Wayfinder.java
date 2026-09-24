@@ -8,9 +8,13 @@ import me.ppgome.wayfinder.commands.place.PlaceCommand;
 import me.ppgome.wayfinder.commands.warp.WarpCommand;
 import me.ppgome.wayfinder.database.DatabaseHandler;
 import me.ppgome.wayfinder.database.place.Category;
+import me.ppgome.wayfinder.guis.GuiUtils;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -43,6 +47,7 @@ public final class Wayfinder extends JavaPlugin {
         initializeCommands();
         registerCommands();
         getServer().getPluginManager().registerEvents(new WListener(this, cache), this);
+        defaultCategories();
     }
 
     @Override
@@ -96,21 +101,33 @@ public final class Wayfinder extends JavaPlugin {
 
     //------------------------------------------------------------------------------------------------------------------
 
-    public void addPlaceCategory(Category category) {
+    public void defaultCategories() {
+        String name;
+        if(config.ENABLE_NETHER_PORTALS) {
+            name = "Nether Portals";
+            if(cache.getCategory(name) != null) {
+                createDefaultCategory(name);
+            }
+        }
+        if(config.ENABLE_NETHER_PORTALS) {
+            name = "End Portals";
+            if(cache.getCategory(name) != null) {
+                createDefaultCategory(name);
+            }
+        }
+        if(config.ENABLE_PLAYERS) {
+            name = "Players";
+            if(cache.getCategory(name) != null) {
+                createDefaultCategory(name);
+            }
+        }
+    }
+
+    private void createDefaultCategory(String name) {
+        ItemStack icon = GuiUtils.getCustomTextureHead("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjBiZmMyNTc3ZjZlMjZjNmM2ZjczNjVjMmM0MDc2YmNjZWU2NTMxMjQ5ODkzODJjZTkzYmNhNGZjOWUzOWIifX19", Component.text("Nether Portals"));
+        Category category = new Category(name, icon);
         database.getCategoryTable().save(category);
         cache.addCategory(category);
-    }
-
-    public void removePlaceCategory() {
-
-    }
-
-    public void addPlace() {
-
-    }
-
-    public void removePlace() {
-
     }
 
     //------------------------------------------------------------------------------------------------------------------

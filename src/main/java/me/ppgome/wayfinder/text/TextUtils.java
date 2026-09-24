@@ -56,4 +56,8 @@ public class TextUtils {
                 .format(DateTimeFormatter.ofPattern("MMM d, yyyy 'at' h:mm a")) + " UTC";
     }
 
+    public static String getBluemapId(String name) {
+        return name.replace(' ', '-').toLowerCase();
+    }
+
 }

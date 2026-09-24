@@ -9,12 +9,14 @@ import me.ppgome.wayfinder.commands.warp.WarpCommand;
 import me.ppgome.wayfinder.database.DatabaseHandler;
 import me.ppgome.wayfinder.database.place.Category;
 import me.ppgome.wayfinder.guis.GuiUtils;
+//import me.ppgome.wayfinder.hooks.BlueMapHook;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,6 +27,8 @@ public final class Wayfinder extends JavaPlugin {
     private DatabaseHandler database;
     private Cache cache;
     private WConfig config;
+
+//    BlueMapHook blueMapHook;
 
     // Commands
     private CommandRegistry commandRegistry;
@@ -48,6 +52,7 @@ public final class Wayfinder extends JavaPlugin {
         registerCommands();
         getServer().getPluginManager().registerEvents(new WListener(this, cache), this);
         defaultCategories();
+//        loadBlueMap();
     }
 
     @Override
@@ -129,6 +134,15 @@ public final class Wayfinder extends JavaPlugin {
         database.getCategoryTable().save(category);
         cache.addCategory(category);
     }
+
+    //------------------------------------------------------------------------------------------------------------------
+
+//    private void loadBlueMap() {
+//        Plugin bluemapPlugin =  getServer().getPluginManager().getPlugin("BlueMap");
+//        if(bluemapPlugin != null) {
+//            this.blueMapHook = new BlueMapHook(this);
+//        }
+//    }
 
     //------------------------------------------------------------------------------------------------------------------
 

@@ -8,7 +8,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class Warp {
 
-    @DatabaseField(canBeNull = false)
+    @DatabaseField(canBeNull = false, id = true)
     private String name;
 
     @DatabaseField

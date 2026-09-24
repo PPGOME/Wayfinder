@@ -49,7 +49,15 @@ public class EditOrDeleteGui<T> extends WGui {
         gui.setItem(2, PaperItemBuilder.from(Material.FLINT_AND_STEEL)
                 .name(Component.text("Delete", NamedTextColor.RED))
                 .asGuiItem(event -> {
-                    if(beingEdited instanceof Category category) cache.removeCategory(category);
+                    if(beingEdited instanceof Category category) {
+                        if(!category.getPlaces().isEmpty()) {
+                            player.sendMessage(
+                                    Component.text("This category is not empty. Please remove all places from it.",
+                                            NamedTextColor.RED)
+                            );
+                        }
+                        cache.removeCategory(category);
+                    }
                     else if(beingEdited instanceof Place place) cache.removePlace(place.getName());
                     else if(beingEdited instanceof Home home) cache.getPlayerMeta(player.getUniqueId())
                             .removeHome(home.getName());

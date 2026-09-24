@@ -80,7 +80,9 @@ public class Cache {
     }
 
     public void removePlace(String name) {
+        Place place = getPlace(name);
         places.remove(name);
+        database.getPlaceTable().delete(place);
     }
 
     // Place Categories ------------------------------------------------------------------------------------------------

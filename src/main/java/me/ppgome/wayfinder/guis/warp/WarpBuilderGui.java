@@ -162,10 +162,10 @@ public class WarpBuilderGui extends WGui implements AcceptsChatGui {
      */
     private void setIcon() {
         gui.setItem(16, guiItem);
-        gui.addSlotAction(14, event -> {
+        gui.addSlotAction(16, event -> {
             ItemStack clickedItem = event.getCursor();
             if(clickedItem.getType() != Material.AIR) {
-                gui.updateItem(14, clickedItem);
+                gui.updateItem(16, clickedItem);
             }
             event.setCancelled(true);
         });

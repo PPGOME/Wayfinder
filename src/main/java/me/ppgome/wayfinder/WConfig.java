@@ -97,7 +97,7 @@ public class WConfig {
         //  Normal
 
         //  Editing
-        root = "messages.warp.edting.";
+        root = "messages.warp.editing.";
         WARP_WARP_EDITING_NAME = config.getString(root + "name", errorMessage);
         WARP_WARP_EDITING_BUILDERS = config.getString(root + "builders", errorMessage);
         WARP_WARP_EDITING_PERMISSION = config.getString(root + "permission", errorMessage);

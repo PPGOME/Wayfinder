@@ -35,6 +35,9 @@ public class WConfig {
     public String WARP_WARP_EDITING_BUILDERS;
     public String WARP_WARP_EDITING_PERMISSION;
 
+    // Reload
+    public String RELOAD_SUCCESS;
+
     /*
     GUI
      */
@@ -101,6 +104,11 @@ public class WConfig {
         WARP_WARP_EDITING_NAME = config.getString(root + "name", errorMessage);
         WARP_WARP_EDITING_BUILDERS = config.getString(root + "builders", errorMessage);
         WARP_WARP_EDITING_PERMISSION = config.getString(root + "permission", errorMessage);
+
+        // Reload
+        root = "messages.reload.";
+        RELOAD_SUCCESS = config.getString(root + "success", errorMessage);
+
 
         /*
         GUI

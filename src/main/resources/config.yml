@@ -30,6 +30,8 @@ messages:
       name: "<prefix> <green>Type what you want the name of this warp to be into chat."
       builders: "<prefix> <green>Type the names of the builders of this warp into chat, separated by commas. Doesn't have to be player names."
       permission: "<prefix> <green>Type the permission needed to access this warp (i.e. wayfinder.warp.player for players, wayfinder.warp.mod for moderators)."
+  reload:
+    success: "<prefix> <green>The configuration has been reloaded successfully!"
 
 gui:
   title:

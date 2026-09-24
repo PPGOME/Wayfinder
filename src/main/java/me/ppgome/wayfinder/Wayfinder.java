@@ -2,6 +2,7 @@ package me.ppgome.wayfinder;
 
 import me.ppgome.wayfinder.commands.CommandHandler;
 import me.ppgome.wayfinder.commands.CommandRegistry;
+import me.ppgome.wayfinder.commands.generic.WayfinderCommand;
 import me.ppgome.wayfinder.commands.home.HomeCommand;
 import me.ppgome.wayfinder.commands.place.PlaceCommand;
 import me.ppgome.wayfinder.commands.warp.WarpCommand;
@@ -27,6 +28,7 @@ public final class Wayfinder extends JavaPlugin {
     private PlaceCommand placeCommand;
     private HomeCommand homeCommand;
     private WarpCommand warpCommand;
+    private WayfinderCommand wayfinderCommand;
 
     @Override
     public void onEnable() {
@@ -54,6 +56,7 @@ public final class Wayfinder extends JavaPlugin {
         placeCommand = new PlaceCommand(this);
         homeCommand = new HomeCommand(this);
         warpCommand = new WarpCommand(this);
+        wayfinderCommand = new WayfinderCommand(this);
     }
 
     private void registerCommands() {
@@ -61,6 +64,7 @@ public final class Wayfinder extends JavaPlugin {
         commandRegistry.register("place", placeCommand);
         commandRegistry.register("home", homeCommand);
         commandRegistry.register("warp", warpCommand);
+        commandRegistry.register("wayfinder", wayfinderCommand);
     }
 
     @Override

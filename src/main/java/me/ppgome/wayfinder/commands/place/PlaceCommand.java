@@ -7,6 +7,9 @@ import me.ppgome.wayfinder.commands.CommandHandler;
 import me.ppgome.wayfinder.guis.place.PlaceMainGui;
 import org.bukkit.entity.Player;
 
+import java.util.Collections;
+import java.util.List;
+
 public class PlaceCommand implements CommandHandler {
 
     Wayfinder plugin;
@@ -27,6 +30,18 @@ public class PlaceCommand implements CommandHandler {
         }
         new PlaceMainGui(config, cache).display(player);
         return true;
+    }
+
+    @Override
+    public List<String> tabComplete(Player player, String name, String[] args) {
+        if(args.length == 1) {
+            return cache.getAllWarps()
+                    .keySet()
+                    .stream()
+                    .filter(warpName -> warpName != null && warpName.contains(args[0]))
+                    .toList();
+        }
+        return Collections.emptyList();
     }
 }
 

@@ -38,7 +38,7 @@ public class Warp {
 
     public Warp() {}
 
-    public Warp(String name, String permission, Location location, String builder) {
+    public Warp(String name, String permission, Location location, String builder, ItemStack itemStack) {
         this.name = name;
         this.permission = permission;
         this.x = location.x();
@@ -46,6 +46,8 @@ public class Warp {
         this.z = location.z();
         this.world = location.getWorld().getName();
         this.builder = builder;
+        this.item = itemStack.serializeAsBytes();
+        this.itemStack = itemStack;
     }
 
     // -----------------------------------------------------------------------------------------------------------------

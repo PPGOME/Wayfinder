@@ -4,12 +4,13 @@ import me.ppgome.wayfinder.Cache;
 import me.ppgome.wayfinder.WConfig;
 import me.ppgome.wayfinder.Wayfinder;
 import me.ppgome.wayfinder.commands.CommandHandler;
-import me.ppgome.wayfinder.guis.warp.WarpMainGui;
+import me.ppgome.wayfinder.database.Warp;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 public class WarpCommand implements CommandHandler {
 
@@ -36,11 +37,21 @@ public class WarpCommand implements CommandHandler {
     @Override
     public List<String> tabComplete(Player player, String name, String[] args) {
         if(args.length == 1) {
-            return cache.getAllWarps()
-                    .keySet()
-                    .stream()
-                    .filter(warpName -> warpName != null && warpName.contains(args[0]))
-                    .toList();
+            List<String> results = new ArrayList<>();
+            String search = args[0];
+
+            for(Map.Entry<String, Warp> entry : cache.getAllWarps().entrySet()) {
+                String warpName = entry.getKey();
+
+                if(warpName != null && warpName.toLowerCase().contains(search.toLowerCase())) {
+                    Warp warp = entry.getValue();
+                    String permission = warp.getPermission();
+                    if(permission == null || permission.isEmpty() || player.hasPermission(permission)) {
+                        results.add(warpName);
+                    }
+                }
+            }
+            return results;
         }
         return Collections.emptyList();
     }

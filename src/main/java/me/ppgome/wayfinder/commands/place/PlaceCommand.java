@@ -35,10 +35,10 @@ public class PlaceCommand implements CommandHandler {
     @Override
     public List<String> tabComplete(Player player, String name, String[] args) {
         if(args.length == 1) {
-            return cache.getAllWarps()
+            return cache.getAllPlaces()
                     .keySet()
                     .stream()
-                    .filter(warpName -> warpName != null && warpName.contains(args[0]))
+                    .filter(placeName -> placeName != null && placeName.contains(args[0]))
                     .toList();
         }
         return Collections.emptyList();

@@ -13,8 +13,14 @@ permissions:
     children:
       wayfinder.admin.place:
         description: "Allows for the creation, editing, and deletion of places"
+      wayfinder.admin.reload:
+        description: "Allows the player to reload the plugin."
 
 commands:
+  wayfinder:
+    description: "The root command for generic Wayfinder utilities"
+    usage: "/wayfinder <utilName>"
+    permission: wayfinder.player
   place:
     description: "The root command for the place system"
     usage: "/place [placeName]"

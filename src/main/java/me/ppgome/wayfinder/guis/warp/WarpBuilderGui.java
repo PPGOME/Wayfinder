@@ -180,7 +180,7 @@ public class WarpBuilderGui extends WGui implements AcceptsChatGui {
                 .asGuiItem(event -> {
                     event.setCancelled(true);
                     WGui hopBackTo;
-                    ItemStack itemStack = gui.getGuiItem(14).getItemStack();
+                    ItemStack itemStack = gui.getGuiItem(16).getItemStack();
 
                     // Verify the item was changed
                     if(itemStack.getType().equals(Material.GRAY_STAINED_GLASS_PANE)) return;
@@ -195,7 +195,10 @@ public class WarpBuilderGui extends WGui implements AcceptsChatGui {
                         hopBackTo = lastGui;
                     } else {
                         Warp newWarp = new Warp(mm.serialize(name),
-                                PlainTextComponentSerializer.plainText().serialize(permission), player.getLocation(), mm.serialize(builder));
+                                PlainTextComponentSerializer.plainText().serialize(permission),
+                                player.getLocation(),
+                                mm.serialize(builder),
+                                itemStack);
                         cache.addWarp(newWarp);
                         tempWarp = newWarp;
                         hopBackTo = this;

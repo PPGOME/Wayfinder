@@ -2,7 +2,6 @@ package me.ppgome.wayfinder.database;
 
 import com.j256.ormlite.dao.Dao;
 import me.ppgome.wayfinder.Wayfinder;
-import me.ppgome.wayfinder.database.place.Place;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -17,6 +16,20 @@ public class HomeTable {
     public HomeTable(Wayfinder plugin, Dao<Home, Integer> homeDao) {
         this.plugin = plugin;
         this.homeDao = homeDao;
+    }
+
+    public CompletableFuture<List<Home>> getAllHomes() {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                return homeDao.queryForAll();
+            } catch(SQLException e) {
+                return null;
+            }
+        }).exceptionally(e -> {
+            plugin.getLogger().severe("Failed to load homes from database");
+            e.printStackTrace();
+            return null;
+        });
     }
 
     public CompletableFuture<List<Home>> getHomesByOwner(UUID ownerUuid) {

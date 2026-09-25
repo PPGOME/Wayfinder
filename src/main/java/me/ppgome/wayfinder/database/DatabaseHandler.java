@@ -100,6 +100,8 @@ public class DatabaseHandler {
         CompletableFuture<List<Category>> categoriesFuture = categoryTable.getAllCategories();
         CompletableFuture<List<Place>> placesFuture = placeTable.getAllPlaces();
         CompletableFuture<List<CategorizedPlace>> categorizedPlacesFuture = categorizedPlaceTable.getAllCategories();
+        CompletableFuture<List<Home>>  homesFuture = homeTable.getAllHomes();
+        CompletableFuture<List<Warp>> warpsFuture = warpTable.getAllWarps();
 
         CompletableFuture.allOf(categoriesFuture, placesFuture, categoriesFuture).thenRun(() -> {
 
@@ -109,6 +111,8 @@ public class DatabaseHandler {
                 List<Category> categories = categoriesFuture.get();
                 List<Place> places = placesFuture.get();
                 List<CategorizedPlace> categorizedPlaces = categorizedPlacesFuture.get();
+                List<Home> homes = homesFuture.get();
+                List<Warp> warps = warpsFuture.get();
 
                 for(Category category : categories) {
                     category.loadItem();
@@ -134,6 +138,11 @@ public class DatabaseHandler {
 
                     placeGainingCategory.addCategory(categoryBeingApplied);
                     categoryBeingApplied.addPlace(placeGainingCategory);
+                }
+
+                for(Warp warp : warps) {
+                    warp.loadItem();
+                    cache.addWarp(warp);
                 }
 
             } catch (Exception e) {

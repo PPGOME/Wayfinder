@@ -4,6 +4,7 @@ import com.j256.ormlite.dao.Dao;
 import me.ppgome.wayfinder.Wayfinder;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class WarpTable {
@@ -14,6 +15,20 @@ public class WarpTable {
     public WarpTable(Wayfinder plugin, Dao<Warp, String> warpDao) {
         this.plugin = plugin;
         this.warpDao = warpDao;
+    }
+
+    public CompletableFuture<List<Warp>> getAllWarps() {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                return warpDao.queryForAll();
+            } catch(SQLException e) {
+                return null;
+            }
+        }).exceptionally(e -> {
+            plugin.getLogger().severe("Failed to load warps from database");
+            e.printStackTrace();
+            return null;
+        });
     }
 
     public void delete(Warp warp) {

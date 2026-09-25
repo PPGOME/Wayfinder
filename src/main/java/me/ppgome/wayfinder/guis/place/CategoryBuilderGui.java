@@ -92,7 +92,7 @@ public class CategoryBuilderGui extends WGui implements AcceptsChatGui {
                     if(itemStack.getType().equals(Material.GRAY_STAINED_GLASS_PANE)) return;
                     String stringifiedName = PlainTextComponentSerializer.plainText().serialize(name);
                     Category checkCat = cache.getCategory(stringifiedName);
-                    if(checkCat != null) {
+                    if(checkCat != null && (category == null || checkCat != category)) {
                         player.sendMessage(PlaceholderParser.of(config.PLACE_CATEGORY_ALREADY_EXISTS).prefix(config.PREFIX).parse());
                         return;
                     }

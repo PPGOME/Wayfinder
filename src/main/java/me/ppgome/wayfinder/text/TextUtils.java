@@ -11,6 +11,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 public class TextUtils {
 
@@ -62,9 +63,9 @@ public class TextUtils {
     }
 
     public static Component locationToComponent(Location location) {
-        return Component.text("x: " + location.getX(), NamedTextColor.RED)
-                .append(Component.text("y: " + location.getY(), NamedTextColor.GREEN))
-                .append(Component.text("z: " + location.getZ(), NamedTextColor.YELLOW));
+        return Component.text("x: " + String.format(Locale.ROOT, "%.2f", location.getX()), NamedTextColor.RED)
+                .append(Component.text(" y: " + String.format(Locale.ROOT, "%.2f", location.getY()), NamedTextColor.GREEN))
+                .append(Component.text(" z: " + String.format(Locale.ROOT, "%.2f", location.getZ()), NamedTextColor.YELLOW));
     }
 
 }

@@ -133,6 +133,8 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
                                     .append(TextUtils.locationToComponent(editingLocation)))
                     .asGuiItem(event -> {
                         editingLocation = player.getLocation();
+                        setLocation();
+                        gui.update();
                         event.setCancelled(true);
                     }));
         }

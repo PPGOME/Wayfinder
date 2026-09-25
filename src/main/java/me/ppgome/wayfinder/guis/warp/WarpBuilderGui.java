@@ -48,6 +48,7 @@ public class WarpBuilderGui extends WGui implements AcceptsChatGui {
     public WarpBuilderGui(Warp warp) {
         this.warp = warp;
         this.name = Component.text(warp.getName());
+        this.permission = Component.text(warp.getPermission());
         this.builder = Component.text(warp.getBuilder());
         this.guiItem = PaperItemBuilder.from(warp.getItemStack()).asGuiItem();
     }

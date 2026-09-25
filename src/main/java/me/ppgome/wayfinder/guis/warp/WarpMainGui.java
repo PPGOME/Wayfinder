@@ -49,11 +49,13 @@ public class WarpMainGui extends WGui {
         int slot = 10;
 
         for(Warp warp : warps) {
-            while(GuiUtils.isBorder(slot)) {
+            if(player.hasPermission(warp.getPermission())) {
+                while(GuiUtils.isBorder(slot)) {
+                    slot++;
+                }
+                GuiUtils.addWarpItem(this, gui, slot, warp, player);
                 slot++;
             }
-            GuiUtils.addWarpItem(this, gui, slot, warp, player);
-            slot++;
         }
 
         if(player.hasPermission("wayfinder.admin.warp")) {

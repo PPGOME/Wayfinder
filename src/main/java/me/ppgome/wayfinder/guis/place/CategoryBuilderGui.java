@@ -192,7 +192,7 @@ public class CategoryBuilderGui extends WGui implements AcceptsChatGui {
     }
 
     private void setBlueMapIcon() {
-        gui.setItem(14, PaperItemBuilder.from(Material.GOLD_INGOT)
+        gui.setItem(16, PaperItemBuilder.from(Material.GOLD_INGOT)
                 .name(TextUtils.stripDecoration("BlueMap Icon").color(NamedTextColor.GREEN))
                 .lore(Component.text("Must be a direct image URL."))
                 .asGuiItem(event -> {

@@ -4,7 +4,10 @@ import me.ppgome.wayfinder.Cache;
 import me.ppgome.wayfinder.WConfig;
 import me.ppgome.wayfinder.Wayfinder;
 import me.ppgome.wayfinder.commands.CommandHandler;
+import me.ppgome.wayfinder.database.place.Place;
 import me.ppgome.wayfinder.guis.place.PlaceMainGui;
+import me.ppgome.wayfinder.navigation.ParticleNavigator;
+import me.ppgome.wayfinder.text.PlaceholderParser;
 import org.bukkit.entity.Player;
 
 import java.util.Collections;
@@ -31,7 +34,18 @@ public class PlaceCommand implements CommandHandler {
             }
             new PlaceMainGui(config, cache).display(player);
         } else {
-
+            String placeName = String.join(" ", args);
+            Place place = cache.getPlace(placeName);
+            if(place != null) {
+                if(!cache.isRouting(player.getUniqueId())) {
+                    new ParticleNavigator(Wayfinder.PLUGIN, player, place.getLocation(), place.getName()).startDisplaying();
+                    player.sendMessage(PlaceholderParser.of(config.PLACE_ROUTING_TO).place(place.getName()).parse());
+                } else {
+                    player.sendMessage(PlaceholderParser.of(config.PLACE_ALREADY_ROUTING).place(place.getName()).parse());
+                }
+            } else {
+                player.sendMessage(PlaceholderParser.of(config.PLACE_DOES_NOT_EXIST).place(placeName).parse());
+            }
         }
         return true;
     }

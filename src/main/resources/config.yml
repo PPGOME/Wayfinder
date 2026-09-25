@@ -13,15 +13,20 @@ messages:
   place:
     normal:
       reachedDestination: "<green>You've reached your destination: <place>!"
-      routingTo: "<green>Now routing to: <place>."
+      routingTo: "<green>Now routing to: <yellow><place></yellow>."
+      alreadyRouting: "<red>You're already routing somewhere! Cancel the current route before starting a new one."
       doesNotExist: "<red>This place doesn't exist."
     editing:
       category:
         name: "<prefix> <green>Type what you want the name of this category to be into chat."
+        priority: "<prefix> <green>Type what you want the priority of this category to be into chat."
+        icon: "<prefix> <green>Type the direct image URL of the icon you wish to use for this category.<newline><red>NOTE! Use small images."
+        alreadyExists: "<prefix> <red>A category with this name already exists."
       place:
         name: "<prefix> <green>Type what you want the name of this place to be into chat."
         builders: "<prefix> <green>Type the names of the builders of this place into chat, separated by commas. Doesn't have to be player names."
         expires: "<prefix> <green>Type the time until this place expires (i.e. 1d3h20m)."
+        alreadyExists: "<prefix> <red>A place with this name already exists."
   # All messages for "/home"
   home:
     editing:
@@ -35,6 +40,7 @@ messages:
       name: "<prefix> <green>Type what you want the name of this warp to be into chat."
       builders: "<prefix> <green>Type the names of the builders of this warp into chat, separated by commas. Doesn't have to be player names."
       permission: "<prefix> <green>Type the permission needed to access this warp (i.e. wayfinder.warp.player for players, wayfinder.warp.mod for moderators)."
+      alreadyExists: "<prefix> <red>A warp with this name already exists."
   # All messages for "/wayfinder reload"
   reload:
     success: "<prefix> <green>The configuration has been reloaded successfully!"

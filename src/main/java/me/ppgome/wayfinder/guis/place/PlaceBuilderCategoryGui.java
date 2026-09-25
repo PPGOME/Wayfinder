@@ -14,6 +14,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.List;
 import java.util.Map;
 
 public class PlaceBuilderCategoryGui extends WGui {
@@ -40,6 +41,8 @@ public class PlaceBuilderCategoryGui extends WGui {
         confirmButton();
 
         GuiUtils.fillWhitePanes(gui);
+
+        GuiUtils.defaultCancel(gui);
 
         return gui;
     }
@@ -69,6 +72,7 @@ public class PlaceBuilderCategoryGui extends WGui {
                 item.editMeta(itemMeta -> {
                     Component metaName = itemMeta.displayName();
                     itemMeta.displayName(metaName.color(categoryColour(PlainTextComponentSerializer.plainText().serialize(metaName))));
+                    itemMeta.lore(List.of(Component.text("Priority: " + category.getPriority())));
                 });
 
                 gui.updateItem(event.getSlot(), item);

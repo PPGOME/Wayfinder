@@ -186,6 +186,12 @@ public class WarpBuilderGui extends WGui implements AcceptsChatGui {
                     // Verify the item was changed
                     if(itemStack.getType().equals(Material.GRAY_STAINED_GLASS_PANE)) return;
 
+                    Warp checkWarp = cache.getWarp(mm.serialize(name));
+                    if(checkWarp != null) {
+                        player.sendMessage(PlaceholderParser.of(config.WARP_WARP_ALREADY_EXISTS).prefix(config.PREFIX).parse());
+                        return;
+                    }
+
                     Warp tempWarp;
 
                     if(warp != null) {

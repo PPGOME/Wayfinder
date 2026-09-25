@@ -117,8 +117,14 @@ public class GuiUtils {
             if(event.isShiftClick()) {
                 wGui.openNext(player, wGui.config, wGui.cache, new EditOrDeleteGui<>(place));
             } else {
-                new ParticleNavigator(Wayfinder.PLUGIN, player, place.getLocation(), place.getName()).startDisplaying();
-                wGui.gui.close(player);
+                if(!wGui.cache.isRouting(player.getUniqueId())) {
+                    new ParticleNavigator(Wayfinder.PLUGIN, player, place.getLocation(), place.getName()).startDisplaying();
+                    player.sendMessage(PlaceholderParser.of(wGui.config.PLACE_ROUTING_TO).place(place.getName()).parse());
+                    wGui.gui.close(player);
+                } else {
+                    player.sendMessage(PlaceholderParser.of(wGui.config.PLACE_ALREADY_ROUTING).place(place.getName()).parse());
+                    wGui.gui.close(player);
+                }
             }
         });
     }
@@ -147,10 +153,12 @@ public class GuiUtils {
     }
 
     public static GuiItem makePlaceItem(Place place) {
-        return PaperItemBuilder.from(place.getItemStack())
-                .name(TextUtils.stripDecoration(place.getName()).color(NamedTextColor.YELLOW))
-                .lore(Component.text(place.getBuilder()))
-                .asGuiItem();
+        PaperItemBuilder paperItemBuilder = PaperItemBuilder.from(place.getItemStack())
+                .name(TextUtils.stripDecoration(place.getName()).color(NamedTextColor.YELLOW));
+        if(place.getBuilder() != null) {
+            paperItemBuilder.lore(Component.text(place.getBuilder()));
+        }
+        return paperItemBuilder.asGuiItem();
     }
 
     public static GuiItem makeWarpItem(Warp warp) {

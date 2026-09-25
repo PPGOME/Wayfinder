@@ -14,13 +14,20 @@ public class WConfig {
     // Place
     //   Normal
     public String PLACE_REACHED_DESTINATION;
+    public String PLACE_ROUTING_TO;
+    public String PLACE_ALREADY_ROUTING;
+    public String PLACE_DOES_NOT_EXIST;
 
     //   Editing
     public String PLACE_CATEGORY_EDITING_NAME;
+    public String PLACE_CATEGORY_EDITING_PRIORITY;
+    public String PLACE_CATEGORY_EDITING_ICON;
+    public String PLACE_CATEGORY_ALREADY_EXISTS;
 
     public String PLACE_PLACE_EDITING_NAME;
     public String PLACE_PLACE_EDITING_BUILDERS;
     public String PLACE_PLACE_EDITING_EXPIRES;
+    public String PLACE_PLACE_ALREADY_EXISTS;
 
     // Home
     //   Normal
@@ -31,11 +38,12 @@ public class WConfig {
     // Warp
     // Normal
     public String WARP_WARP_SUCCESS;
-    public String WARP_WARP_DOESNT_EXIST;
+    public String WARP_WARP_DOES_NOT_EXIST;
     // Editing
     public String WARP_WARP_EDITING_NAME;
     public String WARP_WARP_EDITING_BUILDERS;
     public String WARP_WARP_EDITING_PERMISSION;
+    public String WARP_WARP_ALREADY_EXISTS;
 
     // Reload
     public String RELOAD_SUCCESS;
@@ -84,17 +92,24 @@ public class WConfig {
         //  Normal
         String root = "messages.place.normal.";
         PLACE_REACHED_DESTINATION = config.getString(root + "reachedDestination", errorMessage);
+        PLACE_ROUTING_TO = config.getString(root + "routingTo", errorMessage);
+        PLACE_ALREADY_ROUTING = config.getString(root + "alreadyRouting", errorMessage);
+        PLACE_DOES_NOT_EXIST = config.getString(root + "doesNotExist", errorMessage);
 
         //  Editing
         // -- category
         root = "messages.place.editing.category.";
         PLACE_CATEGORY_EDITING_NAME = config.getString(root + "name", errorMessage);
+        PLACE_CATEGORY_EDITING_PRIORITY = config.getString(root + "priority", errorMessage);
+        PLACE_CATEGORY_EDITING_ICON = config.getString(root + "icon", errorMessage);
+        PLACE_CATEGORY_ALREADY_EXISTS = config.getString(root + "alreadyExists", errorMessage);
 
         // -- place
         root = "messages.place.editing.place.";
         PLACE_PLACE_EDITING_NAME = config.getString(root + "name", errorMessage);
         PLACE_PLACE_EDITING_BUILDERS = config.getString(root + "builders", errorMessage);
         PLACE_PLACE_EDITING_EXPIRES = config.getString(root + "expires", errorMessage);
+        PLACE_PLACE_ALREADY_EXISTS = config.getString(root + "alreadyExists", errorMessage);
 
         // Home
         //  Normal
@@ -107,13 +122,14 @@ public class WConfig {
         //  Normal
         root = "messages.warp.normal.";
         WARP_WARP_SUCCESS = config.getString(root + "success", errorMessage);
-        WARP_WARP_DOESNT_EXIST = config.getString(root + "doesNotExist", errorMessage);
+        WARP_WARP_DOES_NOT_EXIST = config.getString(root + "doesNotExist", errorMessage);
 
         //  Editing
         root = "messages.warp.editing.";
         WARP_WARP_EDITING_NAME = config.getString(root + "name", errorMessage);
         WARP_WARP_EDITING_BUILDERS = config.getString(root + "builders", errorMessage);
         WARP_WARP_EDITING_PERMISSION = config.getString(root + "permission", errorMessage);
+        WARP_WARP_ALREADY_EXISTS = config.getString(root + "alreadyExists", errorMessage);
 
         // Reload
         root = "messages.reload.";

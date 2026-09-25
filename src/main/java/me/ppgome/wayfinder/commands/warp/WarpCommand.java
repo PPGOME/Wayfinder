@@ -37,7 +37,7 @@ public class WarpCommand implements CommandHandler {
             String warpName = String.join(" ", args);
             Warp warp = cache.getWarp(warpName);
             if(warp == null || !player.hasPermission(warp.getPermission())) {
-                player.sendMessage(PlaceholderParser.of(config.WARP_WARP_DOESNT_EXIST).prefix(config.PREFIX).parse());
+                player.sendMessage(PlaceholderParser.of(config.WARP_WARP_DOES_NOT_EXIST).prefix(config.PREFIX).parse());
             } else {
                 player.teleport(warp.getLocation());
                 player.sendMessage(PlaceholderParser.of(config.WARP_WARP_SUCCESS).prefix(config.PREFIX).parse());

@@ -12,7 +12,10 @@ import java.util.Set;
 
 public class Place {
 
-    @DatabaseField(canBeNull = false, id = true)
+    @DatabaseField(generatedId = true)
+    private int id;
+
+    @DatabaseField(canBeNull = false)
     private String name;
 
     @DatabaseField(canBeNull = false)

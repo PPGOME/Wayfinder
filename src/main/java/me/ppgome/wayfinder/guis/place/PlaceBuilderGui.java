@@ -14,6 +14,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -24,6 +25,8 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
 
     private Component name;
     private Component builder;
+    private Component defaultBuilder = Component.text("Click here to add a builder (or more)");
+    private Location editingLocation;
     private Map<String, Category> categories;
     private GuiItem guiItem = PaperItemBuilder.from(Material.GRAY_STAINED_GLASS_PANE)
             .name(TextUtils.stripDecoration(Component.text("Icon (click with item)")))
@@ -42,7 +45,7 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
 
     public PlaceBuilderGui() {
         this.name = Component.text("Click here to name...");
-        this.builder = Component.text("Click here to add a builder (or more)");
+        this.builder = defaultBuilder;
         this.categories = new HashMap<>();
         this.pinned = false;
         this.expires = 0;
@@ -51,7 +54,12 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
     public PlaceBuilderGui(Place place) {
         this.place = place;
         this.name = Component.text(place.getName());
-        this.builder = Component.text(place.getBuilder());
+        String tempBuilder = place.getBuilder();
+        if(tempBuilder != null) {
+            this.builder = Component.text(place.getBuilder());
+        } else {
+            this.builder = Component.text("Click here to add a builder (or more)");
+        }
         this.categories = new HashMap<>();
         for(Category category : place.getCategories()) this.categories.put(category.getName(), category);
         this.guiItem = PaperItemBuilder.from(place.getItemStack()).asGuiItem();
@@ -70,6 +78,7 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
 
         gui = Gui.gui().title(title).rows(5).create();
 
+        setLocation();
         setName();
         setBuilders();
         setIcon();
@@ -115,6 +124,17 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
         gui.update();
     }
 
+    private void setLocation() {
+        if(place != null) {
+            gui.setItem(4, PaperItemBuilder.from(Material.COMPASS)
+                            .name(TextUtils.stripDecoration(Component.text("Update to current location")))
+                    .asGuiItem(event -> {
+                        editingLocation = player.getLocation();
+                        event.setCancelled(true);
+                    }));
+        }
+    }
+
     /**
      *
      */
@@ -122,14 +142,12 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
         gui.setItem(10, PaperItemBuilder.from(Material.NAME_TAG)
                 .name(name)
                 .asGuiItem(event -> {
-                    if(place == null) {
-                        UUID uuid = player.getUniqueId();
-                        cache.addEditingGui(uuid, this);
-                        cache.addAwaitingChat(uuid);
-                        gui.close(player);
-                        fieldType = FieldType.NAME;
-                        player.sendMessage(PlaceholderParser.of(config.PLACE_PLACE_EDITING_NAME).prefix(config.PREFIX).parse());
-                    }
+                    UUID uuid = player.getUniqueId();
+                    cache.addEditingGui(uuid, this);
+                    cache.addAwaitingChat(uuid);
+                    gui.close(player);
+                    fieldType = FieldType.NAME;
+                    player.sendMessage(PlaceholderParser.of(config.PLACE_PLACE_EDITING_NAME).prefix(config.PREFIX).parse());
                     event.setCancelled(true);
                 }));
     }
@@ -244,20 +262,26 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
                     // Verify the item was changed and that the place was assigned at least one category
                     if(itemStack.getType().equals(Material.GRAY_STAINED_GLASS_PANE) || categories.isEmpty()) return;
 
+                    Place checkPlace = cache.getPlace(mm.serialize(name));
+                    if(checkPlace != null) {
+                        player.sendMessage(PlaceholderParser.of(config.PLACE_PLACE_ALREADY_EXISTS).prefix(config.PREFIX).parse());
+                        return;
+                    }
+
                     Place tempPlace;
 
                     if(place != null) {
                         place.setItemStack(itemStack);
-                        place.setLocation(player.getLocation());
-                        place.setBuilder(mm.serialize(builder));
+                        place.setLocation(editingLocation);
+                        if(builder != null) place.setBuilder(mm.serialize(builder));
                         place.setPinned(pinned);
                         place.setCategories(categories);
                         reorganizeCategories(place, new HashSet<>(categories.values()));
                         tempPlace = place;
                         hopBackTo = lastGui;
                     } else {
-                        Place newPlace = new Place(mm.serialize(name), player.getLocation(), mm.serialize(builder),
-                                itemStack, pinned, categories);
+                        Place newPlace = new Place(mm.serialize(name), player.getLocation(),
+                                builder.equals(defaultBuilder) ? null : mm.serialize(builder), itemStack, pinned, categories);
                         cache.addPlace(newPlace);
                         for(Category category : categories.values()) {
                             category.addPlace(newPlace);

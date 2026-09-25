@@ -130,7 +130,7 @@ public final class Wayfinder extends JavaPlugin {
 
     private void createDefaultCategory(String name) {
         ItemStack icon = GuiUtils.getCustomTextureHead("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjBiZmMyNTc3ZjZlMjZjNmM2ZjczNjVjMmM0MDc2YmNjZWU2NTMxMjQ5ODkzODJjZTkzYmNhNGZjOWUzOWIifX19", Component.text("Nether Portals"));
-        Category category = new Category(name, icon);
+        Category category = new Category(name, 50, icon);
         database.getCategoryTable().save(category);
         cache.addCategory(category);
     }

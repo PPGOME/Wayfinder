@@ -9,11 +9,17 @@ import java.util.Set;
 
 public class Category {
 
-    @DatabaseField(id = true, canBeNull = false)
+    @DatabaseField(generatedId = true)
+    private int id;
+
+    @DatabaseField(canBeNull = false)
     private String name;
 
     @DatabaseField
     private String bluemapIcon;
+
+    @DatabaseField(canBeNull = false)
+    private int priority;
 
     @DatabaseField(dataType = DataType.BYTE_ARRAY)
     private byte[] item;
@@ -31,16 +37,18 @@ public class Category {
         places = new HashSet<>();
     }
 
-    public Category(String name, ItemStack itemStack) {
+    public Category(String name, int priority, ItemStack itemStack) {
         this();
         this.name = name;
+        this.priority = priority;
         this.item = itemStack.serializeAsBytes();
         this.itemStack = itemStack;
     }
 
-    public Category(String name, String bluemapIcon, ItemStack itemStack) {
+    public Category(String name, int priority, String bluemapIcon, ItemStack itemStack) {
         this();
         this.name = name;
+        this.priority = priority;
         this.bluemapIcon = bluemapIcon;
         this.item = itemStack.serializeAsBytes();
         this.itemStack = itemStack;
@@ -62,6 +70,11 @@ public class Category {
     public void setName(String name) {
         this.name = name;
     }
+
+    public int getPriority() {
+        return priority;
+    }
+    public void setPriority(int priority) {}
 
     public String getBluemapIcon() {
         return bluemapIcon;

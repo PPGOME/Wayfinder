@@ -5,6 +5,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.bukkit.Location;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -58,6 +59,12 @@ public class TextUtils {
 
     public static String getBluemapId(String name) {
         return name.replace(' ', '-').toLowerCase();
+    }
+
+    public static Component locationToComponent(Location location) {
+        return Component.text("x: " + location.getX(), NamedTextColor.RED)
+                .append(Component.text("y: " + location.getY(), NamedTextColor.GREEN))
+                .append(Component.text("z: " + location.getZ(), NamedTextColor.YELLOW));
     }
 
 }

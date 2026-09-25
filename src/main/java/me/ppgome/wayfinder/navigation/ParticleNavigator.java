@@ -86,8 +86,6 @@ public class ParticleNavigator {
     }
 
     public void cancelTask() {
-        //TODO REMOVE!
-        System.out.println("Cancelled task");
         this.player.hideBossBar(infoBar);
         this.infoBar = null;
         this.repeatingTask.cancel();

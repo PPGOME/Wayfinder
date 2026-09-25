@@ -60,6 +60,7 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
         } else {
             this.builder = Component.text("Click here to add a builder (or more)");
         }
+        editingLocation = place.getLocation();
         this.categories = new HashMap<>();
         for(Category category : place.getCategories()) this.categories.put(category.getName(), category);
         this.guiItem = PaperItemBuilder.from(place.getItemStack()).asGuiItem();
@@ -128,6 +129,8 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
         if(place != null) {
             gui.setItem(4, PaperItemBuilder.from(Material.COMPASS)
                             .name(TextUtils.stripDecoration(Component.text("Update to current location")))
+                            .lore(TextUtils.stripDecoration(Component.text("Current location: ", NamedTextColor.WHITE))
+                                    .append(TextUtils.locationToComponent(editingLocation)))
                     .asGuiItem(event -> {
                         editingLocation = player.getLocation();
                         event.setCancelled(true);
@@ -263,14 +266,15 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
                     if(itemStack.getType().equals(Material.GRAY_STAINED_GLASS_PANE) || categories.isEmpty()) return;
 
                     Place checkPlace = cache.getPlace(mm.serialize(name));
-                    if(checkPlace != null) {
-                        player.sendMessage(PlaceholderParser.of(config.PLACE_PLACE_ALREADY_EXISTS).prefix(config.PREFIX).parse());
-                        return;
+                    if(checkPlace != null && (place == null || checkPlace != place)) {
+                            player.sendMessage(PlaceholderParser.of(config.PLACE_PLACE_ALREADY_EXISTS).prefix(config.PREFIX).parse());
+                            return;
                     }
 
                     Place tempPlace;
 
                     if(place != null) {
+                        place.setName(mm.serialize(name));
                         place.setItemStack(itemStack);
                         place.setLocation(editingLocation);
                         if(builder != null) place.setBuilder(mm.serialize(builder));

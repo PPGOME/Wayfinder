@@ -187,12 +187,12 @@ public class CategoryBuilderGui extends WGui implements AcceptsChatGui {
                     cache.addAwaitingChat(uuid);
                     fieldType = FieldType.PRIORITY;
                     gui.close(player);
-
+                    player.sendMessage(PlaceholderParser.of(config.PLACE_CATEGORY_EDITING_PRIORITY).prefix(config.PREFIX).parse());
                 }));
     }
 
     private void setBlueMapIcon() {
-        gui.setItem(16, PaperItemBuilder.from(Material.GOLD_INGOT)
+        gui.setItem(16, PaperItemBuilder.from(Material.FILLED_MAP)
                 .name(TextUtils.stripDecoration("BlueMap Icon").color(NamedTextColor.GREEN))
                 .lore(Component.text("Must be a direct image URL."))
                 .asGuiItem(event -> {
@@ -201,7 +201,7 @@ public class CategoryBuilderGui extends WGui implements AcceptsChatGui {
                     cache.addAwaitingChat(uuid);
                     fieldType = FieldType.ICON;
                     gui.close(player);
-
+                    player.sendMessage(PlaceholderParser.of(config.PLACE_CATEGORY_EDITING_ICON).prefix(config.PREFIX).parse());
                 }));
     }
 

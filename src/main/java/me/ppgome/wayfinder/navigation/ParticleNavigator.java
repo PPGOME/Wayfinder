@@ -64,6 +64,7 @@ public class ParticleNavigator {
                     player.sendMessage(PlaceholderParser.of(plugin.getConfiguration().PLACE_REACHED_DESTINATION).place(locationName).parse());
                     player.hideBossBar(infoBar);
                     infoBar = null;
+                    plugin.getCache().removeRouting(player.getUniqueId());
                     cancel();
                     return;
                 }

@@ -62,7 +62,7 @@ public class ParticleNavigator {
 
                 if(playerLocation.distance(endLocation) < 5) {
                     player.sendMessage(PlaceholderParser.of(plugin.getConfiguration().PLACE_REACHED_DESTINATION).place(locationName).parse());
-                    cancelTask();
+                    plugin.getCache().removeRouting(player.getUniqueId());
                     return;
                 }
 
@@ -90,7 +90,6 @@ public class ParticleNavigator {
         System.out.println("Cancelled task");
         this.player.hideBossBar(infoBar);
         this.infoBar = null;
-        plugin.getCache().removeRouting(player.getUniqueId());
         this.repeatingTask.cancel();
     }
 

@@ -59,7 +59,9 @@ public class PlaceBuilderCategoryGui extends WGui {
             String catName = category.getName();
             gui.setItem(slot, PaperItemBuilder.from(category.getItemStack())
                     .name(Component.text(catName, categoryColour(catName))
-                            .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE)).asGuiItem());
+                            .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE))
+                            .lore(List.of(Component.text("Priority: " + category.getPriority())))
+                    .asGuiItem());
             gui.addSlotAction(slot, event -> {
                 event.setCancelled(true);
                 if(selectedCategories.containsKey(catName)) {
@@ -72,7 +74,6 @@ public class PlaceBuilderCategoryGui extends WGui {
                 item.editMeta(itemMeta -> {
                     Component metaName = itemMeta.displayName();
                     itemMeta.displayName(metaName.color(categoryColour(PlainTextComponentSerializer.plainText().serialize(metaName))));
-                    itemMeta.lore(List.of(Component.text("Priority: " + category.getPriority())));
                 });
 
                 gui.updateItem(event.getSlot(), item);

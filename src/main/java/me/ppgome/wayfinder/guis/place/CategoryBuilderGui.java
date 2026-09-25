@@ -16,6 +16,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.List;
 import java.util.UUID;
 
 public class CategoryBuilderGui extends WGui implements AcceptsChatGui {
@@ -178,9 +179,8 @@ public class CategoryBuilderGui extends WGui implements AcceptsChatGui {
     private void setPriority() {
         gui.setItem(14, PaperItemBuilder.from(Material.GOLD_INGOT)
                 .name(TextUtils.stripDecoration("Priority").color(NamedTextColor.GREEN))
-                .lore(Component.text("When BlueMap chooses which icon to display for")
-                        .appendNewline()
-                        .append(Component.text("a place, higher priority always wins.")))
+                .lore(List.of(Component.text("When BlueMap chooses which icon to display for"),
+                        Component.text("a place, higher priority always wins.")))
                 .asGuiItem(event -> {
                     UUID uuid = player.getUniqueId();
                     cache.addEditingGui(uuid, this);

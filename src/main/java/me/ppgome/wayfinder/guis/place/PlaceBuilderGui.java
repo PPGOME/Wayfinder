@@ -299,6 +299,7 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
                     }
                     placeTable.save(tempPlace);
                     if(tempPlace.isPinned()) cache.addPinnedPlace(tempPlace);
+                    if(!tempPlace.isPinned() && cache.getPinnedPlace(tempPlace.getName()) != null) cache.removePinnedPlace(tempPlace.getName());
                     suppressCloseEvent = true;
                     hopBackTo.getLast().nullify();
                     hopBackTo.openLast();

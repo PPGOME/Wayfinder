@@ -75,7 +75,8 @@ public class ParticleNavigator {
                 }
                 infoBar.progress(progress);
 
-                Vector direction = endLocation.clone().subtract(playerLocation).toVector().normalize();
+                Location startLocation = playerLocation.clone().add(0, 0.5, 0);
+                Vector direction = endLocation.clone().subtract(startLocation).toVector().normalize();
                 Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(78, 235, 255), 0.75f);
                 for (double i = 0; i < 10; i += 0.5) {
                     Location point = playerLocation.clone().add(direction.clone().multiply(i));

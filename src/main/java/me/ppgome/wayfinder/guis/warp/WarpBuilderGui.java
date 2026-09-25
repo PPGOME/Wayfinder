@@ -16,6 +16,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -27,6 +28,7 @@ public class WarpBuilderGui extends WGui implements AcceptsChatGui {
     private Component name;
     private Component builder;
     private Component permission;
+    private Location editingLocation;
     private GuiItem guiItem = PaperItemBuilder.from(Material.GRAY_STAINED_GLASS_PANE)
             .name(TextUtils.stripDecoration(Component.text("Icon (click with item)")))
             .asGuiItem();
@@ -50,6 +52,7 @@ public class WarpBuilderGui extends WGui implements AcceptsChatGui {
         this.name = Component.text(warp.getName());
         this.permission = Component.text(warp.getPermission());
         this.builder = Component.text(warp.getBuilder());
+        this.editingLocation = warp.getLocation();
         this.guiItem = PaperItemBuilder.from(warp.getItemStack()).asGuiItem();
     }
 
@@ -68,6 +71,7 @@ public class WarpBuilderGui extends WGui implements AcceptsChatGui {
         setPermission();
         setBuilders();
         setIcon();
+        setLocation();
         confirmButton();
         cancelButton();
 
@@ -102,7 +106,23 @@ public class WarpBuilderGui extends WGui implements AcceptsChatGui {
         setPermission();
         setBuilders();
         setIcon();
+        setLocation();
         gui.update();
+    }
+
+    private void setLocation() {
+        if(warp != null) {
+            gui.setItem(29, PaperItemBuilder.from(Material.COMPASS)
+                    .name(TextUtils.stripDecoration(Component.text("Update to current location")))
+                    .lore(TextUtils.stripDecoration(Component.text("Current location: ", NamedTextColor.WHITE))
+                            .append(TextUtils.locationToComponent(editingLocation)))
+                    .asGuiItem(event -> {
+                        editingLocation = player.getLocation();
+                        setLocation();
+                        gui.update();
+                        event.setCancelled(true);
+                    }));
+        }
     }
 
     /**
@@ -176,7 +196,7 @@ public class WarpBuilderGui extends WGui implements AcceptsChatGui {
      *
      */
     private void confirmButton() {
-        gui.setItem(30, PaperItemBuilder.from(Material.EMERALD)
+        gui.setItem(warp != null ? 31 : 30, PaperItemBuilder.from(Material.EMERALD)
                 .name(TextUtils.stripDecoration("Confirm!").color(NamedTextColor.GREEN))
                 .asGuiItem(event -> {
                     event.setCancelled(true);
@@ -187,7 +207,7 @@ public class WarpBuilderGui extends WGui implements AcceptsChatGui {
                     if(itemStack.getType().equals(Material.GRAY_STAINED_GLASS_PANE)) return;
 
                     Warp checkWarp = cache.getWarp(mm.serialize(name));
-                    if(checkWarp != null) {
+                    if(checkWarp != null && (warp == null || checkWarp != warp)) {
                         player.sendMessage(PlaceholderParser.of(config.WARP_WARP_ALREADY_EXISTS).prefix(config.PREFIX).parse());
                         return;
                     }
@@ -196,7 +216,7 @@ public class WarpBuilderGui extends WGui implements AcceptsChatGui {
 
                     if(warp != null) {
                         warp.setItemStack(itemStack);
-                        warp.setLocation(player.getLocation());
+                        warp.setLocation(editingLocation);
                         warp.setBuilder(mm.serialize(builder));
                         tempWarp = warp;
                         hopBackTo = lastGui;
@@ -222,7 +242,7 @@ public class WarpBuilderGui extends WGui implements AcceptsChatGui {
      *
      */
     private void cancelButton() {
-        gui.setItem(32, PaperItemBuilder.from(Material.BARRIER)
+        gui.setItem(warp != null ? 32 : 33, PaperItemBuilder.from(Material.BARRIER)
                 .name(TextUtils.stripDecoration("Cancel").color(NamedTextColor.RED))
                 .asGuiItem(event -> {
                     WGui hopBackTo;

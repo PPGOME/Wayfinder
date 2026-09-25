@@ -49,8 +49,6 @@ public class WarpMainGui extends WGui {
         int slot = 10;
 
         for(Warp warp : warps) {
-            //TODO REMOVE
-            System.out.println("Warp: " + warp.getName() + " | Perm: " + warp.getPermission());
             if(player.hasPermission(warp.getPermission())) {
                 while(GuiUtils.isBorder(slot)) {
                     slot++;
@@ -64,9 +62,7 @@ public class WarpMainGui extends WGui {
             gui.setItem(49,
                     PaperItemBuilder.from(Material.COMPASS)
                             .name(Component.text("New Warp"))
-                            .asGuiItem(event -> {
-                                openNext(player, config, cache, new WarpBuilderGui());
-                            }));
+                            .asGuiItem(event -> openNext(player, config, cache, new WarpBuilderGui())));
         }
 
         return gui;

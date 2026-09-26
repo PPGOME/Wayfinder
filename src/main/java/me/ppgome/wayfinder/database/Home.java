@@ -31,6 +31,12 @@ public class Home {
     @DatabaseField(canBeNull = false)
     private String world;
 
+    @DatabaseField(canBeNull = false)
+    private float pitch;
+
+    @DatabaseField(canBeNull = false)
+    private float yaw;
+
     @DatabaseField(dataType = DataType.BYTE_ARRAY, canBeNull = false)
     private byte[] item;
 
@@ -49,6 +55,8 @@ public class Home {
         this.y = location.y();
         this.z = location.z();
         this.world = location.getWorld().getName();
+        this.pitch = location.getPitch();
+        this.yaw = location.getYaw();
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -69,7 +77,7 @@ public class Home {
     }
 
     public Location getLocation() {
-        return new Location(Bukkit.getWorld(world), x, y, z);
+        return new Location(Bukkit.getWorld(world), x, y, z, pitch, yaw);
     }
 
     public byte[] getItem() {

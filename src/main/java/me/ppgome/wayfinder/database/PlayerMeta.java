@@ -31,6 +31,12 @@ public class PlayerMeta {
     private String world;
 
     @DatabaseField
+    private float pitch;
+
+    @DatabaseField
+    private float yaw;
+
+    @DatabaseField
     private boolean wasMoved;
 
     private HashMap<String, Home> homes;
@@ -85,7 +91,7 @@ public class PlayerMeta {
      * @return Last known Location of the player.
      */
     public Location getLastLocation() {
-        return new Location(Bukkit.getWorld(world), x, y, z);
+        return new Location(Bukkit.getWorld(world), x, y, z, pitch, yaw);
     }
 
     /**
@@ -97,6 +103,8 @@ public class PlayerMeta {
         this.y = location.y();
         this.z = location.z();
         this.world = location.getWorld().getName();
+        this.pitch = location.getPitch();
+        this.yaw = location.getYaw();
     }
 
     /**

@@ -28,6 +28,7 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
     private Component defaultBuilder = Component.text("Click here to add a builder (or more)");
     private Location editingLocation;
     private Map<String, Category> categories;
+    private NetherPortalLink netherPortalLink;
     private GuiItem guiItem = PaperItemBuilder.from(Material.GRAY_STAINED_GLASS_PANE)
             .name(TextUtils.stripDecoration(Component.text("Icon (click with item)")))
             .asGuiItem();
@@ -38,6 +39,7 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
     FieldType fieldType;
     CategorizedPlaceTable categorizedPlaceTable = Wayfinder.PLUGIN.getDatabase().getCategorizedPlaceTable();
     PlaceTable placeTable = Wayfinder.PLUGIN.getDatabase().getPlaceTable();
+    NetherPortalLinkTable netherPortalLinkTable =  Wayfinder.PLUGIN.getDatabase().getNetherPortalLinkTable();
 
     enum FieldType {
         NAME, BUILDERS, EXPIRES
@@ -58,7 +60,7 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
         if(tempBuilder != null) {
             this.builder = Component.text(place.getBuilder());
         } else {
-            this.builder = Component.text("Click here to add a builder (or more)");
+            this.builder = null;
         }
         editingLocation = place.getLocation();
         this.categories = new HashMap<>();
@@ -66,6 +68,7 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
         this.guiItem = PaperItemBuilder.from(place.getItemStack()).asGuiItem();
         this.pinned = place.isPinned();
         this.expires = place.getExpires();
+        this.netherPortalLink = place.getNetherPortalLink();
     }
 
     @Override
@@ -86,6 +89,7 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
         setCategories();
         setPinned();
         setExpires();
+        setNetherPortalLink();
         confirmButton();
         cancelButton();
 
@@ -122,6 +126,7 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
         setCategories();
         setPinned();
         setExpires();
+        setNetherPortalLink();
         gui.update();
     }
 
@@ -162,7 +167,7 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
      */
     private void setBuilders() {
         gui.setItem(12, PaperItemBuilder.from(Material.PLAYER_HEAD)
-                .name(builder)
+                .name(builder != null ? builder : defaultBuilder)
                 .asGuiItem(event -> {
                     event.setCancelled(true);
                     UUID uuid = player.getUniqueId();
@@ -208,6 +213,12 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
     protected void updateCategories(Map<String, Category> categoryMap) {
         this.categories = categoryMap;
         setCategories();
+        if(categories.get("Nether Portals") != null && netherPortalLink == null) {
+            netherPortalLink = new NetherPortalLink();
+        } else if(netherPortalLink != null) {
+            netherPortalLink = null;
+        }
+        setNetherPortalLink();
     }
 
     /**
@@ -256,6 +267,29 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
     /**
      *
      */
+    private void setNetherPortalLink() {
+        if(netherPortalLink != null) {
+            gui.setItem(40, PaperItemBuilder.from(Material.RECOVERY_COMPASS)
+                    .name(TextUtils.stripDecoration("Nether Portal Pair"))
+                    .lore(List.of(
+                            Component.text("Click to set the location of this"),
+                            Component.text("Nether portal on the nether side."),
+                            Component.text("You can close this menu and re-open"),
+                            Component.text("it once in position."),
+                            TextUtils.stripDecoration(Component.text("Current location: ", NamedTextColor.WHITE))
+                                    .append(netherPortalLink.getPartnerLocation() != null
+                                            ? TextUtils.locationToComponent(netherPortalLink.getPartnerLocation())
+                                            : Component.text("Location unset"))
+                    ))
+                    .asGuiItem(event -> {
+                        netherPortalLink.setPartnerLocation(player.getLocation());
+                    }));
+        }
+    }
+
+    /**
+     *
+     */
     private void confirmButton() {
         gui.setItem(32, PaperItemBuilder.from(Material.EMERALD)
                 .name(TextUtils.stripDecoration("Confirm!").color(NamedTextColor.GREEN))
@@ -276,13 +310,15 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
                     Place tempPlace;
 
                     if(place != null) {
+                        String oldName = place.getName();
+                        Set<Category> oldCategories = new HashSet<>(place.getCategories());
                         place.setName(mm.serialize(name));
                         place.setItemStack(itemStack);
                         place.setLocation(editingLocation);
                         if(builder != null) place.setBuilder(mm.serialize(builder));
                         place.setPinned(pinned);
                         place.setCategories(categories);
-                        reorganizeCategories(place, new HashSet<>(categories.values()));
+                        reorganizeCategories(place, oldName, oldCategories, new HashSet<>(categories.values()));
                         tempPlace = place;
                         hopBackTo = lastGui;
                     } else {
@@ -298,6 +334,14 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
                         hopBackTo = this;
                     }
                     placeTable.save(tempPlace);
+                    if(netherPortalLink != null) {
+                        netherPortalLink.setPlaceName(tempPlace.getName());
+                        netherPortalLinkTable.save(netherPortalLink);
+                        tempPlace.setNetherPortalLink(netherPortalLink);
+                    } else {
+                        netherPortalLinkTable.delete(new NetherPortalLink(tempPlace.getName()));
+                        tempPlace.setNetherPortalLink(null);
+                    }
                     if(tempPlace.isPinned()) cache.addPinnedPlace(tempPlace);
                     if(!tempPlace.isPinned() && cache.getPinnedPlace(tempPlace.getName()) != null) cache.removePinnedPlace(tempPlace.getName());
                     suppressCloseEvent = true;
@@ -311,18 +355,28 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
      *
      */
 
-    private void reorganizeCategories(Place oldPlace, Set<Category> newCategories) {
-        Set<Category> oldCategories = oldPlace.getCategories();
+    /**
+     * Sync category changes for an edited place, both in the database (categorized_place table)
+     * and in-memory (each Category's Set<Place>), using the correct old/new place name.
+     *
+     * @param place the place being edited (already has its NEW name/categories set on it)
+     * @param oldPlaceName the place's name BEFORE this edit (used to clear old DB rows)
+     * @param oldCategories the place's categories BEFORE this edit (snapshot taken before setCategories() ran)
+     * @param newCategories the place's categories AFTER this edit
+     */
+    private void reorganizeCategories(Place place, String oldPlaceName, Set<Category> oldCategories, Set<Category> newCategories) {
         Set<Category> removed = new HashSet<>(oldCategories);
         removed.removeAll(newCategories);
         Set<Category> added = new HashSet<>(newCategories);
         added.removeAll(oldCategories);
 
         for(Category category : removed) {
-            categorizedPlaceTable.delete(place.getName(), category.getName());
+            category.removePlace(place);
+            categorizedPlaceTable.delete(oldPlaceName, category.getName());
         }
 
         for(Category category : added) {
+            category.addPlace(place);
             categorizedPlaceTable.save(new CategorizedPlace(category.getName(), place.getName()));
         }
     }

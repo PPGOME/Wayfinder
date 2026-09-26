@@ -1,7 +1,10 @@
 package me.ppgome.wayfinder.navigation;
 
+import me.ppgome.wayfinder.Cache;
 import me.ppgome.wayfinder.WConfig;
 import me.ppgome.wayfinder.Wayfinder;
+import me.ppgome.wayfinder.database.place.Category;
+import me.ppgome.wayfinder.database.place.Place;
 import me.ppgome.wayfinder.text.PlaceholderParser;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.sound.Sound;
@@ -17,6 +20,8 @@ import org.bukkit.util.Vector;
 public class ParticleNavigator {
 
     private Wayfinder plugin;
+    private Cache cache;
+    private WConfig config;
     private Player player;
     private Location endLocation;
     private String locationName;
@@ -27,6 +32,8 @@ public class ParticleNavigator {
 
     public ParticleNavigator(Wayfinder plugin, Player player, Location endLocation, String locationName) {
         this.plugin = plugin;
+        this.cache = plugin.getCache();
+        this.config = plugin.getConfiguration();
         this.player = player;
         this.endLocation = endLocation;
         this.locationName = locationName;
@@ -39,7 +46,7 @@ public class ParticleNavigator {
     // TODO: Figure out end and nether portal math
 
     public void startDisplaying() {
-        plugin.getCache().addRouting(player.getUniqueId(), this);
+        cache.addRouting(player.getUniqueId(), this);
         float originalDistance = (float) player.getLocation().distance(endLocation);
         infoBar = BossBar.bossBar(
                 Component.text("Routing to: ", NamedTextColor.YELLOW)
@@ -61,8 +68,8 @@ public class ParticleNavigator {
                 playerLocation = player.getLocation().clone();
 
                 if(playerLocation.distance(endLocation) < 5) {
-                    player.sendMessage(PlaceholderParser.of(plugin.getConfiguration().PLACE_REACHED_DESTINATION).place(locationName).parse());
-                    plugin.getCache().removeRouting(player.getUniqueId());
+                    player.sendMessage(PlaceholderParser.of(config.PLACE_REACHED_DESTINATION).place(locationName).parse());
+                    cache.removeRouting(player.getUniqueId());
                     return;
                 }
 
@@ -75,7 +82,7 @@ public class ParticleNavigator {
                 }
                 infoBar.progress(progress);
 
-                Location startLocation = playerLocation.clone().add(0, 0.5, 0);
+                Location startLocation = playerLocation.clone().add(0, 1, 0);
                 Vector direction = endLocation.clone().subtract(startLocation).toVector().normalize();
                 Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(78, 235, 255), 0.75f);
                 for (double i = 0; i < 10; i += 0.5) {
@@ -84,6 +91,20 @@ public class ParticleNavigator {
                 }
             }
         }.runTaskTimer(plugin, 0, 10);
+    }
+
+    private Place findNearestNetherPortal(Location location) {
+        if(config.ENABLE_NETHER_PORTALS) {
+            Category category = cache.getCategory("Nether Portals");
+            if(category == null || category.getPlaces().isEmpty()) return null;
+            Place nearestPortal;
+            double nearestDistance;
+            for(Place place : category.getPlaces()) {
+                Location placeLocation = place.getLocation();
+                nearestDistance = placeLocation.distance(location);
+            }
+        }
+        return null;
     }
 
     public void cancelTask() {

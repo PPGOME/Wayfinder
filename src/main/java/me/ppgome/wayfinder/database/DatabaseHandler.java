@@ -33,6 +33,7 @@ public class DatabaseHandler {
     private Dao<Warp, String> warpDao;
     private Dao<Waypoint, Integer> waypointDao;
     private Dao<Place, String> placeDao;
+    private Dao<NetherPortalLink, String> netherPortalLinkDao;
     private Dao<Category, String> categoryDao;
     private Dao<CategorizedPlace, Integer> categorizedPlaceDao;
 
@@ -42,6 +43,7 @@ public class DatabaseHandler {
     private WarpTable warpTable;
     private WaypointTable waypointTable;
     private PlaceTable placeTable;
+    private NetherPortalLinkTable netherPortalLinkTable;
     private CategoryTable categoryTable;
     private CategorizedPlaceTable categorizedPlaceTable;
 
@@ -65,6 +67,7 @@ public class DatabaseHandler {
             warpDao = DaoManager.createDao(connectionSource, Warp.class);
             waypointDao = DaoManager.createDao(connectionSource, Waypoint.class);
             placeDao = DaoManager.createDao(connectionSource, Place.class);
+            netherPortalLinkDao = DaoManager.createDao(connectionSource, NetherPortalLink.class);
             categoryDao = DaoManager.createDao(connectionSource, Category.class);
             categorizedPlaceDao = DaoManager.createDao(connectionSource, CategorizedPlace.class);
 
@@ -75,6 +78,7 @@ public class DatabaseHandler {
             warpTable = new WarpTable(plugin, warpDao);
             waypointTable = new WaypointTable(plugin, waypointDao);
             placeTable = new PlaceTable(plugin, placeDao);
+            netherPortalLinkTable = new NetherPortalLinkTable(plugin, netherPortalLinkDao);
             categoryTable = new CategoryTable(plugin, categoryDao);
             categorizedPlaceTable = new CategorizedPlaceTable(plugin, categorizedPlaceDao);
 
@@ -85,11 +89,13 @@ public class DatabaseHandler {
             TableUtils.createTableIfNotExists(connectionSource, Warp.class);
             TableUtils.createTableIfNotExists(connectionSource, Waypoint.class);
             TableUtils.createTableIfNotExists(connectionSource, Place.class);
+            TableUtils.createTableIfNotExists(connectionSource, NetherPortalLink.class);
             TableUtils.createTableIfNotExists(connectionSource, Category.class);
             TableUtils.createTableIfNotExists(connectionSource, CategorizedPlace.class);
 
         } catch(SQLException e) {
-            // TODO: Error
+            plugin.getLogger().severe("Failed to set up database: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -100,17 +106,18 @@ public class DatabaseHandler {
         CompletableFuture<List<Category>> categoriesFuture = categoryTable.getAllCategories();
         CompletableFuture<List<Place>> placesFuture = placeTable.getAllPlaces();
         CompletableFuture<List<CategorizedPlace>> categorizedPlacesFuture = categorizedPlaceTable.getAllCategories();
+        CompletableFuture<List<NetherPortalLink>> netherPortalLinksFuture = netherPortalLinkTable.getAllNetherPortalLinks();
         CompletableFuture<List<Home>>  homesFuture = homeTable.getAllHomes();
         CompletableFuture<List<Warp>> warpsFuture = warpTable.getAllWarps();
 
-        CompletableFuture.allOf(categoriesFuture, placesFuture, categoriesFuture).thenRun(() -> {
-
-            PlayerMeta playerMeta;
+        CompletableFuture.allOf(categoriesFuture, placesFuture, categorizedPlacesFuture,
+                netherPortalLinksFuture, homesFuture, warpsFuture).thenRun(() -> {
 
             try {
                 List<Category> categories = categoriesFuture.get();
                 List<Place> places = placesFuture.get();
                 List<CategorizedPlace> categorizedPlaces = categorizedPlacesFuture.get();
+                List<NetherPortalLink> netherPortalLinks = netherPortalLinksFuture.get();
                 List<Home> homes = homesFuture.get();
                 List<Warp> warps = warpsFuture.get();
 
@@ -129,12 +136,26 @@ public class DatabaseHandler {
                     } catch(Exception e) {}
                 }
 
+                if(!netherPortalLinks.isEmpty()) {
+                    for(NetherPortalLink netherPortalLink : netherPortalLinks) {
+                        Place findPlace = cache.getPlace(netherPortalLink.getPlaceName());
+                        if(findPlace != null) findPlace.setNetherPortalLink(netherPortalLink);
+                    }
+                }
+
                 Place placeGainingCategory;
                 Category categoryBeingApplied;
 
                 for(CategorizedPlace categorizedPlace : categorizedPlaces) {
                     placeGainingCategory = cache.getPlace(categorizedPlace.getPlace());
                     categoryBeingApplied = cache.getCategory(categorizedPlace.getCategory());
+
+                    if(placeGainingCategory == null || categoryBeingApplied == null) {
+                        plugin.getLogger().warning("Skipping orphaned CategorizedPlace row (place='"
+                                + categorizedPlace.getPlace() + "', category='" + categorizedPlace.getCategory()
+                                + "') - referenced place or category no longer exists.");
+                        continue;
+                    }
 
                     placeGainingCategory.addCategory(categoryBeingApplied);
                     categoryBeingApplied.addPlace(placeGainingCategory);
@@ -181,6 +202,10 @@ public class DatabaseHandler {
 
     public PlaceTable getPlaceTable() {
         return placeTable;
+    }
+
+    public  NetherPortalLinkTable getNetherPortalLinkTable() {
+        return netherPortalLinkTable;
     }
 
     public CategoryTable getCategoryTable() {

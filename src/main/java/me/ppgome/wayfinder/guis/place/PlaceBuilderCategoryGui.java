@@ -90,7 +90,7 @@ public class PlaceBuilderCategoryGui extends WGui {
      *
      */
     private void confirmButton() {
-        gui.setItem(30, PaperItemBuilder.from(Material.EMERALD)
+        gui.setItem(31, PaperItemBuilder.from(Material.EMERALD)
                 .name(TextUtils.stripDecoration("Confirm!").color(NamedTextColor.GREEN))
                 .asGuiItem(event -> {
                     event.setCancelled(true);

@@ -116,7 +116,7 @@ public final class Wayfinder extends JavaPlugin {
                 createDefaultCategory(name, headValue);
             }
         }
-        if(config.ENABLE_NETHER_PORTALS) {
+        if(config.ENABLE_END_PORTALS) {
             name = "End Portals";
             headValue = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjVkZjU1NTkyNjQzMGQ1ZDc1YWRlZDIxZGQ5NjE5Yjc2YzViN2NhMmM3ZjU0MDE0NDA1MjNkNTNhOGJjZmFhYiJ9fX0=";
             if(cache.getCategory(name) == null) {

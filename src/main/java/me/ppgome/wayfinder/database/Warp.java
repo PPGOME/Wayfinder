@@ -27,6 +27,12 @@ public class Warp {
     private double z;
 
     @DatabaseField(canBeNull = false)
+    private float pitch;
+
+    @DatabaseField(canBeNull = false)
+    private float yaw;
+
+    @DatabaseField(canBeNull = false)
     private String world;
 
     @DatabaseField(canBeNull = true)
@@ -47,6 +53,8 @@ public class Warp {
         this.x = location.x();
         this.y = location.y();
         this.z = location.z();
+        this.pitch = location.getPitch();
+        this.yaw = location.getYaw();
         this.world = location.getWorld().getName();
         this.builder = builder;
         this.item = itemStack.serializeAsBytes();
@@ -70,7 +78,7 @@ public class Warp {
     }
 
     public Location getLocation() {
-        return new Location(Bukkit.getWorld(world), x, y, z);
+        return new Location(Bukkit.getWorld(world), x, y, z, pitch, yaw);
     }
 
     public void setLocation(Location location) {
@@ -78,6 +86,8 @@ public class Warp {
         this.y = location.getY();
         this.z = location.getZ();
         this.world = location.getWorld().getName();
+        this.pitch = location.getPitch();
+        this.yaw = location.getYaw();
     }
 
     public String getBuilder() {

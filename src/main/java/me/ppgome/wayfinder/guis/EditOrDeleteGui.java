@@ -58,7 +58,10 @@ public class EditOrDeleteGui<T> extends WGui {
                         }
                         cache.removeCategory(category);
                     }
-                    else if(beingEdited instanceof Place place) cache.removePlace(place.getName());
+                    else if(beingEdited instanceof Place place) {
+                        cache.removePlace(place.getName());
+                        if(cache.getPinnedPlace(place.getName()) != null) cache.removePinnedPlace(place.getName());
+                    }
                     else if(beingEdited instanceof Home home) cache.getPlayerMeta(player.getUniqueId())
                             .removeHome(home.getName());
                     else if(beingEdited instanceof Warp warp) cache.removeWarp(warp.getName());

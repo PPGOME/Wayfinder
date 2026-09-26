@@ -30,7 +30,7 @@ public class Place {
     @DatabaseField(canBeNull = false)
     private String world;
 
-    @DatabaseField(canBeNull = true)
+    @DatabaseField
     private String builder;
 
     @DatabaseField(dataType = DataType.BYTE_ARRAY)
@@ -43,6 +43,8 @@ public class Place {
 
     @DatabaseField
     private long expires;
+
+    private transient NetherPortalLink netherPortalLink;
 
     private Set<Category> categories;
 
@@ -147,5 +149,17 @@ public class Place {
 
     public void addCategory(Category category) {
         this.categories.add(category);
+    }
+
+    public NetherPortalLink getNetherPortalLink() {
+        return netherPortalLink;
+    }
+
+    public void setNetherPortalLink(NetherPortalLink netherPortalLink) {
+        this.netherPortalLink = netherPortalLink;
+    }
+
+    public boolean isNetherPortal() {
+        return netherPortalLink != null;
     }
 }

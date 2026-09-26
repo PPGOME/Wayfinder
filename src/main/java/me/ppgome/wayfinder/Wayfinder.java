@@ -108,28 +108,32 @@ public final class Wayfinder extends JavaPlugin {
 
     public void defaultCategories() {
         String name;
+        String headValue;
         if(config.ENABLE_NETHER_PORTALS) {
             name = "Nether Portals";
-            if(cache.getCategory(name) != null) {
-                createDefaultCategory(name);
+            headValue = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjBiZmMyNTc3ZjZlMjZjNmM2ZjczNjVjMmM0MDc2YmNjZWU2NTMxMjQ5ODkzODJjZTkzYmNhNGZjOWUzOWIifX19";
+            if(cache.getCategory(name) == null) {
+                createDefaultCategory(name, headValue);
             }
         }
         if(config.ENABLE_NETHER_PORTALS) {
             name = "End Portals";
-            if(cache.getCategory(name) != null) {
-                createDefaultCategory(name);
+            headValue = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjVkZjU1NTkyNjQzMGQ1ZDc1YWRlZDIxZGQ5NjE5Yjc2YzViN2NhMmM3ZjU0MDE0NDA1MjNkNTNhOGJjZmFhYiJ9fX0=";
+            if(cache.getCategory(name) == null) {
+                createDefaultCategory(name, headValue);
             }
         }
         if(config.ENABLE_PLAYERS) {
             name = "Players";
-            if(cache.getCategory(name) != null) {
-                createDefaultCategory(name);
+            headValue = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTlmNGQ4YjlkZjJmOGMzZjBhYTNlNDAwOTFmNzhmZTc3OTc4Y2FkY2IwMGFjMmY0OWU4ZTIxNWI4NTIwMzZlNSJ9fX0=";
+            if(cache.getCategory(name) == null) {
+                createDefaultCategory(name, headValue);
             }
         }
     }
 
-    private void createDefaultCategory(String name) {
-        ItemStack icon = GuiUtils.getCustomTextureHead("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjBiZmMyNTc3ZjZlMjZjNmM2ZjczNjVjMmM0MDc2YmNjZWU2NTMxMjQ5ODkzODJjZTkzYmNhNGZjOWUzOWIifX19", Component.text("Nether Portals"));
+    private void createDefaultCategory(String name, String headValue) {
+        ItemStack icon = GuiUtils.getCustomTextureHead(headValue, Component.text("Nether Portals"));
         Category category = new Category(name, 50, icon);
         database.getCategoryTable().save(category);
         cache.addCategory(category);

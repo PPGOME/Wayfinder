@@ -181,10 +181,11 @@ public class GuiUtils {
         ItemStack head = new ItemStack(Material.PLAYER_HEAD, 1);
         head.editMeta(SkullMeta.class, skullMeta -> {
             UUID uuid = UUID.nameUUIDFromBytes(value.getBytes(StandardCharsets.UTF_8));
+            int endIndex = Math.min(PlainTextComponentSerializer.plainText().serialize(name).length(), 16);
             PlayerProfile profile = Bukkit.createProfile(uuid, PlainTextComponentSerializer
                     .plainText()
                     .serialize(name)
-                    .substring(0, 16)
+                    .substring(0, endIndex)
                     .replace(' ', 'e'));
             profile.setProperty(new ProfileProperty("textures", value));
             skullMeta.setPlayerProfile(profile);

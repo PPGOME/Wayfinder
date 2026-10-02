@@ -37,11 +37,3 @@ commands:
     description: "Teleports you to your last known location"
     usage: "/back"
     permission: wayfinder.back
-  tp:
-    description: "Teleports you to a player"
-    usage: "/back"
-    permission: wayfinder.tp
-  tphere:
-    description: "Teleports a player to you"
-    usage: "/back"
-    permission: wayfinder.tphere

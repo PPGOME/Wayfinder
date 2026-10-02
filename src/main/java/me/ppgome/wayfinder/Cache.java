@@ -56,6 +56,7 @@ public class Cache {
         this.editingGui = new HashMap<>();
         this.awaitingChat = new HashSet<>();
         this.routing = new HashMap<>();
+        this.back = new HashMap<>();
     }
 
     // Places ----------------------------------------------------------------------------------------------------------

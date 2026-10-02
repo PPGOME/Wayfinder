@@ -8,12 +8,14 @@ import me.ppgome.wayfinder.database.PlayerMetaTable;
 import me.ppgome.wayfinder.guis.WGui;
 import me.ppgome.wayfinder.guis.AcceptsChatGui;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 import java.util.UUID;
 
@@ -105,9 +107,15 @@ public class WListener implements Listener {
 
     @EventHandler
     public void onPlayerSwapHandItems(PlayerSwapHandItemsEvent event) {
-        System.out.println("A");
         UUID uuid = event.getPlayer().getUniqueId();
         if(cache.isRouting(uuid)) cache.removeRouting(uuid);
+    }
+
+    @EventHandler
+    public void onPlayerTeleport(PlayerTeleportEvent event) {
+        Player player = event.getPlayer();
+        Location location = event.getFrom();
+        cache.addBack(player.getUniqueId(), location);
     }
 
 }

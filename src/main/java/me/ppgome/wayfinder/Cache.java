@@ -9,6 +9,7 @@ import me.ppgome.wayfinder.database.place.Place;
 import me.ppgome.wayfinder.guis.WGui;
 import me.ppgome.wayfinder.navigation.ParticleNavigator;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -35,6 +36,8 @@ public class Cache {
     private HashMap<UUID, WGui> editingGui;
     private Set<UUID> awaitingChat;
     private HashMap<UUID, ParticleNavigator> routing;
+
+    private HashMap<UUID, Location> back;
 
     //------------------------------------------------------------------------------------------------------------------
 
@@ -222,6 +225,24 @@ public class Cache {
     public void removeRouting(UUID uuid) {
         routing.get(uuid).cancelTask();
         routing.remove(uuid);
+    }
+
+    // Back -------------------------------------------=----------------------------------------------------------------
+
+    public void addBack(UUID uuid, Location location) {
+        back.put(uuid, location);
+    }
+
+    public Location getBack(UUID uuid) {
+        return back.get(uuid);
+    }
+
+    public boolean isBack(UUID uuid) {
+        return back.containsKey(uuid);
+    }
+
+    public void removeBack(UUID uuid) {
+        back.remove(uuid);
     }
 
 }

@@ -6,6 +6,7 @@ import me.ppgome.wayfinder.commands.generic.WayfinderCommand;
 import me.ppgome.wayfinder.commands.home.HomeCommand;
 import me.ppgome.wayfinder.commands.place.PlaceCommand;
 import me.ppgome.wayfinder.commands.teleport.BackCommand;
+import me.ppgome.wayfinder.commands.teleport.TPHereCommand;
 import me.ppgome.wayfinder.commands.warp.WarpCommand;
 import me.ppgome.wayfinder.database.DatabaseHandler;
 import me.ppgome.wayfinder.database.place.Category;
@@ -39,6 +40,7 @@ public final class Wayfinder extends JavaPlugin {
     private WarpCommand warpCommand;
     private WayfinderCommand wayfinderCommand;
     private BackCommand backCommand;
+    private TPHereCommand tphereCommand;
 
     @Override
     public void onEnable() {
@@ -70,6 +72,7 @@ public final class Wayfinder extends JavaPlugin {
         warpCommand = new WarpCommand(this);
         wayfinderCommand = new WayfinderCommand(this);
         backCommand = new BackCommand(this);
+        tphereCommand = new TPHereCommand(this);
     }
 
     private void registerCommands() {
@@ -79,6 +82,7 @@ public final class Wayfinder extends JavaPlugin {
         commandRegistry.register("warp", warpCommand);
         commandRegistry.register("wayfinder", wayfinderCommand);
         commandRegistry.register("back", backCommand);
+        commandRegistry.register("tphere", tphereCommand);
     }
 
     @Override

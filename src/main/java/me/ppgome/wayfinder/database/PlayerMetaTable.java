@@ -24,16 +24,20 @@ public class PlayerMetaTable {
     //------------------------------------------------------------------------------------------------------------------
 
     public CompletableFuture<PlayerMeta> getPlayerMeta(Player player) {
+        return getPlayerMetaByUUID(player.getUniqueId());
+    }
+
+    public CompletableFuture<PlayerMeta> getPlayerMetaByUUID(UUID uuid) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                return playerMetaDao.queryForId(player.getUniqueId());
+                return playerMetaDao.queryForId(uuid);
             } catch(SQLException e) {
-                plugin.getLogger().severe("SQLException fetching playermeta: " + player.getUniqueId());
+                plugin.getLogger().severe("SQLException fetching playermeta: " + uuid);
                 e.printStackTrace();
                 return null;
             }
         }).exceptionally(e -> {
-            plugin.getLogger().severe("Failed to fetch playermeta: " + player.getUniqueId());
+            plugin.getLogger().severe("Failed to fetch playermeta: " + uuid);
             e.printStackTrace();
             return null;
         });

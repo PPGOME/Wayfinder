@@ -63,7 +63,7 @@ public class PlayerMeta {
      */
     public PlayerMeta(UUID uuid, String name) {
         this.uuid = uuid;
-        this.name = name;
+        this.name = name.toLowerCase();
         this.homes = new HashMap<>();
         this.waypoints = new HashMap<>();
     }

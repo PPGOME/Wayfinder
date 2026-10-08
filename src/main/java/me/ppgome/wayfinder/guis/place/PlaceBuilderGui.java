@@ -271,22 +271,27 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
         if(netherPortalLink != null) {
             gui.setItem(40, PaperItemBuilder.from(Material.RECOVERY_COMPASS)
                     .name(TextUtils.stripDecoration("Nether Portal Pair"))
-                    .lore(List.of(
-                            Component.text("Click to set the location of this"),
-                            Component.text("Nether portal on the nether side."),
-                            Component.text("You can close this menu and re-open"),
-                            Component.text("it once in position."),
-                            TextUtils.stripDecoration(Component.text("Current location: ", NamedTextColor.WHITE))
-                                    .append(netherPortalLink.getPartnerLocation() != null
-                                            ? TextUtils.locationToComponent(netherPortalLink.getPartnerLocation())
-                                            : Component.text("Location unset"))
-                    ))
+                    .lore(buildLore())
                     .asGuiItem(event -> {
-                        netherPortalLink.setPartnerLocation(player.getLocation());
                         event.setCancelled(true);
+                        netherPortalLink.setPartnerLocation(player.getLocation());
                         setNetherPortalLink();
+                        gui.update();
                     }));
         }
+    }
+
+    private List<Component> buildLore() {
+        return List.of(
+                Component.text("Click to set the location of this"),
+                Component.text("Nether portal on the nether side."),
+                Component.text("You can close this menu and re-open"),
+                Component.text("it once in position."),
+                TextUtils.stripDecoration(Component.text("Current location: ", NamedTextColor.WHITE))
+                        .append(netherPortalLink.getPartnerLocation() != null
+                                ? TextUtils.locationToComponent(netherPortalLink.getPartnerLocation())
+                                : Component.text("Location unset"))
+        );
     }
 
     /**

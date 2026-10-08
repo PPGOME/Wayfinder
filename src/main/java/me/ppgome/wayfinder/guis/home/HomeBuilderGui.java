@@ -28,7 +28,7 @@ public class HomeBuilderGui extends WGui implements AcceptsChatGui {
 
     private Home home;
 
-    private HomeTable homeTable = Wayfinder.PLUGIN.getDatabase().getHomeTable();
+    private final HomeTable homeTable = Wayfinder.PLUGIN.getDatabase().getHomeTable();
 
     private boolean suppressCloseEvent = false;
 

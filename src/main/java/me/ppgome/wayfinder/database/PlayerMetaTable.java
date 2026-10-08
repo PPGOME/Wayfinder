@@ -13,8 +13,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class PlayerMetaTable {
 
-    private Wayfinder plugin;
-    private Dao<PlayerMeta, UUID> playerMetaDao;
+    private final Wayfinder plugin;
+    private final Dao<PlayerMeta, UUID> playerMetaDao;
 
     public PlayerMetaTable(Wayfinder plugin, Dao<PlayerMeta, UUID> playerMetaDao) {
         this.plugin = plugin;

@@ -11,8 +11,8 @@ import java.util.List;
 
 public class WayfinderCommand implements CommandHandler {
 
-    private Wayfinder plugin;
-    private Cache cache;
+    private final Wayfinder plugin;
+    private final Cache cache;
     private final WConfig config;
 
     public WayfinderCommand(Wayfinder plugin) {

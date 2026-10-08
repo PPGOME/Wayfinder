@@ -21,7 +21,7 @@ import java.util.Set;
 
 public class PlaceListGui extends WGui {
 
-    private Category category;
+    private final Category category;
 
     //------------------------------------------------------------------------------------------------------------------
 

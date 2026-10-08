@@ -17,8 +17,8 @@ import java.util.List;
 
 public class HomeCommand implements CommandHandler {
 
-    private Wayfinder plugin;
-    private Cache cache;
+    private final Wayfinder plugin;
+    private final Cache cache;
 
     public HomeCommand(Wayfinder plugin) {
         this.plugin = plugin;

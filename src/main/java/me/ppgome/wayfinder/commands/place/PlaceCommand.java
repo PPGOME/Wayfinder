@@ -38,7 +38,7 @@ public class PlaceCommand implements CommandHandler {
             Place place = cache.getPlace(placeName);
             if(place != null) {
                 if(!cache.isRouting(player.getUniqueId())) {
-                    new ParticleNavigator(Wayfinder.PLUGIN, player, place.getLocation(), place.getName()).startDisplaying();
+                    new ParticleNavigator(Wayfinder.PLUGIN, player, place).startDisplaying();
                     player.sendMessage(PlaceholderParser.of(config.PLACE_ROUTING_TO).place(place.getName()).parse());
                 } else {
                     player.sendMessage(PlaceholderParser.of(config.PLACE_ALREADY_ROUTING).place(place.getName()).parse());

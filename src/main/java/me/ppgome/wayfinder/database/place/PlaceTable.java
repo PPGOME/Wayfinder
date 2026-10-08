@@ -9,8 +9,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class PlaceTable {
 
-    private Wayfinder plugin;
-    private Dao<Place, String> placeDao;
+    private final Wayfinder plugin;
+    private final Dao<Place, String> placeDao;
 
     public PlaceTable(Wayfinder plugin, Dao<Place, String> placeDao) {
         this.plugin = plugin;

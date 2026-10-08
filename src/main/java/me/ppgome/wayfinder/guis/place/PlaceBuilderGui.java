@@ -25,7 +25,7 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
 
     private Component name;
     private Component builder;
-    private Component defaultBuilder = Component.text("Click here to add a builder (or more)");
+    private final Component defaultBuilder = Component.text("Click here to add a builder (or more)");
     private Location editingLocation;
     private Map<String, Category> categories;
     private NetherPortalLink netherPortalLink;

@@ -10,8 +10,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class CategorizedPlaceTable {
 
-    private Wayfinder plugin;
-    private Dao<CategorizedPlace, Integer> categorizedPlaceDao;
+    private final Wayfinder plugin;
+    private final Dao<CategorizedPlace, Integer> categorizedPlaceDao;
 
     public CategorizedPlaceTable(Wayfinder plugin, Dao<CategorizedPlace, Integer> categorizedPlaceDao) {
         this.plugin = plugin;

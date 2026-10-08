@@ -118,7 +118,7 @@ public class GuiUtils {
                 wGui.openNext(player, wGui.config, wGui.cache, new EditOrDeleteGui<>(place));
             } else {
                 if(!wGui.cache.isRouting(player.getUniqueId())) {
-                    new ParticleNavigator(Wayfinder.PLUGIN, player, place.getLocation(), place.getName()).startDisplaying();
+                    new ParticleNavigator(Wayfinder.PLUGIN, player, place).startDisplaying();
                     player.sendMessage(PlaceholderParser.of(wGui.config.PLACE_ROUTING_TO).place(place.getName()).parse());
                     wGui.gui.close(player);
                 } else {

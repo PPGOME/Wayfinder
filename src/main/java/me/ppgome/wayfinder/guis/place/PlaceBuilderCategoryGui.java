@@ -19,9 +19,9 @@ import java.util.Map;
 
 public class PlaceBuilderCategoryGui extends WGui {
 
-    private Component placeName;
+    private final Component placeName;
     Map<String, Category> allCategories;
-    private Map<String, Category> selectedCategories;
+    private final Map<String, Category> selectedCategories;
 
     public PlaceBuilderCategoryGui(Component placeName, Map<String, Category> selectedCategories) {
         this.placeName = placeName;

@@ -16,28 +16,28 @@ import java.util.*;
 
 public class Cache {
 
-    private Wayfinder plugin;
-    private DatabaseHandler database;
+    private final Wayfinder plugin;
+    private final DatabaseHandler database;
 
-    private HashMap<UUID, PlayerMeta> playerMetaMap;
+    private final HashMap<UUID, PlayerMeta> playerMetaMap;
 
-    private HashMap<String, Place> places;
-    private HashMap<String, Category> placeCategories;
-    private HashMap<String, Place> pinnedPlaces;
+    private final HashMap<String, Place> places;
+    private final HashMap<String, Category> placeCategories;
+    private final HashMap<String, Place> pinnedPlaces;
 
-    private HashMap<String, Warp> warps;
+    private final HashMap<String, Warp> warps;
 
-    private Set<Place> overworldNetherPortals;
-    private Set<Place> netherNetherPortals;
+    private final Set<Place> netherPortalPlaces;
+    private final Set<Place> endPortalPlaces;
 
-    private HashMap<UUID, PlayerMeta> playerMetaByUuid;
-    private HashMap<String, PlayerMeta> playerMetaByName;
+    private final HashMap<UUID, PlayerMeta> playerMetaByUuid;
+    private final HashMap<String, PlayerMeta> playerMetaByName;
 
-    private HashMap<UUID, WGui> editingGui;
-    private Set<UUID> awaitingChat;
-    private HashMap<UUID, ParticleNavigator> routing;
+    private final HashMap<UUID, WGui> editingGui;
+    private final Set<UUID> awaitingChat;
+    private final HashMap<UUID, ParticleNavigator> routing;
 
-    private HashMap<UUID, Location> back;
+    private final HashMap<UUID, Location> back;
 
     //------------------------------------------------------------------------------------------------------------------
 
@@ -49,8 +49,8 @@ public class Cache {
         this.placeCategories = new HashMap<>();
         this.warps = new HashMap<>();
         this.pinnedPlaces = new HashMap<>();
-        this.overworldNetherPortals = new HashSet<>();
-        this.netherNetherPortals = new HashSet<>();
+        this.netherPortalPlaces = new HashSet<>();
+        this.endPortalPlaces = new HashSet<>();
         this.playerMetaByUuid = new HashMap<>();
         this.playerMetaByName = new HashMap<>();
         this.editingGui = new HashMap<>();
@@ -158,11 +158,21 @@ public class Cache {
         database.getWarpTable().delete(warp);
     }
 
-    // Overworld Nether Portals ----------------------------------------------------------------------------------------
+    // Nether Portal Places --------------------------------------------------------------------------------------------
 
+    public void addNetherPortalPlace(Place place) {
+        netherPortalPlaces.add(place);
+    }
 
+    public Set<Place> getAllNetherPortalPlaces() {
+        return netherPortalPlaces;
+    }
 
-    // Nether Nether Portals -------------------------------------------------------------------------------------------
+    public void removeNetherPortalPlace(Place place) {
+        netherPortalPlaces.remove(place);
+    }
+
+    // End Portal Places -----------------------------------------------------------------------------------------------
 
 
 

@@ -26,7 +26,7 @@ public class Category {
 
     ItemStack itemStack;
 
-    private Set<Place> places;
+    private final Set<Place> places;
 
     //------------------------------------------------------------------------------------------------------------------
 

@@ -21,10 +21,10 @@ import java.util.UUID;
 
 public class WListener implements Listener {
 
-    private Wayfinder plugin;
-    private Cache cache;
-    private PlayerMetaTable playerMetaTable;
-    private HomeTable homeTable;
+    private final Wayfinder plugin;
+    private final Cache cache;
+    private final PlayerMetaTable playerMetaTable;
+    private final HomeTable homeTable;
 
     public WListener(Wayfinder plugin, Cache cache) {
         this.plugin = plugin;

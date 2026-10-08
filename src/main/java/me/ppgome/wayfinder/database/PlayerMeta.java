@@ -39,8 +39,8 @@ public class PlayerMeta {
     @DatabaseField
     private boolean wasMoved;
 
-    private HashMap<String, Home> homes;
-    private HashMap<String, Waypoint> waypoints;
+    private final HashMap<String, Home> homes;
+    private final HashMap<String, Waypoint> waypoints;
 
     // Teleport relationships
     private Set<UUID> friends;

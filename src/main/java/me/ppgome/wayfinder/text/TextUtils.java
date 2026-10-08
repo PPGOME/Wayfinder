@@ -15,7 +15,7 @@ import java.util.Locale;
 
 public class TextUtils {
 
-    private static MiniMessage mm =  MiniMessage.miniMessage();
+    private static final MiniMessage mm =  MiniMessage.miniMessage();
 
     public static Component stripDecoration(Component component) {
         return component.color(NamedTextColor.WHITE).decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE);

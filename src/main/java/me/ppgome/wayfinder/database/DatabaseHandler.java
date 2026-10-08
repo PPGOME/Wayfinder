@@ -16,7 +16,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class DatabaseHandler {
 
-    private Wayfinder plugin;
+    private final Wayfinder plugin;
     private Cache cache;
 
     private static final String DATABASE_URL = "jdbc:sqlite:plugins/Wayfinder/Wayfinder.db";

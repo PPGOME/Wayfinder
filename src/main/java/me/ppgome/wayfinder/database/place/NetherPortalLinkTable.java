@@ -9,8 +9,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class NetherPortalLinkTable {
 
-    private Wayfinder plugin;
-    private Dao<NetherPortalLink, String> placeNetherPortalDao;
+    private final Wayfinder plugin;
+    private final Dao<NetherPortalLink, String> placeNetherPortalDao;
 
     public NetherPortalLinkTable(Wayfinder plugin, Dao<NetherPortalLink, String> placeDao) {
         this.plugin = plugin;

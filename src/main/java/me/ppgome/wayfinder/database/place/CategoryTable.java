@@ -9,8 +9,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class CategoryTable {
 
-    private Wayfinder plugin;
-    private Dao<Category, String> categoryDao;
+    private final Wayfinder plugin;
+    private final Dao<Category, String> categoryDao;
 
     public CategoryTable(Wayfinder plugin, Dao<Category, String> categoryDao) {
         this.plugin = plugin;

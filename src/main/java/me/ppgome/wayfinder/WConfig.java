@@ -4,7 +4,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 
 public class WConfig {
 
-    private Wayfinder plugin;
+    private final Wayfinder plugin;
 
     public String PREFIX;
 

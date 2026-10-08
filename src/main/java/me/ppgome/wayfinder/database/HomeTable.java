@@ -10,8 +10,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class HomeTable {
 
-    private Wayfinder plugin;
-    private Dao<Home, Integer> homeDao;
+    private final Wayfinder plugin;
+    private final Dao<Home, Integer> homeDao;
 
     public HomeTable(Wayfinder plugin, Dao<Home, Integer> homeDao) {
         this.plugin = plugin;

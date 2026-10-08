@@ -5,8 +5,8 @@ import me.ppgome.wayfinder.Wayfinder;
 
 public class WaypointTable {
 
-    private Wayfinder plugin;
-    private Dao<Waypoint, Integer> waypointDao;
+    private final Wayfinder plugin;
+    private final Dao<Waypoint, Integer> waypointDao;
 
     public WaypointTable(Wayfinder plugin, Dao<Waypoint, Integer> waypointDao) {
         this.plugin = plugin;

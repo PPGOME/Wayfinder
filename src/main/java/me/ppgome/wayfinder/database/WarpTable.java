@@ -9,8 +9,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class WarpTable {
 
-    private Wayfinder plugin;
-    private Dao<Warp, String> warpDao;
+    private final Wayfinder plugin;
+    private final Dao<Warp, String> warpDao;
 
     public WarpTable(Wayfinder plugin, Dao<Warp, String> warpDao) {
         this.plugin = plugin;

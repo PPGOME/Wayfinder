@@ -94,6 +94,7 @@ public class PlaceBuilderCategoryGui extends WGui {
                 .name(TextUtils.stripDecoration("Confirm!").color(NamedTextColor.GREEN))
                 .asGuiItem(event -> {
                     event.setCancelled(true);
+                    cache.removeEditingGui(player.getUniqueId());
                     if(lastGui instanceof PlaceBuilderGui placeBuilderGui) placeBuilderGui.updateCategories(selectedCategories);
                     this.openLast();
                 }));

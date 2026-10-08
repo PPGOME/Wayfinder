@@ -111,6 +111,7 @@ public class CategoryBuilderGui extends WGui implements AcceptsChatGui {
                     hopBackTo.getLast().nullify();
                     hopBackTo.openLast();
                     suppressCloseEvent = false;
+                    cache.removeEditingGui(player.getUniqueId());
                 }));
 
         /*

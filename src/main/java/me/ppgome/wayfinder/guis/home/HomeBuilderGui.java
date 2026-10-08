@@ -145,6 +145,7 @@ public class HomeBuilderGui extends WGui implements AcceptsChatGui {
                     suppressCloseEvent = true;
                     hopBackTo.getLast().nullify();
                     hopBackTo.openLast();
+                    cache.removeEditingGui(player.getUniqueId());
                     suppressCloseEvent = false;
                 }));
     }

@@ -283,6 +283,8 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
                     ))
                     .asGuiItem(event -> {
                         netherPortalLink.setPartnerLocation(player.getLocation());
+                        event.setCancelled(true);
+                        setNetherPortalLink();
                     }));
         }
     }

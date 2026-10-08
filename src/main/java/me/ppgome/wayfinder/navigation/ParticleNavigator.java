@@ -12,6 +12,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -31,8 +33,8 @@ public class ParticleNavigator {
     private BossBar infoBar;
     private BukkitTask repeatingTask;
 
-    private List<Location> targets;   // where the particles should point, in order
-    private double[] legs;            // legs[i] = distance walked after reaching targets[i]
+    private List<Location> targets;
+    private double[] legs;
     private double totalDistance;
     private int step = 0;
 
@@ -69,7 +71,7 @@ public class ParticleNavigator {
                 BossBar.Overlay.PROGRESS);
         player.showBossBar(infoBar);
 
-        Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(78, 235, 255), 0.75f);
+        Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(255, 0, 255), 0.75f);
 
         this.repeatingTask = new BukkitRunnable() {
             @Override
@@ -82,17 +84,15 @@ public class ParticleNavigator {
                 Location playerLocation = player.getLocation();
                 int last = targets.size() - 1;
 
-                // Player's world no longer matches the target => they went through a portal
                 while (step < last && !sameWorld(playerLocation, targets.get(step))) {
                     step++;
                 }
 
                 Location target = targets.get(step);
-                if (!sameWorld(playerLocation, target)) return; // in a dimension we can't route in
+                if (!sameWorld(playerLocation, target)) return;
 
                 double distToTarget = playerLocation.distance(target);
 
-                // Only the final target ends navigation
                 if (step == last && distToTarget < 5) {
                     player.sendMessage(PlaceholderParser.of(config.PLACE_REACHED_DESTINATION)
                             .place(destination.getName()).parse());
@@ -102,11 +102,15 @@ public class ParticleNavigator {
 
                 updateProgress(distToTarget);
 
-                if (distToTarget < 1) return; // avoids normalising a zero vector
-                Location startLocation = playerLocation.clone().add(0, 1, 0);
-                Vector direction = target.clone().subtract(startLocation).toVector().normalize();
-                for (double i = 0; i < 10; i += 0.5) {
+                if (distToTarget < 1) return;
+                Vector direction = target.toVector().subtract(playerLocation.toVector());
+                direction.setY(0);
+                if (direction.lengthSquared() < 1) return;
+                direction.normalize();
+
+                for (double i = 1; i < 10; i += 0.5) {
                     Location point = playerLocation.clone().add(direction.clone().multiply(i));
+                    point.setY(groundY(point, playerLocation.getBlockY()) + 0.3);
                     player.spawnParticle(Particle.DUST, point, 1, dustOptions);
                 }
             }
@@ -127,13 +131,13 @@ public class ParticleNavigator {
             Location netherA = a.getNetherPortalLink().getPartnerLocation();
             Location netherB = b.getNetherPortalLink().getPartnerLocation();
 
-            targets.add(a.getLocation());   // enter portal A (overworld side)
-            targets.add(netherB);           // walk to B's nether side
-            targets.add(to.getLocation());  // exit B and walk to destination
+            targets.add(a.getLocation());
+            targets.add(netherB);
+            targets.add(to.getLocation());
 
             legs = new double[] {
-                    netherA.distance(netherB),             // nether walk
-                    b.getLocation().distance(to.getLocation()) // final overworld walk
+                    netherA.distance(netherB),
+                    b.getLocation().distance(to.getLocation())
                     , 0
             };
         } else {
@@ -157,6 +161,21 @@ public class ParticleNavigator {
     private void stop() {
         cancelTask();
         cache.removeRouting(player.getUniqueId());
+    }
+
+    private double groundY(Location point, int refY) {
+        World world = point.getWorld();
+        int x = point.getBlockX();
+        int z = point.getBlockZ();
+
+        for (int y = refY + 3; y >= refY - 6; y--) {
+            Block block = world.getBlockAt(x, y, z);
+            Block above = world.getBlockAt(x, y + 1, z);
+            if (!block.isPassable() && above.isPassable()) {
+                return y + 1;
+            }
+        }
+        return refY;
     }
 
     public void cancelTask() {

@@ -101,7 +101,7 @@ public class DatabaseHandler {
 
     //------------------------------------------------------------------------------------------------------------------
 
-    public void loadDatabaseData() {
+    public CompletableFuture<Void> loadDatabaseData() {
 
         CompletableFuture<List<Category>> categoriesFuture = categoryTable.getAllCategories();
         CompletableFuture<List<Place>> placesFuture = placeTable.getAllPlaces();
@@ -110,7 +110,7 @@ public class DatabaseHandler {
         CompletableFuture<List<Home>>  homesFuture = homeTable.getAllHomes();
         CompletableFuture<List<Warp>> warpsFuture = warpTable.getAllWarps();
 
-        CompletableFuture.allOf(categoriesFuture, placesFuture, categorizedPlacesFuture,
+        return CompletableFuture.allOf(categoriesFuture, placesFuture, categorizedPlacesFuture,
                 netherPortalLinksFuture, homesFuture, warpsFuture).thenRun(() -> {
 
             try {
@@ -171,11 +171,10 @@ public class DatabaseHandler {
             }
 
         }).exceptionally(e -> {
-            plugin.getLogger().severe("Failed to process categories.");
+            plugin.getLogger().severe("Failed to process data.");
             e.printStackTrace();
             return null;
         });
-
     }
 
     // Getters ---------------------------------------------------------------------------------------------------------

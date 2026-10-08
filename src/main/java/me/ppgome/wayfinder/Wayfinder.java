@@ -51,11 +51,10 @@ public final class Wayfinder extends JavaPlugin {
         database.setupDatabase();
         this.cache = new Cache(this);
         database.setCache(cache);
-        database.loadDatabaseData();
+        database.loadDatabaseData().thenRun(this::defaultCategories);
         initializeCommands();
         registerCommands();
         getServer().getPluginManager().registerEvents(new WListener(this, cache), this);
-        defaultCategories();
 //        loadBlueMap();
     }
 

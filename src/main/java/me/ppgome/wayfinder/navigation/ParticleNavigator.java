@@ -123,26 +123,47 @@ public class ParticleNavigator {
         List<Place> places = route.places();
         targets = new ArrayList<>();
 
-        if (route.usesPortal()) {
-            Place a = places.get(0);
-            Place b = places.get(1);
-            Place to = places.get(2);
+        switch (route.type()) {
+            case NETHER -> {
+                Place a = places.get(0);
+                Place b = places.get(1);
+                Place to = places.get(2);
 
-            Location netherA = a.getNetherPortalLink().getPartnerLocation();
-            Location netherB = b.getNetherPortalLink().getPartnerLocation();
+                Location netherA = a.getNetherPortalLink().getPartnerLocation();
+                Location netherB = b.getNetherPortalLink().getPartnerLocation();
 
-            targets.add(a.getLocation());
-            targets.add(netherB);
-            targets.add(to.getLocation());
+                targets.add(a.getLocation());
+                targets.add(netherB);
+                targets.add(to.getLocation());
 
-            legs = new double[] {
-                    netherA.distance(netherB),
-                    b.getLocation().distance(to.getLocation())
-                    , 0
-            };
-        } else {
-            targets.add(places.get(places.size() - 1).getLocation());
-            legs = new double[] { 0 };
+                legs = new double[] {
+                        netherA.distance(netherB) / 8.0,
+                        b.getLocation().distance(to.getLocation()),
+                        0
+                };
+            }
+            case END -> {
+                Place e = places.get(0);
+                Place to = places.get(1);
+
+                World endWorld = RoutePlanner.findEndWorld();
+                Location endExit = new Location(endWorld, 0.5, 64, 0.5); // exit portal in the End
+                Location returnPoint = RoutePlanner.getEndReturnPoint(player, to.getLocation());
+
+                targets.add(e.getLocation());   // enter the end portal
+                targets.add(endExit);           // walk to the exit portal
+                targets.add(to.getLocation());  // arrive at bed / 0,0, walk to destination
+
+                legs = new double[] {
+                        RoutePlanner.END_SIDE_DISTANCE,
+                        returnPoint.distance(to.getLocation()),
+                        0
+                };
+            }
+            default -> {
+                targets.add(places.get(places.size() - 1).getLocation());
+                legs = new double[] { 0 };
+            }
         }
     }
 

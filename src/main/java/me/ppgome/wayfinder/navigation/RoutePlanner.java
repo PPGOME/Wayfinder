@@ -5,7 +5,9 @@ import me.ppgome.wayfinder.WConfig;
 import me.ppgome.wayfinder.Wayfinder;
 import me.ppgome.wayfinder.database.place.NetherPortalLink;
 import me.ppgome.wayfinder.database.place.Place;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -45,18 +47,30 @@ public class RoutePlanner {
     // -----------------------------------------------------------------------------------------------------------------
 
     private Route planOverworld(Location from, Location to) {
-        Route best = null;
-        if (from.getWorld().equals(to.getWorld())) {
-            best = new Route(List.of(toPlace), from.distance(to), false);
-            System.out.println("Gets here 1");
-        }
-        if (!config.ENABLE_NETHER_PORTALS) return best;
-        System.out.println("Gets here 2");
+        boolean sameWorld = from.getWorld().equals(to.getWorld());
 
+        Route direct = sameWorld
+                ? new Route(List.of(toPlace), from.distance(to), Type.DIRECT)
+                : null;
+
+        Route bestPortal = config.ENABLE_NETHER_PORTALS ? planNether(from, to) : null;
+
+        Route viaEnd = planEnd(from, to);
+        if (viaEnd != null && (bestPortal == null
+                || viaEnd.estimatedDistance() < bestPortal.estimatedDistance())) {
+            bestPortal = viaEnd;
+        }
+
+        if (bestPortal == null) return direct;
+        if (direct == null) return bestPortal;
+        return bestPortal.estimatedDistance() < direct.estimatedDistance() * 0.9 ? bestPortal : direct;
+    }
+
+    private Route planNether(Location from, Location to) {
+        Route best = null;
         Set<Place> portals = cache.getAllNetherPortalPlaces();
 
         for (Place a : portals) {
-            System.out.println("Gets here 3");
             NetherPortalLink linkA = a.getNetherPortalLink();
             if (linkA == null || !a.getLocation().getWorld().equals(from.getWorld())) continue;
 
@@ -64,32 +78,62 @@ public class RoutePlanner {
             Location netherA = linkA.getPartnerLocation();
 
             for (Place b : portals) {
-                if (b == a) continue;
+                if (b.equals(a)) continue;
                 NetherPortalLink linkB = b.getNetherPortalLink();
                 if (linkB == null || !b.getLocation().getWorld().equals(to.getWorld())) continue;
 
-                double leg2 = netherA.distance(linkB.getPartnerLocation());
+                double leg2 = netherA.distance(linkB.getPartnerLocation()) / 8.0;
                 double leg3 = b.getLocation().distance(to);
                 double total = leg1 + leg2 + leg3;
 
-                if (best == null || total < best.estimatedDistance() * 0.9) {
-                    best = new Route(List.of(a, b, toPlace), total, true);
+                if (best == null || total < best.estimatedDistance()) {
+                    best = new Route(List.of(a, b, toPlace), total, Type.NETHER);
                 }
             }
         }
         return best;
     }
 
-    private Route planNether(Location from, Location to) {
-        return null;
+    private Route planEnd(Location from, Location to) {
+        if (findEndWorld() == null) return null;
+
+        Location returnPoint = getEndReturnPoint(player, to);
+        double leg3 = returnPoint.distance(to);
+
+        Route best = null;
+        for (Place e : cache.getAllEndPortalPlaces()) {
+            if (!e.getLocation().getWorld().equals(from.getWorld())) continue;
+
+            double total = from.distance(e.getLocation()) + END_SIDE_DISTANCE + leg3;
+            if (best == null || total < best.estimatedDistance()) {
+                best = new Route(List.of(e, toPlace), total, Type.END);
+            }
+        }
+        return best;
     }
 
-    private Route planEnd(Location from, Location to) {
+    // -----------------------------------------------------------------------------------------------------------------
+
+    static final double END_SIDE_DISTANCE = 100.0;
+
+    static World findEndWorld() {
+        for (World w : Bukkit.getWorlds()) {
+            if (w.getEnvironment() == World.Environment.THE_END) return w;
+        }
         return null;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
 
-    public record Route(List<Place> places, double estimatedDistance, boolean usesPortal) {}
+    /** Where the player ends up after leaving the End: their bed, or 0,0 if none. */
+    static Location getEndReturnPoint(Player player, Location to) {
+        Location bed = player.getRespawnLocation();
+        if (bed != null && bed.getWorld().equals(to.getWorld())) return bed;
+        return new Location(to.getWorld(), 0, to.getY(), 0);
+    }
+
+    public enum Type { DIRECT, NETHER, END }
+
+    public record Route(List<Place> places, double estimatedDistance, Type type) {}
 
 }

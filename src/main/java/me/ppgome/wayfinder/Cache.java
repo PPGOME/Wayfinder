@@ -174,7 +174,17 @@ public class Cache {
 
     // End Portal Places -----------------------------------------------------------------------------------------------
 
+    public void addEndPortalPlace(Place place) {
+        endPortalPlaces.add(place);
+    }
 
+    public Set<Place> getAllEndPortalPlaces() {
+        return endPortalPlaces;
+    }
+
+    public void removeEndPortalPlace(Place place) {
+        endPortalPlaces.remove(place);
+    }
 
     // PlayerMeta by UUID ----------------------------------------------------------------------------------------------
 

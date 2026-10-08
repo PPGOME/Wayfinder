@@ -48,12 +48,15 @@ public class RoutePlanner {
         Route best = null;
         if (from.getWorld().equals(to.getWorld())) {
             best = new Route(List.of(toPlace), from.distance(to), false);
+            System.out.println("Gets here 1");
         }
         if (!config.ENABLE_NETHER_PORTALS) return best;
+        System.out.println("Gets here 2");
 
         Set<Place> portals = cache.getAllNetherPortalPlaces();
 
         for (Place a : portals) {
+            System.out.println("Gets here 3");
             NetherPortalLink linkA = a.getNetherPortalLink();
             if (linkA == null || !a.getLocation().getWorld().equals(from.getWorld())) continue;
 

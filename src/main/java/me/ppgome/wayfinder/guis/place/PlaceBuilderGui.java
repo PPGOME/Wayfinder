@@ -338,9 +338,11 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
                         netherPortalLink.setPlaceName(tempPlace.getName());
                         netherPortalLinkTable.save(netherPortalLink);
                         tempPlace.setNetherPortalLink(netherPortalLink);
+                        cache.addNetherPortalPlace(tempPlace);
                     } else {
                         netherPortalLinkTable.delete(new NetherPortalLink(tempPlace.getName()));
                         tempPlace.setNetherPortalLink(null);
+                        cache.removeNetherPortalPlace(tempPlace);
                     }
                     if(tempPlace.isPinned()) cache.addPinnedPlace(tempPlace);
                     if(!tempPlace.isPinned() && cache.getPinnedPlace(tempPlace.getName()) != null) cache.removePinnedPlace(tempPlace.getName());

@@ -140,6 +140,7 @@ public class DatabaseHandler {
                     for(NetherPortalLink netherPortalLink : netherPortalLinks) {
                         Place findPlace = cache.getPlace(netherPortalLink.getPlaceName());
                         if(findPlace != null) findPlace.setNetherPortalLink(netherPortalLink);
+                        cache.addNetherPortalPlace(findPlace);
                     }
                 }
 

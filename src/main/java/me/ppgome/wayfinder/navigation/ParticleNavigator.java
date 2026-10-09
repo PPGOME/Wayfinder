@@ -6,6 +6,7 @@ import me.ppgome.wayfinder.Wayfinder;
 import me.ppgome.wayfinder.database.place.Place;
 import me.ppgome.wayfinder.navigation.RoutePlanner.Route;
 import me.ppgome.wayfinder.text.PlaceholderParser;
+import me.ppgome.wayfinder.text.TextUtils;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -65,7 +66,7 @@ public class ParticleNavigator {
                 Component.text("Routing to: ", NamedTextColor.YELLOW)
                         .append(Component.text(destination.getName(), NamedTextColor.GOLD))
                         .append(Component.text(" | ", NamedTextColor.BLUE))
-                        .append(Component.text("Press F to cancel", NamedTextColor.RED)),
+                        .append(TextUtils.parseMiniMessage("<red>Press <key:key.swapOffhand> to cancel</red>")),
                 0.0f,
                 BossBar.Color.GREEN,
                 BossBar.Overlay.PROGRESS);
@@ -150,9 +151,9 @@ public class ParticleNavigator {
                 Location endExit = new Location(endWorld, 0.5, 64, 0.5); // exit portal in the End
                 Location returnPoint = RoutePlanner.getEndReturnPoint(player, to.getLocation());
 
-                targets.add(e.getLocation());   // enter the end portal
-                targets.add(endExit);           // walk to the exit portal
-                targets.add(to.getLocation());  // arrive at bed / 0,0, walk to destination
+                targets.add(e.getLocation());
+                targets.add(endExit);
+                targets.add(to.getLocation());
 
                 legs = new double[] {
                         RoutePlanner.END_SIDE_DISTANCE,

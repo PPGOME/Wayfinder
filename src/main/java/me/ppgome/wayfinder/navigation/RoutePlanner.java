@@ -68,7 +68,17 @@ public class RoutePlanner {
 
     private Route planNether(Location from, Location to) {
         Route best = null;
-        Set<Place> portals = cache.getAllNetherPortalPlaces();
+        List<Place> portals = cache.getAllNetherPortalPlaces().stream()
+                .filter(p -> {
+                    if (p == null || p.getLocation() == null || p.getLocation().getWorld() == null) return false;
+                    NetherPortalLink link = p.getNetherPortalLink();
+                    if (link == null) return false;
+                    Location partner = link.getPartnerLocation();
+                    return partner != null
+                            && partner.getWorld() != null
+                            && partner.getWorld().getEnvironment() == World.Environment.NETHER;
+                })
+                .toList();
 
         for (Place a : portals) {
             NetherPortalLink linkA = a.getNetherPortalLink();

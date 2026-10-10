@@ -56,7 +56,8 @@ public class PlaceCommand implements CommandHandler {
             return cache.getAllPlaces()
                     .keySet()
                     .stream()
-                    .filter(placeName -> placeName != null && placeName.contains(args[0]))
+                    .filter(placeName -> placeName != null && placeName.toLowerCase().contains(args[0]))
+                    .map(String::toLowerCase)
                     .toList();
         }
         return Collections.emptyList();

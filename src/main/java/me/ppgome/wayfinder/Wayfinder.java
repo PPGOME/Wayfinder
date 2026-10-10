@@ -12,6 +12,7 @@ import me.ppgome.wayfinder.database.DatabaseHandler;
 import me.ppgome.wayfinder.database.place.Category;
 import me.ppgome.wayfinder.guis.GuiUtils;
 //import me.ppgome.wayfinder.hooks.BlueMapHook;
+import me.ppgome.wayfinder.hooks.BlueMapHook;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -30,7 +31,7 @@ public final class Wayfinder extends JavaPlugin {
     private Cache cache;
     private WConfig config;
 
-//    BlueMapHook blueMapHook;
+    private BlueMapHook blueMapHook;
 
     // Commands
     private CommandRegistry commandRegistry;
@@ -55,7 +56,7 @@ public final class Wayfinder extends JavaPlugin {
         initializeCommands();
         registerCommands();
         getServer().getPluginManager().registerEvents(new WListener(this, cache), this);
-//        loadBlueMap();
+        loadBlueMap();
     }
 
     @Override
@@ -148,12 +149,12 @@ public final class Wayfinder extends JavaPlugin {
 
     //------------------------------------------------------------------------------------------------------------------
 
-//    private void loadBlueMap() {
-//        Plugin bluemapPlugin =  getServer().getPluginManager().getPlugin("BlueMap");
-//        if(bluemapPlugin != null) {
-//            this.blueMapHook = new BlueMapHook(this);
-//        }
-//    }
+    private void loadBlueMap() {
+        Plugin bluemapPlugin =  getServer().getPluginManager().getPlugin("BlueMap");
+        if(bluemapPlugin != null) {
+            this.blueMapHook = new BlueMapHook(this);
+        }
+    }
 
     //------------------------------------------------------------------------------------------------------------------
 

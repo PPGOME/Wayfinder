@@ -22,5 +22,5 @@ Ideas
 ## Ideas/roadmap in no particular order
 - [ ] Overworld/Nether/End cross-dimension guide
 - [ ] Player tracking
-- [ ] Nearest category (maybe button in GUI as well as command?)
+- [ ] Nearest of a category (maybe button in GUI as well as command?)
 - [ ] Add /tp and teleport relationships

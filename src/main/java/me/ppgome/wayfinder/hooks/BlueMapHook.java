@@ -60,7 +60,6 @@ public class BlueMapHook {
                 POIMarker marker = POIMarker.builder()
                         .label(place.getName())
                         .position(location.getX(), location.getY(), location.getZ())
-                        .maxDistance(1000)
                         .build();
                 marker.setIcon(category.getBluemapIcon(), 0, 0);
 

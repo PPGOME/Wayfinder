@@ -22,7 +22,7 @@ public class BlueMapHook {
     Cache cache;
     Optional<BlueMapAPI> blueMapAPI = BlueMapAPI.getInstance();
 
-    HashMap<String, MarkerSet> marketSetMap  = new HashMap<>();
+    HashMap<String, MarkerSet> markerSetMap = new HashMap<>();
     HashMap<String, Marker> markerMap  = new HashMap<>();
 
     public BlueMapHook(Wayfinder plugin) {
@@ -58,6 +58,7 @@ public class BlueMapHook {
                 for(BlueMapMap map : world.getMaps()) {
                     System.out.println("Bluemap 5");
                     map.getMarkerSets().put(TextUtils.getBluemapId(category.getName()), markerSet);
+                    markerSetMap.put(TextUtils.getBluemapId(category.getName()), markerSet);
                     System.out.println(TextUtils.getBluemapId(category.getName()));
                 }
             });
@@ -93,7 +94,7 @@ public class BlueMapHook {
                 .build();
         marker.setIcon(highestCategory.getBluemapIcon(), 0, 0);
         markerMap.put(place.getName(), marker);
-        MarkerSet markerSet = marketSetMap.get(highestCategory.getName());
+        MarkerSet markerSet = markerSetMap.get(highestCategory.getName());
         markerSet.getMarkers().put(TextUtils.getBluemapId(highestCategory.getName()), marker);
         System.out.println(TextUtils.getBluemapId(highestCategory.getName()));
         System.out.println("Bluemap 10");

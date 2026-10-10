@@ -11,6 +11,7 @@ import me.ppgome.wayfinder.database.place.Category;
 import me.ppgome.wayfinder.database.place.Place;
 import me.ppgome.wayfinder.text.TextUtils;
 import org.bukkit.Location;
+import org.bukkit.World;
 
 import java.util.HashMap;
 import java.util.Optional;
@@ -47,9 +48,10 @@ public class BlueMapHook {
         System.out.println("Bluemap 3");
         if(category.getBluemapIcon() == null) return;
         Place firstPlace = category.getPlaces().stream().findFirst().orElse(null);
+        World placeWorld = firstPlace.getLocation().getWorld();
         if(firstPlace != null) {
             System.out.println("Bluemap 4");
-            api.getWorld(category.getPlaces()).ifPresent(world -> {
+            api.getWorld(placeWorld).ifPresent(world -> {
                 MarkerSet markerSet = MarkerSet.builder()
                         .label(category.getName())
                         .build();

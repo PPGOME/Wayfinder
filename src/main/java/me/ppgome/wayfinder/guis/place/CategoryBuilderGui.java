@@ -104,6 +104,7 @@ public class CategoryBuilderGui extends WGui implements AcceptsChatGui {
                         category.setPriority(priority);
                         category.setBluemapIcon(iconUrl);
                         category.setItemStack(itemStack);
+                        cache.updateCategory(category);
                         hopBackTo = lastGui;
                     } else {
                         cache.addCategory(new Category(mm.serialize(name), priority, itemStack));

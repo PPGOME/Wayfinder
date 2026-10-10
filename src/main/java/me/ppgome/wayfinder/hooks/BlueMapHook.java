@@ -32,7 +32,7 @@ public class BlueMapHook {
         BlueMapAPI.onEnable(api -> {
             System.out.println("Bluemap 2");
             cache.getAllCategories().entrySet().stream().forEach(entry -> {
-                addCategoryMarkerSet(entry.getValue());
+                addCategoryMarkerSet(api, entry.getValue());
             });
 
             cache.getAllPlaces().entrySet().stream().forEach(entry -> {
@@ -43,13 +43,13 @@ public class BlueMapHook {
 
     //------------------------------------------------------------------------------------------------------------------
 
-    public void addCategoryMarkerSet(Category category) {
+    public void addCategoryMarkerSet(BlueMapAPI api, Category category) {
         System.out.println("Bluemap 3");
         if(category.getBluemapIcon() == null) return;
         Place firstPlace = category.getPlaces().stream().findFirst().orElse(null);
         if(firstPlace != null) {
             System.out.println("Bluemap 4");
-            blueMapAPI.get().getWorld(category.getPlaces()).ifPresent(world -> {
+            api.getWorld(category.getPlaces()).ifPresent(world -> {
                 MarkerSet markerSet = MarkerSet.builder()
                         .label(category.getName())
                         .build();

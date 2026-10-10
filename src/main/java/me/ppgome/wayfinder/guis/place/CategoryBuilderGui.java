@@ -11,11 +11,13 @@ import me.ppgome.wayfinder.text.PlaceholderParser;
 import me.ppgome.wayfinder.text.TextUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -160,6 +162,7 @@ public class CategoryBuilderGui extends WGui implements AcceptsChatGui {
     @Override
     public void update() {
         setNameTag();
+        setBlueMapIcon();
         gui.update();
     }
 
@@ -193,9 +196,14 @@ public class CategoryBuilderGui extends WGui implements AcceptsChatGui {
     }
 
     private void setBlueMapIcon() {
+
+        List<Component> itemLore = new ArrayList<>();
+        itemLore.add(Component.text("Must be a direct image URL."));
+        if(iconUrl != null) itemLore.add(Component.text(iconUrl, NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
+
         gui.setItem(16, PaperItemBuilder.from(Material.FILLED_MAP)
                 .name(TextUtils.stripDecoration("BlueMap Icon").color(NamedTextColor.GREEN))
-                .lore(Component.text("Must be a direct image URL."))
+                .lore(itemLore)
                 .asGuiItem(event -> {
                     UUID uuid = player.getUniqueId();
                     cache.addEditingGui(uuid, this);

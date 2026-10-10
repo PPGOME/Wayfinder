@@ -79,7 +79,7 @@ public class BlueMapHook {
             }
         }
 
-        System.out.println("Bluemap 8");
+        System.out.println("Bluemap 8 " + highestCategory.getBluemapIcon());
         if(highestCategory == null || highestCategory.getBluemapIcon() == null) return;
 
         System.out.println("Bluemap 9");

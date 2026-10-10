@@ -23,6 +23,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -157,13 +158,13 @@ public class GuiUtils {
         PaperItemBuilder paperItemBuilder = PaperItemBuilder.from(place.getItemStack())
                 .name(TextUtils.stripDecoration(place.getName()).color(NamedTextColor.YELLOW));
         Location placeLocation = place.getLocation();
+        List<Component> loreList = new ArrayList<>();
         if(place.getBuilder() != null) {
-            paperItemBuilder.lore(List.of(
-                    Component.text(place.getBuilder()),
-                    TextUtils.locationToComponent(placeLocation),
-                    Component.text(place.getLocation().distance(placeLocation) + " blocks away", NamedTextColor.GOLD)
-            ));
+            loreList.add(Component.text(place.getBuilder()));
         }
+        loreList.add(TextUtils.locationToComponent(placeLocation));
+        loreList.add(Component.text(player.getLocation().distance(placeLocation) + " blocks away", NamedTextColor.GOLD));
+        paperItemBuilder.lore(loreList);
         return paperItemBuilder.asGuiItem();
     }
 

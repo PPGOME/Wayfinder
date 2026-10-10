@@ -114,7 +114,7 @@ public class GuiUtils {
     public static void addPlaceItem(WGui wGui, Gui gui, int slot, Place place, Player player) {
         gui.setItem(slot, GuiUtils.makePlaceItem(place, player));
         gui.addSlotAction(slot, event -> {
-            if(event.isShiftClick()) {
+            if(event.isShiftClick() && player.hasPermission("wayfinder.admin.place")) {
                 wGui.openNext(player, wGui.config, wGui.cache, new EditOrDeleteGui<>(place));
             } else {
                 if(!wGui.cache.isRouting(player.getUniqueId())) {

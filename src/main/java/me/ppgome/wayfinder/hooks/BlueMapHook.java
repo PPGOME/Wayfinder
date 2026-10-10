@@ -91,7 +91,7 @@ public class BlueMapHook {
         marker.setIcon(highestCategory.getBluemapIcon(), 0, 0);
         markerMap.put(place.getName(), marker);
         MarkerSet markerSet = marketSetMap.get(highestCategory.getName());
-        markerSet.getMarkers().put(TextUtils.getBluemapId(place.getName()), marker);
+        markerSet.getMarkers().put(TextUtils.getBluemapId(highestCategory.getName()), marker);
         System.out.println("Bluemap 10");
     }
 

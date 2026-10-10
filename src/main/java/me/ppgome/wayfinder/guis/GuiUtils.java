@@ -16,6 +16,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -112,7 +113,7 @@ public class GuiUtils {
     }
 
     public static void addPlaceItem(WGui wGui, Gui gui, int slot, Place place, Player player) {
-        gui.setItem(slot, GuiUtils.makePlaceItem(place));
+        gui.setItem(slot, GuiUtils.makePlaceItem(place, player));
         gui.addSlotAction(slot, event -> {
             if(event.isShiftClick()) {
                 wGui.openNext(player, wGui.config, wGui.cache, new EditOrDeleteGui<>(place));
@@ -152,11 +153,16 @@ public class GuiUtils {
         });
     }
 
-    public static GuiItem makePlaceItem(Place place) {
+    public static GuiItem makePlaceItem(Place place, Player player) {
         PaperItemBuilder paperItemBuilder = PaperItemBuilder.from(place.getItemStack())
                 .name(TextUtils.stripDecoration(place.getName()).color(NamedTextColor.YELLOW));
+        Location placeLocation = place.getLocation();
         if(place.getBuilder() != null) {
-            paperItemBuilder.lore(Component.text(place.getBuilder()));
+            paperItemBuilder.lore(List.of(
+                    Component.text(place.getBuilder()),
+                    TextUtils.locationToComponent(placeLocation),
+                    Component.text(place.getLocation().distance(placeLocation) + " blocks away", NamedTextColor.GOLD)
+            ));
         }
         return paperItemBuilder.asGuiItem();
     }

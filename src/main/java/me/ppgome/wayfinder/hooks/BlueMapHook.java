@@ -25,10 +25,12 @@ public class BlueMapHook {
     HashMap<String, Marker> markerMap  = new HashMap<>();
 
     public BlueMapHook(Wayfinder plugin) {
+        System.out.println("Bluemap 1");
         this.plugin = plugin;
         this.cache = plugin.getCache();
 
         BlueMapAPI.onEnable(api -> {
+            System.out.println("Bluemap 2");
             cache.getAllCategories().entrySet().stream().forEach(entry -> {
                 addCategoryMarkerSet(entry.getValue());
             });
@@ -42,14 +44,17 @@ public class BlueMapHook {
     //------------------------------------------------------------------------------------------------------------------
 
     public void addCategoryMarkerSet(Category category) {
+        System.out.println("Bluemap 3");
         if(category.getBluemapIcon() == null) return;
         Place firstPlace = category.getPlaces().stream().findFirst().orElse(null);
         if(firstPlace != null) {
+            System.out.println("Bluemap 4");
             blueMapAPI.get().getWorld(category.getPlaces()).ifPresent(world -> {
                 MarkerSet markerSet = MarkerSet.builder()
                         .label(category.getName())
                         .build();
                 for(BlueMapMap map : world.getMaps()) {
+                    System.out.println("Bluemap 5");
                     map.getMarkerSets().put(TextUtils.getBluemapId(category.getName()), markerSet);
                 }
             });
@@ -63,17 +68,21 @@ public class BlueMapHook {
     }
 
     public void addPlaceMarker(Place place) {
+        System.out.println("Bluemap 6");
         Location location = place.getLocation();
         Category highestCategory = null;
 
         for(Category category : place.getCategories()) {
+            System.out.println("Bluemap 7");
             if(highestCategory == null || category.getPriority() > highestCategory.getPriority()) {
                 highestCategory = category;
             }
         }
 
+        System.out.println("Bluemap 8");
         if(highestCategory == null || highestCategory.getBluemapIcon() == null) return;
 
+        System.out.println("Bluemap 9");
         POIMarker marker = POIMarker.builder()
                 .label(place.getName())
                 .position(location.getX(), location.getY(), location.getZ())
@@ -83,6 +92,7 @@ public class BlueMapHook {
         markerMap.put(place.getName(), marker);
         MarkerSet markerSet = marketSetMap.get(highestCategory.getName());
         markerSet.getMarkers().put(TextUtils.getBluemapId(place.getName()), marker);
+        System.out.println("Bluemap 10");
     }
 
     public void removePlaceMarker(Place place) {

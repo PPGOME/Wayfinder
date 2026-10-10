@@ -162,10 +162,15 @@ public class GuiUtils {
         }
         loreList.add(TextUtils.locationToComponent(placeLocation)
                 .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));
-        loreList.add(Component.text(
-                String.format(Locale.ROOT, "%.2f", player.getLocation().distance(placeLocation))
-                        + " blocks away", NamedTextColor.GOLD)
-                .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));
+        if(player.getLocation().getWorld() == placeLocation.getWorld()) {
+            loreList.add(Component.text(
+                            String.format(Locale.ROOT, "%.2f", player.getLocation().distance(placeLocation))
+                                    + " blocks away", NamedTextColor.GOLD)
+                    .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));
+        } else {
+            loreList.add(Component.text("Hm... that seems out of this world!", NamedTextColor.GOLD)
+                    .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));
+        }
         paperItemBuilder.lore(loreList);
         return paperItemBuilder.asGuiItem();
     }

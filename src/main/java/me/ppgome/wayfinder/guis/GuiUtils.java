@@ -14,6 +14,7 @@ import me.ppgome.wayfinder.text.PlaceholderParser;
 import me.ppgome.wayfinder.text.TextUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -23,10 +24,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class GuiUtils {
 
@@ -162,8 +160,12 @@ public class GuiUtils {
         if(place.getBuilder() != null) {
             loreList.add(Component.text(place.getBuilder()));
         }
-        loreList.add(TextUtils.locationToComponent(placeLocation));
-        loreList.add(Component.text(player.getLocation().distance(placeLocation) + " blocks away", NamedTextColor.GOLD));
+        loreList.add(TextUtils.locationToComponent(placeLocation)
+                .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));
+        loreList.add(Component.text(
+                String.format(Locale.ROOT, "%.2f", player.getLocation().distance(placeLocation))
+                        + " blocks away", NamedTextColor.GOLD)
+                .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));
         paperItemBuilder.lore(loreList);
         return paperItemBuilder.asGuiItem();
     }

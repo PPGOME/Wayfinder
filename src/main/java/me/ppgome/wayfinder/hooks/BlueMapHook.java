@@ -54,19 +54,34 @@ public class BlueMapHook {
         if (highest == null || highest.getBluemapIcon() == null) return;
 
         final Category category = highest;
+        POIMarker marker = POIMarker.builder()
+                .label(place.getName())
+                .position(location.getX(), location.getY(), location.getZ())
+                .build();
 
         api.getWorld(location.getWorld()).ifPresent(world -> {
             for (BlueMapMap map : world.getMaps()) {
-                POIMarker marker = POIMarker.builder()
-                        .label(place.getName())
-                        .position(location.getX(), location.getY(), location.getZ())
-                        .build();
                 marker.setIcon(category.getBluemapIcon(), 0, 0);
 
                 getOrCreateMarkerSet(map, category)
                         .getMarkers().put(markerId(place), marker);
             }
         });
+
+        if(place.isNetherPortal()) {
+            api.getWorld(place.getNetherPortalLink().getPartnerLocation().getWorld()).ifPresent(world -> {
+                for (BlueMapMap map : world.getMaps()) {
+                    marker.setIcon(category.getBluemapIcon(), 0, 0);
+
+                    getOrCreateMarkerSet(map, category)
+                            .getMarkers().put(markerId(place), marker);
+                }
+            });
+        }
+    }
+
+    private void markerAction(BlueMapAPI api) {
+
     }
 
     public void removePlaceMarker(Place place) {

@@ -10,8 +10,7 @@ import me.ppgome.wayfinder.navigation.ParticleNavigator;
 import me.ppgome.wayfinder.text.PlaceholderParser;
 import org.bukkit.entity.Player;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class PlaceCommand implements CommandHandler {
 
@@ -52,15 +51,24 @@ public class PlaceCommand implements CommandHandler {
 
     @Override
     public List<String> tabComplete(Player player, String name, String[] args) {
-        if(args.length == 1) {
-            return cache.getAllPlaces()
-                    .keySet()
-                    .stream()
-                    .filter(placeName -> placeName != null && placeName.toLowerCase().contains(args[0]))
-                    .map(String::toLowerCase)
-                    .toList();
-        }
-        return Collections.emptyList();
+        if (args.length == 0) return Collections.emptyList();
+
+        String typed = String.join(" ", args).toLowerCase(Locale.ROOT);
+        int currentArg = args.length - 1;
+
+        return cache.getAllPlaces()
+                .values()
+                .stream()
+                .map(Place::getName)
+                .filter(n -> n != null && n.toLowerCase(Locale.ROOT).startsWith(typed))
+                .map(n -> {
+                    String[] words = n.split(" ");
+                    if (currentArg >= words.length) return null;
+                    return String.join(" ", Arrays.copyOfRange(words, currentArg, words.length));
+                })
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
     }
 }
 

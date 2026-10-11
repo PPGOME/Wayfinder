@@ -182,10 +182,15 @@ public class CategoryBuilderGui extends WGui implements AcceptsChatGui {
     }
 
     private void setPriority() {
+        List<Component> itemLore = new ArrayList<>();
+        itemLore.add(Component.text("When BlueMap chooses which icon to display for"));
+        itemLore.add(Component.text("a place, higher priority always wins."));
+        if(priority != 0) {
+            itemLore.add(Component.text("Priority: " + priority,  NamedTextColor.GREEN));
+        }
         gui.setItem(14, PaperItemBuilder.from(Material.GOLD_INGOT)
                 .name(TextUtils.stripDecoration("Priority").color(NamedTextColor.GREEN))
-                .lore(List.of(Component.text("When BlueMap chooses which icon to display for"),
-                        Component.text("a place, higher priority always wins.")))
+                .lore(itemLore)
                 .asGuiItem(event -> {
                     UUID uuid = player.getUniqueId();
                     cache.addEditingGui(uuid, this);
@@ -193,6 +198,7 @@ public class CategoryBuilderGui extends WGui implements AcceptsChatGui {
                     fieldType = FieldType.PRIORITY;
                     gui.close(player);
                     player.sendMessage(PlaceholderParser.of(config.PLACE_CATEGORY_EDITING_PRIORITY).prefix(config.PREFIX).parse());
+                    event.setCancelled(true);
                 }));
     }
 
@@ -212,6 +218,7 @@ public class CategoryBuilderGui extends WGui implements AcceptsChatGui {
                     fieldType = FieldType.ICON;
                     gui.close(player);
                     player.sendMessage(PlaceholderParser.of(config.PLACE_CATEGORY_EDITING_ICON).prefix(config.PREFIX).parse());
+                    event.setCancelled(true);
                 }));
     }
 

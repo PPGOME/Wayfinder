@@ -2,13 +2,11 @@ package me.ppgome.wayfinder;
 
 import me.ppgome.wayfinder.database.DatabaseHandler;
 import me.ppgome.wayfinder.database.PlayerMeta;
-import me.ppgome.wayfinder.database.PlayerMetaTable;
 import me.ppgome.wayfinder.database.Warp;
 import me.ppgome.wayfinder.database.place.Category;
 import me.ppgome.wayfinder.database.place.Place;
 import me.ppgome.wayfinder.guis.WGui;
 import me.ppgome.wayfinder.navigation.ParticleNavigator;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 

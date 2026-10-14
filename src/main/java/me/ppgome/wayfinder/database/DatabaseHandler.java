@@ -2,6 +2,7 @@ package me.ppgome.wayfinder.database;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
+import com.j256.ormlite.dao.GenericRawResults;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
@@ -92,6 +93,7 @@ public class DatabaseHandler {
             TableUtils.createTableIfNotExists(connectionSource, NetherPortalLink.class);
             TableUtils.createTableIfNotExists(connectionSource, Category.class);
             TableUtils.createTableIfNotExists(connectionSource, CategorizedPlace.class);
+            migrateDatabase();
 
         } catch(SQLException e) {
             plugin.getLogger().severe("Failed to set up database: " + e.getMessage());
@@ -160,6 +162,8 @@ public class DatabaseHandler {
 
                     placeGainingCategory.addCategory(categoryBeingApplied);
                     categoryBeingApplied.addPlace(placeGainingCategory);
+
+                    if(categorizedPlace.getCategory().equals("End Portals")) cache.addEndPortalPlace(placeGainingCategory);
                 }
 
                 for(Warp warp : warps) {
@@ -176,6 +180,36 @@ public class DatabaseHandler {
             e.printStackTrace();
             return null;
         });
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    private void migrateDatabase() throws SQLException {
+        String playerMeta = "playerMeta";
+        addColumnIfMissing(playerMetaDao, playerMeta, "placeParticlesEnabled", "BOOLEAN DEFAULT 0");
+        addColumnIfMissing(playerMetaDao, playerMeta, "placeArrowEnabled", "BOOLEAN DEFAULT 1");
+        addColumnIfMissing(playerMetaDao, playerMeta, "enablePortalSkipping", "BOOLEAN DEFAULT 0");
+    }
+
+    private void addColumnIfMissing(Dao<?, ?> dao, String table, String column, String definition)
+            throws SQLException {
+        boolean exists = false;
+        try (GenericRawResults<String[]> results =
+                     dao.queryRaw("PRAGMA table_info(`" + table + "`)")) {
+            for (String[] row : results) {
+                if (row[1].equalsIgnoreCase(column)) {
+                    exists = true;
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            throw new SQLException(e);
+        }
+
+        if (!exists) {
+            dao.executeRaw("ALTER TABLE `" + table + "` ADD COLUMN `" + column + "` " + definition);
+            plugin.getLogger().info("Added column " + column + " to " + table);
+        }
     }
 
     // Getters ---------------------------------------------------------------------------------------------------------

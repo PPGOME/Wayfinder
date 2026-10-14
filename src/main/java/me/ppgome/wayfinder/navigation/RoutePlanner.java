@@ -11,6 +11,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 public class RoutePlanner {
 
@@ -55,15 +56,25 @@ public class RoutePlanner {
         Node end = new Node(to, null);
         List<Node> nodes = new ArrayList<>(List.of(start, end));
 
+        plugin.getLogger().info("from=" + fmt(from) + " enabled=" + config.ENABLE_NETHER_PORTALS);
         if(config.ENABLE_NETHER_PORTALS) addNetherPortals(nodes);
         Node endPlatform = addEnd(nodes);
         connectWalking(nodes);
 
+        for (Node n : nodes) {
+            StringBuilder sb = new StringBuilder(fmt(n.loc) + " -> ");
+            for (Edge e : n.edges) sb.append(fmt(e.to().loc)).append(" (").append(Math.round(e.cost())).append("), ");
+            plugin.getLogger().info(sb.toString());
+        }
+        plugin.getLogger().info("PORTAL_COST=" + PORTAL_COST);
+
         Result result = pathfind(start, end);
+        plugin.getLogger().info("result=" + (result == null ? "null" : result.cost() + " via " + result.path().stream().map(n -> fmt(n.loc)).toList()));
         if(result == null) return null;
 
         if(from.getWorld().equals(to.getWorld())) {
             double direct = from.distance(to);
+            plugin.getLogger().info("direct=" + direct + " bias threshold=" + (direct * DIRECT_BIAS));
             if(result.cost() >= direct * DIRECT_BIAS) {
                 return new Route(List.of(new RouteWaypoint(to, toPlace, 0)), direct, Type.DIRECT);
             }
@@ -74,12 +85,25 @@ public class RoutePlanner {
     // -----------------------------------------------------------------------------------------------------------------
 
     private void addNetherPortals(List<Node> nodes) {
-        for(Place netherPortalPlace : cache.getAllNetherPortalPlaces()) {
-            if(netherPortalPlace == null || netherPortalPlace.getLocation() == null) continue;
-            NetherPortalLink link = netherPortalPlace.getNetherPortalLink();
-            if(link == null || link.getPartnerLocation() == null) continue;
 
-            Node a = new Node(player.getLocation(), netherPortalPlace);
+        Logger log = plugin.getLogger();
+        int added = 0, noLoc = 0, noLink = 0, noPartner = 0;
+
+        for(Place netherPortalPlace : cache.getAllNetherPortalPlaces()) {
+            if(netherPortalPlace == null || netherPortalPlace.getLocation() == null) {
+                noLoc++;
+                log.info("skipped (no location): " + (netherPortalPlace == null ? "null place" : netherPortalPlace.getName()));
+                continue;
+            }
+            NetherPortalLink link = netherPortalPlace.getNetherPortalLink();
+            if(link == null) { noLink++; continue; }
+            if(link == null || link.getPartnerLocation() == null) {
+                noPartner++;
+                log.info("skipped (no partner): " + netherPortalPlace.getName() + " at " + fmt(netherPortalPlace.getLocation()));
+                continue;
+            }
+
+            Node a = new Node(netherPortalPlace.getLocation(), netherPortalPlace);
             Node b = new Node(link.getPartnerLocation(), netherPortalPlace);
 
             a.edges.add(new Edge(b, PORTAL_COST));
@@ -87,7 +111,16 @@ public class RoutePlanner {
 
             nodes.add(a);
             nodes.add(b);
+
+            added++;
+            log.info("portal " + netherPortalPlace.getName() + ": " + fmt(netherPortalPlace.getLocation()) + " <-> " + fmt(link.getPartnerLocation()));
         }
+        log.info("nether portals: added=" + added + " noLoc=" + noLoc
+                + " noLink=" + noLink + " noPartner=" + noPartner);
+    }
+
+    private static String fmt(Location l) {
+        return l.getWorld().getName() + " " + l.getBlockX() + "," + l.getBlockY() + "," + l.getBlockZ();
     }
 
     private Node addEnd(List<Node> nodes) {
@@ -95,7 +128,7 @@ public class RoutePlanner {
         if(end == null) return null;
 
         Node platform = new Node(new Location(end, 100.5, 49, 0.5), null);
-        Node exit = new Node(new Location(end, 100.5, 49, 0.5), null);
+        Node exit = new Node(new Location(end, 0.5, 64, 0.5), null);
         Node respawn = new Node(getEndReturnPoint(), null);
 
         exit.edges.add(new Edge(respawn, PORTAL_COST));

@@ -340,6 +340,7 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
                         tempPlace = newPlace;
                         hopBackTo = this;
                     }
+
                     placeTable.save(tempPlace);
                     if(netherPortalLink != null) {
                         netherPortalLink.setPlaceName(tempPlace.getName());
@@ -351,6 +352,13 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
                         tempPlace.setNetherPortalLink(null);
                         cache.removeNetherPortalPlace(tempPlace);
                     }
+
+                    if(this.categories.get("End Portals") != null) {
+                        cache.addEndPortalPlace(tempPlace);
+                    } else {
+                        cache.removeEndPortalPlace(tempPlace);
+                    }
+
                     if(tempPlace.isPinned()) cache.addPinnedPlace(tempPlace);
                     if(!tempPlace.isPinned() && cache.getPinnedPlace(tempPlace.getName()) != null) cache.removePinnedPlace(tempPlace.getName());
                     suppressCloseEvent = true;

@@ -63,10 +63,7 @@ public class ParticleNavigator {
         cache.addRouting(player.getUniqueId(), this);
 
         infoBar = BossBar.bossBar(
-                Component.text("Routing to: ", NamedTextColor.YELLOW)
-                        .append(Component.text(destination.getName(), NamedTextColor.GOLD))
-                        .append(Component.text(" | ", NamedTextColor.BLUE))
-                        .append(TextUtils.parseMiniMessage("<red>Press <key:key.swapOffhand> to cancel</red>")),
+                updateBossBar(totalDistance),
                 0.0f,
                 BossBar.Color.GREEN,
                 BossBar.Overlay.PROGRESS);
@@ -102,6 +99,7 @@ public class ParticleNavigator {
                 }
 
                 updateProgress(distToTarget);
+                infoBar.name(updateBossBar(distToTarget));
 
                 if (distToTarget < 1) return;
                 Vector direction = target.toVector().subtract(playerLocation.toVector());
@@ -174,6 +172,16 @@ public class ParticleNavigator {
 
         float progress = (float) (1.0 - remaining / totalDistance);
         infoBar.progress(Math.max(0.0f, Math.min(1.0f, progress)));
+    }
+
+    private Component updateBossBar(double distToTarget) {
+        return Component.text("Routing to: ", NamedTextColor.YELLOW)
+                .append(Component.text(destination.getName(), NamedTextColor.GOLD))
+                .append(Component.text(" | ", NamedTextColor.BLUE))
+                .append(TextUtils.parseMiniMessage("<red>Press <key:key.swapOffhand> to cancel</red>"))
+                .append(Component.text(" | ", NamedTextColor.BLUE))
+                .append(Component.text("Distance: ", NamedTextColor.YELLOW))
+                .append(Component.text(String.valueOf(distToTarget), NamedTextColor.GOLD));
     }
 
     private boolean sameWorld(Location a, Location b) {

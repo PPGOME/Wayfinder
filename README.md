@@ -24,3 +24,7 @@ Ideas
 - [ ] Player tracking
 - [ ] Nearest of a category (maybe button in GUI as well as command?)
 - [ ] Add /tp and teleport relationships
+- [ ] Map mod compatible waypoints
+- [ ] Turn player towards place
+- [ ] Give distance to place when run
+- [ ] Case-insensitive

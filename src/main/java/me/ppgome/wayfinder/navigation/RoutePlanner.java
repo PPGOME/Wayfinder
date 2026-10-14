@@ -10,14 +10,16 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class RoutePlanner {
 
     private final Wayfinder plugin;
     private final Cache cache;
     private final WConfig config;
+
+    private final static double PORTAL_COST = 20.0;
+    private final static double DIRECT_BIAS = 0.9;
 
     Player player;
     private final Place toPlace;
@@ -30,120 +32,174 @@ public class RoutePlanner {
         this.toPlace = place;
     }
 
+    private static final class Node {
+        final Location loc;
+        final Place place; // null for virtual nodes
+        final List<Edge> edges = new ArrayList<>();
+        Node(Location loc, Place place) { this.loc = loc; this.place = place; }
+    }
+    private record Edge(Node to, double cost) {}
+    private record Result(List<Node> path, Map<Node, Double> distance, double cost) {}
+
+    public enum Type { DIRECT, NETHER, END }
+    public record RouteWaypoint(Location location, Place place, double remaining) {}
+    public record Route(List<RouteWaypoint> routeWaypoints, double estimatedDistance, Type type) {}
+
     // -----------------------------------------------------------------------------------------------------------------
 
     public Route plan() {
         Location from = player.getLocation();
         Location to = toPlace.getLocation();
 
-        return switch(to.getWorld().getEnvironment()) {
-            case NORMAL -> planOverworld(from, to);
-            case NETHER -> planNether(from, to);
-            case THE_END -> planEnd(from, to);
-            default -> planOverworld(from, to);
-        };
+        Node start = new Node(from, null);
+        Node end = new Node(to, null);
+        List<Node> nodes = new ArrayList<>(List.of(start, end));
+
+        if(config.ENABLE_NETHER_PORTALS) addNetherPortals(nodes);
+        Node endPlatform = addEnd(nodes);
+        connectWalking(nodes);
+
+        Result result = pathfind(start, end);
+        if(result == null) return null;
+
+        if(from.getWorld().equals(to.getWorld())) {
+            double direct = from.distance(to);
+            if(result.cost() >= direct * DIRECT_BIAS) {
+                return new Route(List.of(new RouteWaypoint(to, toPlace, 0)), direct, Type.DIRECT);
+            }
+        }
+        return toRoute(result, endPlatform);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
 
-    private Route planOverworld(Location from, Location to) {
-        boolean sameWorld = from.getWorld().equals(to.getWorld());
+    private void addNetherPortals(List<Node> nodes) {
+        for(Place netherPortalPlace : cache.getAllNetherPortalPlaces()) {
+            if(netherPortalPlace == null || netherPortalPlace.getLocation() == null) continue;
+            NetherPortalLink link = netherPortalPlace.getNetherPortalLink();
+            if(link == null || link.getPartnerLocation() == null) continue;
 
-        Route direct = sameWorld
-                ? new Route(List.of(toPlace), from.distance(to), Type.DIRECT)
-                : null;
+            Node a = new Node(player.getLocation(), netherPortalPlace);
+            Node b = new Node(link.getPartnerLocation(), netherPortalPlace);
 
-        Route bestPortal = config.ENABLE_NETHER_PORTALS ? planNether(from, to) : null;
+            a.edges.add(new Edge(b, PORTAL_COST));
+            b.edges.add(new Edge(a, PORTAL_COST));
 
-        Route viaEnd = planEnd(from, to);
-        if (viaEnd != null && (bestPortal == null
-                || viaEnd.estimatedDistance() < bestPortal.estimatedDistance())) {
-            bestPortal = viaEnd;
+            nodes.add(a);
+            nodes.add(b);
         }
-
-        if (bestPortal == null) return direct;
-        if (direct == null) return bestPortal;
-        return bestPortal.estimatedDistance() < direct.estimatedDistance() * 0.9 ? bestPortal : direct;
     }
 
-    private Route planNether(Location from, Location to) {
-        Route best = null;
-        List<Place> portals = cache.getAllNetherPortalPlaces().stream()
-                .filter(p -> {
-                    if (p == null || p.getLocation() == null || p.getLocation().getWorld() == null) return false;
-                    NetherPortalLink link = p.getNetherPortalLink();
-                    if (link == null) return false;
-                    Location partner = link.getPartnerLocation();
-                    return partner != null
-                            && partner.getWorld() != null
-                            && partner.getWorld().getEnvironment() == World.Environment.NETHER;
-                })
-                .toList();
+    private Node addEnd(List<Node> nodes) {
+        World end = findWorld(World.Environment.THE_END);
+        if(end == null) return null;
 
-        for (Place a : portals) {
-            NetherPortalLink linkA = a.getNetherPortalLink();
-            if (linkA == null || !a.getLocation().getWorld().equals(from.getWorld())) continue;
+        Node platform = new Node(new Location(end, 100.5, 49, 0.5), null);
+        Node exit = new Node(new Location(end, 100.5, 49, 0.5), null);
+        Node respawn = new Node(getEndReturnPoint(), null);
 
-            double leg1 = from.distance(a.getLocation());
-            Location netherA = linkA.getPartnerLocation();
+        exit.edges.add(new Edge(respawn, PORTAL_COST));
 
-            for (Place b : portals) {
-                if (b.equals(a)) continue;
-                NetherPortalLink linkB = b.getNetherPortalLink();
-                if (linkB == null || !b.getLocation().getWorld().equals(to.getWorld())) continue;
+        for(Place endPortalPlace : cache.getAllEndPortalPlaces()) {
+            if(endPortalPlace == null || endPortalPlace.getLocation() == null) continue;
+            Node entryPortal = new Node(endPortalPlace.getLocation(), endPortalPlace);
+            entryPortal.edges.add(new Edge(platform, PORTAL_COST));
+            nodes.add(entryPortal);
+        }
+        nodes.addAll(List.of(platform, exit, respawn));
+        return platform;
+    }
 
-                double leg2 = netherA.distance(linkB.getPartnerLocation()) / 8.0;
-                double leg3 = b.getLocation().distance(to);
-                double total = leg1 + leg2 + leg3;
-
-                if (best == null || total < best.estimatedDistance()) {
-                    best = new Route(List.of(a, b, toPlace), total, Type.NETHER);
+    private void connectWalking(List<Node> nodes) {
+        Map<World, List<Node>> byWorld = new HashMap<>();
+        for(Node node : nodes) {
+            byWorld.computeIfAbsent(node.loc.getWorld(),  world -> new ArrayList<>()).add(node);
+        }
+        for(List<Node> group : byWorld.values()) {
+            for(int i = 0; i < group.size(); i++) {
+                for(int p = i + 1; p < group.size(); p++) {
+                    Node a = group.get(i);
+                    Node b = group.get(p);
+                    double distance = a.loc.distance(b.loc);
+                    a.edges.add(new Edge(b, distance));
+                    b.edges.add(new Edge(a, distance));
                 }
             }
         }
-        return best;
-    }
-
-    private Route planEnd(Location from, Location to) {
-        if (findEndWorld() == null) return null;
-
-        Location returnPoint = getEndReturnPoint(player, to);
-        double leg3 = returnPoint.distance(to);
-
-        Route best = null;
-        for (Place e : cache.getAllEndPortalPlaces()) {
-            if (!e.getLocation().getWorld().equals(from.getWorld())) continue;
-
-            double total = from.distance(e.getLocation()) + END_SIDE_DISTANCE + leg3;
-            if (best == null || total < best.estimatedDistance()) {
-                best = new Route(List.of(e, toPlace), total, Type.END);
-            }
-        }
-        return best;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
 
-    static final double END_SIDE_DISTANCE = 100.0;
+    // Find using Dijkstra's algorithm
+    private Result pathfind(Node start, Node destination) {
+        record Entry(Node node, double distance) {}
 
-    static World findEndWorld() {
-        for (World w : Bukkit.getWorlds()) {
-            if (w.getEnvironment() == World.Environment.THE_END) return w;
+        Map<Node, Double> distance = new HashMap<>();
+        Map<Node, Node> previous = new HashMap<>();
+        PriorityQueue<Entry> queue = new PriorityQueue<>(Comparator.comparingDouble(Entry::distance));
+
+        distance.put(start, 0.0);
+        queue.add(new Entry(start, 0));
+
+        while(!queue.isEmpty()) {
+            Entry current = queue.poll();
+            if(current.distance() > distance.getOrDefault(current.node, Double.MAX_VALUE)) continue;
+            if(current.node() == destination) break;
+
+            for(Edge edge : current.node().edges) {
+                double nd = current.distance() + edge.cost();
+                if(nd < distance.getOrDefault(edge.to, Double.MAX_VALUE)) {
+                    distance.put(edge.to, nd);
+                    previous.put(edge.to, current.node);
+                    queue.add(new Entry(edge.to, nd));
+                }
+            }
+        }
+
+        if(!distance.containsKey(destination)) return null;
+        LinkedList<Node> path = new LinkedList<>();
+        for(Node n = destination; n != null; n = previous.get(n)) path.addFirst(n);
+        return new Result(path, distance, distance.get(destination));
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    private Route toRoute(Result result, Node endPlatform) {
+        List<Node> path = result.path;
+        Node last = path.get(path.size() - 1);
+        List<RouteWaypoint> routeWaypoints = new ArrayList<>();
+        boolean usedEnd = false;
+        boolean crossed = false;
+
+        for(int i = 1; i < path.size(); i++) {
+            Node previous = path.get(i - 1);
+            Node current = path.get(i);
+            boolean arrival = !previous.loc.getWorld().equals(current.loc.getWorld());
+
+            if(current == endPlatform) usedEnd = true;
+            if(arrival) crossed = true;
+
+            if(arrival && current != last) continue;
+            double remaining = result.cost - result.distance.get(current);
+            routeWaypoints.add(new RouteWaypoint(current.loc, current.place, remaining));
+        }
+        Type type = usedEnd ? Type.END : crossed ? Type.NETHER : Type.DIRECT;
+        return new Route(routeWaypoints, result.cost, type);
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    private static World findWorld(World.Environment env) {
+        for(World world : Bukkit.getWorlds()) {
+            if(world.getEnvironment() == env) return world;
         }
         return null;
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
-
     /** Where the player ends up after leaving the End: their bed, or 0,0 if none. */
-    static Location getEndReturnPoint(Player player, Location to) {
+    private Location getEndReturnPoint() {
         Location bed = player.getRespawnLocation();
-        if (bed != null && bed.getWorld().equals(to.getWorld())) return bed;
-        return new Location(to.getWorld(), 0, to.getY(), 0);
+        if (bed != null) return bed;
+        return findWorld(World.Environment.NORMAL).getSpawnLocation();
     }
-
-    public enum Type { DIRECT, NETHER, END }
-
-    public record Route(List<Place> places, double estimatedDistance, Type type) {}
-
 }

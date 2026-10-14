@@ -3,10 +3,12 @@ package me.ppgome.wayfinder.navigation;
 import me.ppgome.wayfinder.Cache;
 import me.ppgome.wayfinder.WConfig;
 import me.ppgome.wayfinder.Wayfinder;
+import me.ppgome.wayfinder.database.Waypoint;
 import me.ppgome.wayfinder.database.place.Place;
 import me.ppgome.wayfinder.navigation.RoutePlanner.Route;
 import me.ppgome.wayfinder.text.PlaceholderParser;
 import me.ppgome.wayfinder.text.TextUtils;
+import me.ppgome.wayfinder.navigation.RoutePlanner.RouteWaypoint;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -34,8 +36,7 @@ public class ParticleNavigator {
     private BossBar infoBar;
     private BukkitTask repeatingTask;
 
-    private List<Location> targets;
-    private double[] legs;
+    private List<RouteWaypoint> waypoints;
     private double totalDistance;
     private int step = 0;
 
@@ -51,13 +52,13 @@ public class ParticleNavigator {
 
     public void startDisplaying() {
         Route route = new RoutePlanner(plugin, player, destination).plan();
-        if (route == null || route.places().isEmpty()) {
+        if (route == null || route.routeWaypoints().isEmpty()) {
             // TODO: add a config message, e.g. config.PLACE_NO_ROUTE
             player.sendMessage(Component.text("No route could be found to that place.", NamedTextColor.RED));
             return;
         }
 
-        buildTargets(route);
+        this.waypoints = route.routeWaypoints();
         this.totalDistance = Math.max(route.estimatedDistance(), 1.0);
 
         cache.addRouting(player.getUniqueId(), this);
@@ -80,13 +81,13 @@ public class ParticleNavigator {
                 }
 
                 Location playerLocation = player.getLocation();
-                int last = targets.size() - 1;
+                int last = waypoints.size() - 1;
 
-                while (step < last && !sameWorld(playerLocation, targets.get(step))) {
+                while (step < last && !sameWorld(playerLocation, waypoints.get(step).location())) {
                     step++;
                 }
 
-                Location target = targets.get(step);
+                Location target = waypoints.get(step).location();
                 if (!sameWorld(playerLocation, target)) return;
 
                 double distToTarget = playerLocation.distance(target);
@@ -118,57 +119,8 @@ public class ParticleNavigator {
 
     //------------------------------------------------------------------------------------------------------------------
 
-    private void buildTargets(Route route) {
-        List<Place> places = route.places();
-        targets = new ArrayList<>();
-
-        switch (route.type()) {
-            case NETHER -> {
-                Place a = places.get(0);
-                Place b = places.get(1);
-                Place to = places.get(2);
-
-                Location netherA = a.getNetherPortalLink().getPartnerLocation();
-                Location netherB = b.getNetherPortalLink().getPartnerLocation();
-
-                targets.add(a.getLocation());
-                targets.add(netherB);
-                targets.add(to.getLocation());
-
-                legs = new double[] {
-                        netherA.distance(netherB) / 8.0,
-                        b.getLocation().distance(to.getLocation()),
-                        0
-                };
-            }
-            case END -> {
-                Place e = places.get(0);
-                Place to = places.get(1);
-
-                World endWorld = RoutePlanner.findEndWorld();
-                Location endExit = new Location(endWorld, 0.5, 64, 0.5); // exit portal in the End
-                Location returnPoint = RoutePlanner.getEndReturnPoint(player, to.getLocation());
-
-                targets.add(e.getLocation());
-                targets.add(endExit);
-                targets.add(to.getLocation());
-
-                legs = new double[] {
-                        RoutePlanner.END_SIDE_DISTANCE,
-                        returnPoint.distance(to.getLocation()),
-                        0
-                };
-            }
-            default -> {
-                targets.add(places.get(places.size() - 1).getLocation());
-                legs = new double[] { 0 };
-            }
-        }
-    }
-
     private void updateProgress(double distToTarget) {
         double remaining = distToTarget;
-        for (int i = step; i < legs.length; i++) remaining += legs[i];
 
         float progress = (float) (1.0 - remaining / totalDistance);
         infoBar.progress(Math.max(0.0f, Math.min(1.0f, progress)));

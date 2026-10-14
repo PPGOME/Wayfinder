@@ -74,3 +74,11 @@ place:
   enableNetherPortals: true
   enableEndPortals: true
   enablePlayers: true
+  presetOptions:
+    end:
+      portal_x: 0
+      portal_y: 54
+      portal_z: 0
+      return_x: 0
+      return_y: 0
+      return_z: 0

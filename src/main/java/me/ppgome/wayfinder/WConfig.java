@@ -1,5 +1,6 @@
 package me.ppgome.wayfinder;
 
+import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 
 public class WConfig {
@@ -69,6 +70,9 @@ public class WConfig {
     public boolean ENABLE_NETHER_PORTALS;
     public boolean ENABLE_END_PORTALS;
     public boolean ENABLE_PLAYERS;
+    //  Preset Options
+    //    The End
+    public Location endPortalLocation;
 
     public WConfig(Wayfinder plugin) {
         this.plugin = plugin;
@@ -161,6 +165,11 @@ public class WConfig {
         ENABLE_NETHER_PORTALS = config.getBoolean(root + "enableNetherPortals", true);
         ENABLE_END_PORTALS = config.getBoolean(root + "enableEndPortals", true);
         ENABLE_PLAYERS = config.getBoolean(root + "enablePlayers", true);
+
+        //  Preset Options
+        //    The End
+        root = "place.presetOptions.end.";
+
 
     }
 

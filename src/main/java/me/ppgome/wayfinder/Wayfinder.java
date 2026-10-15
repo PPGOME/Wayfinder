@@ -11,15 +11,17 @@ import me.ppgome.wayfinder.commands.warp.WarpCommand;
 import me.ppgome.wayfinder.database.DatabaseHandler;
 import me.ppgome.wayfinder.database.place.Category;
 import me.ppgome.wayfinder.guis.GuiUtils;
-//import me.ppgome.wayfinder.hooks.BlueMapHook;
 import me.ppgome.wayfinder.hooks.BlueMapHook;
+import me.ppgome.wayfinder.tasks.TwoMinuteTask;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
 public final class Wayfinder extends JavaPlugin {
@@ -29,6 +31,8 @@ public final class Wayfinder extends JavaPlugin {
     private DatabaseHandler database;
     private Cache cache;
     private WConfig config;
+    private TwoMinuteTask twoMinuteTask;
+    private BukkitTask twoMinuteBukkitTask;
 
     private BlueMapHook blueMapHook;
 
@@ -54,12 +58,15 @@ public final class Wayfinder extends JavaPlugin {
         database.loadDatabaseData().thenRun(this::defaultCategories);
         initializeCommands();
         registerCommands();
-        getServer().getPluginManager().registerEvents(new WListener(this, cache), this);
         loadBlueMap();
+        getServer().getPluginManager().registerEvents(new WListener(this, cache), this);
+        twoMinuteTask = new TwoMinuteTask(this);
+        twoMinuteBukkitTask = Bukkit.getScheduler().runTaskTimer(this, twoMinuteTask, 20L, 20L * 60L * 2L);
     }
 
     @Override
     public void onDisable() {
+        twoMinuteBukkitTask.cancel();
         // Plugin shutdown logic
     }
 

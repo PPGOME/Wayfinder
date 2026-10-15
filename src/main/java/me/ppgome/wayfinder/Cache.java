@@ -17,13 +17,13 @@ public class Cache {
 
     private final Wayfinder plugin;
     private final DatabaseHandler database;
-    private final BlueMapHook blueMapHook;
 
     private final HashMap<UUID, PlayerMeta> playerMetaMap;
 
     private final HashMap<String, Place> places;
     private final HashMap<String, Category> placeCategories;
     private final HashMap<String, Place> pinnedPlaces;
+    private final Set<Place> expiringPlaces;
 
     private final HashMap<String, Warp> warps;
 
@@ -41,12 +41,12 @@ public class Cache {
     public Cache(Wayfinder plugin) {
         this.plugin = plugin;
         this.database = plugin.getDatabase();
-        this.blueMapHook = plugin.getBlueMapHook();
         this.playerMetaMap = new HashMap<>();
         this.places = new HashMap<>();
         this.placeCategories = new HashMap<>();
-        this.warps = new HashMap<>();
         this.pinnedPlaces = new HashMap<>();
+        this.expiringPlaces = new HashSet<>();
+        this.warps = new HashMap<>();
         this.netherPortalPlaces = new HashSet<>();
         this.endPortalPlaces = new HashSet<>();
         this.editingGui = new HashMap<>();
@@ -70,7 +70,9 @@ public class Cache {
     }
 
     public void removePlace(String name) {
+        plugin.getLogger().info("Removing place " + name);
         Place place = getPlace(key(name));
+        plugin.getLogger().info("Removed place " + place);
         places.remove(key(name));
         if(place != null) {
             if(!place.getCategories().isEmpty()) {
@@ -78,9 +80,16 @@ public class Cache {
                     category.removePlace(place);
                 }
             }
-            blueMapHook.removePlaceMarker(place.getLocation(), place.getName());
+            if(place.isPinned()) {
+                removePinnedPlace(name);
+            }
+            BlueMapHook blueMapHook = plugin.getBlueMapHook();
+            if(blueMapHook != null) {
+                blueMapHook.removePlaceMarker(place.getLocation(), place.getName());
+            }
             database.getPlaceTable().delete(place);
         }
+        plugin.getLogger().info("Fully removed place " + name);
     }
 
     // Place Categories ------------------------------------------------------------------------------------------------
@@ -123,6 +132,22 @@ public class Cache {
 
     public void removePinnedPlace(String name) {
         pinnedPlaces.remove(key(name));
+    }
+
+    // Expiring Places -------------------------------------------------------------------------------------------------
+
+    public void addExpiringPlace(Place place) {
+        expiringPlaces.add(place);
+    }
+
+    public Set<Place> getAllExpiringPlaces() {
+        return expiringPlaces;
+    }
+
+    public void removeExpiringPlace(Place place) {
+        expiringPlaces.remove(place);
+        plugin.getLogger().info(place.getName() + " has expired, reached removal!");
+        removePlace(key(place.getName()));
     }
 
     // Warps -----------------------------------------------------------------------------------------------------------

@@ -135,6 +135,10 @@ public class DatabaseHandler {
                         if(place.isPinned()) {
                             cache.addPinnedPlace(place);
                         }
+                        if(place.getExpires() > 0) {
+                            plugin.getLogger().info(place.getName() + " will expire!");
+                            cache.addExpiringPlace(place);
+                        }
                     } catch(Exception e) {}
                 }
 

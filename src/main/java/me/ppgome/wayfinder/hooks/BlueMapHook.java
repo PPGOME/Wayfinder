@@ -5,6 +5,7 @@ import de.bluecolored.bluemap.api.BlueMapMap;
 import de.bluecolored.bluemap.api.markers.MarkerSet;
 import de.bluecolored.bluemap.api.markers.POIMarker;
 import me.ppgome.wayfinder.Cache;
+import me.ppgome.wayfinder.WConfig;
 import me.ppgome.wayfinder.Wayfinder;
 import me.ppgome.wayfinder.database.place.Category;
 import me.ppgome.wayfinder.database.place.NetherPortalLink;
@@ -15,11 +16,13 @@ import org.bukkit.Location;
 public class BlueMapHook {
 
     private final Wayfinder plugin;
+    private final WConfig config;
     private final Cache cache;
     private BlueMapAPI api; // set in onEnable
 
     public BlueMapHook(Wayfinder plugin) {
         this.plugin = plugin;
+        this.config = plugin.getConfiguration();
         this.cache = plugin.getCache();
 
         BlueMapAPI.onEnable(api -> {
@@ -56,7 +59,7 @@ public class BlueMapHook {
     public void addPlaceMarker(Place place) {
         if (api == null) return;
 
-        plugin.getLogger().info("Adding place marker for " + place.getName());
+        debugMessage("Adding place marker for " + place.getName());
 
         Location location = place.getLocation();
         if (location == null || location.getWorld() == null) return;
@@ -64,9 +67,9 @@ public class BlueMapHook {
         String placeIcon = place.getBluemapIcon();
         Category highestCategory = getHighestCategory(place);
 
-        plugin.getLogger().info("Icon: " + placeIcon);
+        debugMessage("Icon: " + placeIcon);
         String tempName = highestCategory != null ? highestCategory.getName() : "null";
-        plugin.getLogger().info("Highest category: " + tempName);
+        debugMessage("Highest category: " + tempName);
 
         if(placeIcon == null) {
             if(highestCategory != null) {
@@ -75,8 +78,6 @@ public class BlueMapHook {
                 return;
             }
         }
-
-        plugin.getLogger().info("Made it here");
 
         POIMarker marker = POIMarker.builder()
                 .label(place.getName())
@@ -123,7 +124,7 @@ public class BlueMapHook {
      */
     public void removePlaceMarker(Location oldLocation, String oldPlaceName) {
         if (api == null) return;
-        plugin.getLogger().info("Removing place marker for " + oldPlaceName);
+        debugMessage("Removing place marker for " + oldPlaceName);
 
         if (oldLocation == null || oldLocation.getWorld() == null) return;
 
@@ -156,6 +157,10 @@ public class BlueMapHook {
             }
         }
         return highest;
+    }
+
+    private void debugMessage(String message) {
+        if(config.DEBUG) plugin.getLogger().info(message);
     }
 
 }

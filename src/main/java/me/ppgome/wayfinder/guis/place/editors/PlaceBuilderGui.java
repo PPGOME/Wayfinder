@@ -267,8 +267,7 @@ public class PlaceBuilderGui extends EditorGui {
                 .name(text)
                 .asGuiItem(event -> {
                     event.setCancelled(true);
-                    // The expiry can only be chosen when the place is first created
-                    if (!editing) promptChat(FieldType.EXPIRES, config.PLACE_PLACE_EDITING_EXPIRES);
+                    promptChat(FieldType.EXPIRES, config.PLACE_PLACE_EDITING_EXPIRES);
                 }));
     }
 
@@ -362,6 +361,8 @@ public class PlaceBuilderGui extends EditorGui {
         String builderText = builderText();
         if (builderText != null) place.setBuilder(builderText);
         place.setPinned(pinned);
+        place.setExpires(expires);
+        if(expires != 0) cache.addExpiringPlace(place);
         place.setCategories(categories);
         place.setBluemapIcon(bluemapIcon);
         reorganizeCategories(place, oldName, oldCategories, new HashSet<>(categories.values()));
@@ -394,7 +395,10 @@ public class PlaceBuilderGui extends EditorGui {
             category.addPlace(newPlace);
             categorizedPlaceTable.save(new CategorizedPlace(category.getName(), newPlace.getName()));
         }
-        if (expires != 0) newPlace.setExpires(expires);
+        if (expires != 0) {
+            newPlace.setExpires(expires);
+            cache.addExpiringPlace(newPlace);
+        }
 
         blueMapHook.addPlaceMarker(newPlace);
 

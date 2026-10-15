@@ -155,10 +155,9 @@ public class ParticleNavigator {
     private void drawTrail(Location from, Location target, Particle.DustTransition dust) {
         Vector dir = target.toVector().subtract(from.toVector()).setY(0);
         double horiz = dir.length();
-        if (horiz < 0.5) return; // basically directly above/below, the beacon + arrow handle that case
+        if (horiz < 0.5) return;
         dir.multiply(1.0 / horiz);
 
-        // The phase slides every refresh, so the dots appear to flow toward the destination
         double phase = (tick * TRAIL_SCROLL) % TRAIL_SPACING;
         int lastY = from.getBlockY();
         double end = Math.min(TRAIL_LENGTH, horiz);
@@ -166,7 +165,7 @@ public class ParticleNavigator {
 
         for (double d = 1 + phase; d < end; d += TRAIL_SPACING, n++) {
             Location p = from.clone().add(dir.clone().multiply(d));
-            double y = groundY(p, lastY);   // follow the previous point rather than the player's Y
+            double y = groundY(p, lastY);
             lastY = (int) Math.floor(y);
             p.setY(y + 0.3);
 
@@ -206,19 +205,17 @@ public class ParticleNavigator {
     private void spawnArrow() {
         Location eye = player.getEyeLocation();
         arrow = eye.getWorld().spawn(eye, ItemDisplay.class, d -> {
-            // Runs before the entity is added to the world, so nobody ever sees it by accident
             d.setVisibleByDefault(false);
-            d.setPersistent(false); // never saved, so a crash can't leave stray arrows behind
+            d.setPersistent(false);
             d.setItemStack(new ItemStack(Material.ARROW));
             d.setItemDisplayTransform(ItemDisplay.ItemDisplayTransform.FIXED);
             d.setBillboard(Display.Billboard.FIXED);
-            d.setBrightness(new Display.Brightness(15, 15)); // fullbright, visible in caves
-            d.setTeleportDuration(2);                        // smooth movement between updates
+            d.setBrightness(new Display.Brightness(15, 15));
+            d.setTeleportDuration(2);
             d.setGlowing(true);
             d.setGlowColorOverride(Color.FUCHSIA);
             d.setTransformation(new Transformation(
                     new Vector3f(),
-                    // Roll the diagonal sprite so its tip points "up", then lay it flat so the tip points forward
                     new Quaternionf()
                             .rotateY((float) Math.toRadians(ARROW_YAW_FIX_DEG))
                             .rotateX((float) Math.toRadians(ARROW_FLAT_DEG))

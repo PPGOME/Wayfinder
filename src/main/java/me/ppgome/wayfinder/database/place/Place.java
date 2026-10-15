@@ -44,6 +44,9 @@ public class Place {
     @DatabaseField
     private long expires;
 
+    @DatabaseField
+    private String bluemapIcon;
+
     private transient NetherPortalLink netherPortalLink;
 
     private Set<Category> categories;
@@ -58,7 +61,7 @@ public class Place {
     }
 
     public Place(String name, Location location, String builder, ItemStack itemStack, boolean pinned,
-                 Map<String, Category> categories) {
+                 Map<String, Category> categories, String bluemapIcon) {
         this.name = name;
         this.x = location.x();
         this.y = location.y();
@@ -68,6 +71,7 @@ public class Place {
         this.item = itemStack.serializeAsBytes();
         this.itemStack = itemStack;
         this.pinned = pinned;
+        this.bluemapIcon = bluemapIcon;
         setCategories(categories);
     }
 
@@ -161,5 +165,13 @@ public class Place {
 
     public boolean isNetherPortal() {
         return netherPortalLink != null;
+    }
+
+    public String getBluemapIcon() {
+        return bluemapIcon;
+    }
+
+    public void setBluemapIcon(String bluemapIcon) {
+        this.bluemapIcon = bluemapIcon;
     }
 }

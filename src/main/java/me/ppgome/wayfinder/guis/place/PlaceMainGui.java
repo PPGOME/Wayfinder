@@ -10,6 +10,8 @@ import me.ppgome.wayfinder.database.place.Place;
 import me.ppgome.wayfinder.guis.EditOrDeleteGui;
 import me.ppgome.wayfinder.guis.GuiUtils;
 import me.ppgome.wayfinder.guis.WGui;
+import me.ppgome.wayfinder.guis.place.editors.CategoryBuilderGui;
+import me.ppgome.wayfinder.guis.place.editors.PlaceBuilderGui;
 import me.ppgome.wayfinder.utils.TextUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;

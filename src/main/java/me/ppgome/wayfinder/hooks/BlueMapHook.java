@@ -29,78 +29,111 @@ public class BlueMapHook {
         BlueMapAPI.onDisable(api -> this.api = null);
     }
 
-    private MarkerSet getOrCreateMarkerSet(BlueMapMap map, Category category) {
-        return map.getMarkerSets().computeIfAbsent(
-                TextUtils.getBluemapId(category.getName()),
-                id -> MarkerSet.builder().label(category.getName()).build());
+    /**
+     *
+     * @param map
+     * @param category
+     * @return
+     */
+    private MarkerSet getOrCreateMarkerSet(BlueMapMap map, String name) {
+        return map.getMarkerSets().computeIfAbsent(name, id -> MarkerSet.builder().label(name).build());
     }
 
+    /**
+     *
+     * @param place
+     * @return
+     */
     private String markerId(Place place) {
         return TextUtils.getBluemapId(place.getName());
     }
 
+    /**
+     *
+     * @param place
+     */
     public void addPlaceMarker(Place place) {
         if (api == null) return;
 
         Location location = place.getLocation();
         if (location == null || location.getWorld() == null) return;
 
-        Category highest = null;
-        for (Category category : place.getCategories()) {
-            if (highest == null || category.getPriority() > highest.getPriority()) {
-                highest = category;
-            }
-        }
-        if (highest == null || highest.getBluemapIcon() == null) return;
+        String placeIcon = place.getBluemapIcon();
+        Category highestCategory = getHighestCategory(place);
 
-        final Category category = highest;
+        if(placeIcon == null) placeIcon = highestCategory.getBluemapIcon();
+
         POIMarker marker = POIMarker.builder()
                 .label(place.getName())
                 .position(location.getX(), location.getY(), location.getZ())
                 .build();
 
+        String finalPlaceIcon = placeIcon;
         api.getWorld(location.getWorld()).ifPresent(world -> {
             for (BlueMapMap map : world.getMaps()) {
-                marker.setIcon(category.getBluemapIcon(), 0, 0);
+                marker.setIcon(finalPlaceIcon, 0, 0);
 
-                getOrCreateMarkerSet(map, category)
+                getOrCreateMarkerSet(map, highestCategory != null ?
+                        TextUtils.getBluemapId(highestCategory.getName()) :
+                        "solo-markers")
                         .getMarkers().put(markerId(place), marker);
             }
         });
 
         if(place.isNetherPortal()) {
+            String finalPlaceIconPortal = placeIcon;
             api.getWorld(place.getNetherPortalLink().getPartnerLocation().getWorld()).ifPresent(world -> {
                 for (BlueMapMap map : world.getMaps()) {
-                    marker.setIcon(category.getBluemapIcon(), 0, 0);
+                    marker.setIcon(finalPlaceIconPortal, 0, 0);
 
-                    getOrCreateMarkerSet(map, category)
+                    getOrCreateMarkerSet(map, highestCategory != null ?
+                            TextUtils.getBluemapId(highestCategory.getName()) :
+                            "solo-markers")
                             .getMarkers().put(markerId(place), marker);
                 }
             });
         }
     }
 
-    private void markerAction(BlueMapAPI api) {
-
-    }
-
-    public void removePlaceMarker(Place place) {
+    /**
+     *
+     * @param place
+     */
+    public void removePlaceMarker(Location oldLocation, String oldPlaceName) {
         if (api == null) return;
-        Location location = place.getLocation();
-        if (location == null || location.getWorld() == null) return;
+        if (oldLocation == null || oldLocation.getWorld() == null) return;
 
-        api.getWorld(location.getWorld()).ifPresent(world -> {
+        api.getWorld(oldLocation.getWorld()).ifPresent(world -> {
             for (BlueMapMap map : world.getMaps()) {
                 for (MarkerSet set : map.getMarkerSets().values()) {
-                    set.getMarkers().remove(markerId(place));
+                    set.getMarkers().remove(TextUtils.getBluemapId(oldPlaceName));
                 }
             }
         });
     }
 
+    /**
+     *
+     * @param category
+     */
     public void removeCategoryMarkerSet(Category category) {
         if (api == null) return;
         String id = TextUtils.getBluemapId(category.getName());
         api.getMaps().forEach(map -> map.getMarkerSets().remove(id));
     }
+
+    private Category getHighestCategory(Place place) {
+        if(place.getBluemapIcon() == null) return null;
+
+        Category highest = null;
+        for (Category category : place.getCategories()) {
+            if(category.getBluemapIcon() == null) continue;
+
+            if (highest == null || category.getPriority() > highest.getPriority()) {
+                highest = category;
+            }
+        }
+        return highest;
+    }
+
 }

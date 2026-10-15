@@ -147,7 +147,7 @@ public class GuiUtils {
     /**
      * A blank, click-proof pane.
      */
-    private static GuiItem pane(Material material) {
+    public static GuiItem pane(Material material) {
         return PaperItemBuilder.from(material)
                 .name(Component.text(" "))
                 .asGuiItem(event -> event.setCancelled(true));

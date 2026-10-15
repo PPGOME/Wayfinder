@@ -169,4 +169,6 @@ public final class Wayfinder extends JavaPlugin {
         return config;
     }
 
+    public BlueMapHook getBlueMapHook() { return blueMapHook; }
+
 }

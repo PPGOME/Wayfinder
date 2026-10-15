@@ -1,4 +1,4 @@
-package me.ppgome.wayfinder.guis.place;
+package me.ppgome.wayfinder.guis.place.editors;
 
 import dev.triumphteam.gui.builder.item.PaperItemBuilder;
 import dev.triumphteam.gui.guis.Gui;

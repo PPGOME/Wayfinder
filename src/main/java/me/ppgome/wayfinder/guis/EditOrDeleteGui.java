@@ -55,6 +55,7 @@ public class EditOrDeleteGui<T> extends WGui {
                                     Component.text("This category is not empty. Please remove all places from it.",
                                             NamedTextColor.RED)
                             );
+                            return;
                         }
                         cache.removeCategory(category);
                     }

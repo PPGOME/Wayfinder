@@ -57,7 +57,7 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
 
     public PlaceBuilderGui(Place place) {
         this.place = place;
-        this.name = Component.text(place.getName());
+        this.name = mm.deserialize(place.getName());
         String tempBuilder = place.getBuilder();
         if(tempBuilder != null) {
             this.builder = Component.text(place.getBuilder());
@@ -215,9 +215,11 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
     protected void updateCategories(Map<String, Category> categoryMap) {
         this.categories = categoryMap;
         setCategories();
-        if(categories.get("Nether Portals") != null && netherPortalLink == null) {
+        
+        boolean wantsPortalLink = categories.containsKey("Nether Portals");
+        if(wantsPortalLink && netherPortalLink == null) {
             netherPortalLink = new NetherPortalLink();
-        } else if(netherPortalLink != null) {
+        } else if(!wantsPortalLink) {
             netherPortalLink = null;
         }
         setNetherPortalLink();
@@ -310,9 +312,8 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
                     // Verify the item was changed and that the place was assigned at least one category
                     if(itemStack.getType().equals(Material.GRAY_STAINED_GLASS_PANE) || categories.isEmpty()) return;
 
-                    String stringName = mm.serialize(name);
-                    Place checkPlace = cache.getPlace(stringName);
-                    if(!stringName.equalsIgnoreCase("nearest") && checkPlace != null && (place == null || checkPlace != place)) {
+                    Place checkPlace = cache.getPlace(mm.serialize(name));
+                    if(mm.serialize(name).equalsIgnoreCase("nearest") || checkPlace != null && (place == null || checkPlace != place)) {
                             player.sendMessage(PlaceholderParser.of(config.PLACE_PLACE_ALREADY_EXISTS).prefix(config.PREFIX).parse());
                             return;
                     }
@@ -322,7 +323,7 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
                     if(place != null) {
                         String oldName = place.getName();
                         Set<Category> oldCategories = new HashSet<>(place.getCategories());
-                        place.setName(stringName);
+                        place.setName(mm.serialize(name));
                         place.setItemStack(itemStack);
                         place.setLocation(editingLocation);
                         if(builder != null) place.setBuilder(mm.serialize(builder));
@@ -332,7 +333,7 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
                         tempPlace = place;
                         hopBackTo = lastGui;
                     } else {
-                        Place newPlace = new Place(stringName, player.getLocation(),
+                        Place newPlace = new Place(mm.serialize(name), player.getLocation(),
                                 builder.equals(defaultBuilder) ? null : mm.serialize(builder), itemStack, pinned, categories);
                         cache.addPlace(newPlace);
                         for(Category category : categories.values()) {
@@ -364,6 +365,7 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
 
                     if(tempPlace.isPinned()) cache.addPinnedPlace(tempPlace);
                     if(!tempPlace.isPinned() && cache.getPinnedPlace(tempPlace.getName()) != null) cache.removePinnedPlace(tempPlace.getName());
+                    cache.removeEditingGui(player.getUniqueId());
                     suppressCloseEvent = true;
                     hopBackTo.getLast().nullify();
                     hopBackTo.openLast();
@@ -371,24 +373,15 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
                 }));
     }
 
-    /**
-     *
-     */
-
-    /**
-     * Sync category changes for an edited place, both in the database (categorized_place table)
-     * and in-memory (each Category's Set<Place>), using the correct old/new place name.
-     *
-     * @param place the place being edited (already has its NEW name/categories set on it)
-     * @param oldPlaceName the place's name BEFORE this edit (used to clear old DB rows)
-     * @param oldCategories the place's categories BEFORE this edit (snapshot taken before setCategories() ran)
-     * @param newCategories the place's categories AFTER this edit
-     */
     private void reorganizeCategories(Place place, String oldPlaceName, Set<Category> oldCategories, Set<Category> newCategories) {
         Set<Category> removed = new HashSet<>(oldCategories);
         removed.removeAll(newCategories);
         Set<Category> added = new HashSet<>(newCategories);
         added.removeAll(oldCategories);
+
+        if (!oldPlaceName.equals(place.getName())) {
+            categorizedPlaceTable.renamePlace(oldPlaceName, place.getName());
+        }
 
         for(Category category : removed) {
             category.removePlace(place);

@@ -7,6 +7,7 @@ import de.bluecolored.bluemap.api.markers.POIMarker;
 import me.ppgome.wayfinder.Cache;
 import me.ppgome.wayfinder.Wayfinder;
 import me.ppgome.wayfinder.database.place.Category;
+import me.ppgome.wayfinder.database.place.NetherPortalLink;
 import me.ppgome.wayfinder.database.place.Place;
 import me.ppgome.wayfinder.utils.TextUtils;
 import org.bukkit.Location;
@@ -55,13 +56,27 @@ public class BlueMapHook {
     public void addPlaceMarker(Place place) {
         if (api == null) return;
 
+        plugin.getLogger().info("Adding place marker for " + place.getName());
+
         Location location = place.getLocation();
         if (location == null || location.getWorld() == null) return;
 
         String placeIcon = place.getBluemapIcon();
         Category highestCategory = getHighestCategory(place);
 
-        if(placeIcon == null) placeIcon = highestCategory.getBluemapIcon();
+        plugin.getLogger().info("Icon: " + placeIcon);
+        String tempName = highestCategory != null ? highestCategory.getName() : "null";
+        plugin.getLogger().info("Highest category: " + tempName);
+
+        if(placeIcon == null) {
+            if(highestCategory != null) {
+                placeIcon = highestCategory.getBluemapIcon();
+            } else {
+                return;
+            }
+        }
+
+        plugin.getLogger().info("Made it here");
 
         POIMarker marker = POIMarker.builder()
                 .label(place.getName())
@@ -80,18 +95,25 @@ public class BlueMapHook {
             }
         });
 
-        if(place.isNetherPortal()) {
-            String finalPlaceIconPortal = placeIcon;
-            api.getWorld(place.getNetherPortalLink().getPartnerLocation().getWorld()).ifPresent(world -> {
-                for (BlueMapMap map : world.getMaps()) {
-                    marker.setIcon(finalPlaceIconPortal, 0, 0);
+        NetherPortalLink link = place.getNetherPortalLink();
+        if (place.isNetherPortal() && link != null) {
+            Location partner = link.getPartnerLocation();
+            if (partner != null && partner.getWorld() != null) {
+                POIMarker portalMarker = POIMarker.builder()
+                        .label(place.getName())
+                        .position(partner.getX(), partner.getY(), partner.getZ())
+                        .build();
 
-                    getOrCreateMarkerSet(map, highestCategory != null ?
-                            TextUtils.getBluemapId(highestCategory.getName()) :
-                            "solo-markers")
-                            .getMarkers().put(markerId(place), marker);
-                }
-            });
+                api.getWorld(partner.getWorld()).ifPresent(world -> {
+                    for (BlueMapMap map : world.getMaps()) {
+                        portalMarker.setIcon(finalPlaceIcon, 0, 0);
+                        getOrCreateMarkerSet(map, highestCategory != null ?
+                                TextUtils.getBluemapId(highestCategory.getName()) :
+                                "solo-markers")
+                                .getMarkers().put(markerId(place), portalMarker);
+                    }
+                });
+            }
         }
     }
 
@@ -101,6 +123,8 @@ public class BlueMapHook {
      */
     public void removePlaceMarker(Location oldLocation, String oldPlaceName) {
         if (api == null) return;
+        plugin.getLogger().info("Removing place marker for " + oldPlaceName);
+
         if (oldLocation == null || oldLocation.getWorld() == null) return;
 
         api.getWorld(oldLocation.getWorld()).ifPresent(world -> {
@@ -123,8 +147,6 @@ public class BlueMapHook {
     }
 
     private Category getHighestCategory(Place place) {
-        if(place.getBluemapIcon() == null) return null;
-
         Category highest = null;
         for (Category category : place.getCategories()) {
             if(category.getBluemapIcon() == null) continue;

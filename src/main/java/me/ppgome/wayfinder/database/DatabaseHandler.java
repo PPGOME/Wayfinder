@@ -189,6 +189,7 @@ public class DatabaseHandler {
         addColumnIfMissing(playerMetaDao, playerMeta, "placeParticlesEnabled", "BOOLEAN DEFAULT 0");
         addColumnIfMissing(playerMetaDao, playerMeta, "placeArrowEnabled", "BOOLEAN DEFAULT 1");
         addColumnIfMissing(playerMetaDao, playerMeta, "enablePortalSkipping", "BOOLEAN DEFAULT 1");
+        addColumnIfMissing(placeDao, "place", "bluemapIcon", "VARCHAR DEFAULT NULL");
     }
 
     private void addColumnIfMissing(Dao<?, ?> dao, String table, String column, String definition)

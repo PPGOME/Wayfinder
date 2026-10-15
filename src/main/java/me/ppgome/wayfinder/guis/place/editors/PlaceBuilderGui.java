@@ -74,6 +74,7 @@ public class PlaceBuilderGui extends EditorGui {
         this.categories = new HashMap<>();
         for(Category category : place.getCategories()) this.categories.put(category.getName(), category);
         this.guiItem = PaperItemBuilder.from(place.getItemStack()).asGuiItem();
+        this.bluemapIcon = place.getBluemapIcon();
         this.pinned = place.isPinned();
         this.expires = place.getExpires();
         this.netherPortalLink = place.getNetherPortalLink();
@@ -116,6 +117,7 @@ public class PlaceBuilderGui extends EditorGui {
 
     @Override
     public void submitChatEntry(Component entry) {
+        Wayfinder.PLUGIN.getLogger().info("submitChatEntry type=" + type + " entry=" + plain(entry));
         if(type == FieldType.NAME) {
             this.name = entry;
         } else if(type == FieldType.BUILDERS) {
@@ -124,6 +126,7 @@ public class PlaceBuilderGui extends EditorGui {
             this.expires = TextUtils.stringToMilliseconds(plain(entry));
         } else if(type == FieldType.ICON) {
             this.bluemapIcon = plain(entry);
+            Wayfinder.PLUGIN.getLogger().info("bluemapIcon set to " + bluemapIcon);
         }
         type = null;
     }
@@ -309,7 +312,7 @@ public class PlaceBuilderGui extends EditorGui {
      *
      */
     private void confirm() {
-        ItemStack icon = gui.getGuiItem(32).getItemStack();
+        ItemStack icon = gui.getGuiItem(14).getItemStack();
 
         if (icon.getType() == Material.GRAY_STAINED_GLASS_PANE) {
             reject("Click the icon slot with an item first.");
@@ -360,6 +363,7 @@ public class PlaceBuilderGui extends EditorGui {
         if (builderText != null) place.setBuilder(builderText);
         place.setPinned(pinned);
         place.setCategories(categories);
+        place.setBluemapIcon(bluemapIcon);
         reorganizeCategories(place, oldName, oldCategories, new HashSet<>(categories.values()));
 
         blueMapHook.removePlaceMarker(oldLocation, oldName);

@@ -6,6 +6,7 @@ import me.ppgome.wayfinder.database.Warp;
 import me.ppgome.wayfinder.database.place.Category;
 import me.ppgome.wayfinder.database.place.Place;
 import me.ppgome.wayfinder.guis.WGui;
+import me.ppgome.wayfinder.hooks.BlueMapHook;
 import me.ppgome.wayfinder.navigation.ParticleNavigator;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -16,6 +17,7 @@ public class Cache {
 
     private final Wayfinder plugin;
     private final DatabaseHandler database;
+    private final BlueMapHook blueMapHook;
 
     private final HashMap<UUID, PlayerMeta> playerMetaMap;
 
@@ -39,6 +41,7 @@ public class Cache {
     public Cache(Wayfinder plugin) {
         this.plugin = plugin;
         this.database = plugin.getDatabase();
+        this.blueMapHook = plugin.getBlueMapHook();
         this.playerMetaMap = new HashMap<>();
         this.places = new HashMap<>();
         this.placeCategories = new HashMap<>();
@@ -75,6 +78,7 @@ public class Cache {
                     category.removePlace(place);
                 }
             }
+            blueMapHook.removePlaceMarker(place.getLocation(), place.getName());
             database.getPlaceTable().delete(place);
         }
     }

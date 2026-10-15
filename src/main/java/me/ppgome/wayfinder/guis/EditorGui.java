@@ -34,7 +34,7 @@ public abstract class EditorGui extends WGui implements AcceptsChatGui {
         UUID uuid = player.getUniqueId();
         cache.addEditingGui(uuid, this);
         cache.addAwaitingChat(uuid);
-        fieldType = type;
+        type = fieldType;
         gui.close(player);
         player.sendMessage(PlaceholderParser.of(message).prefix(config.PREFIX).parse());
     }

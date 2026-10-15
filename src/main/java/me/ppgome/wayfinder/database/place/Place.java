@@ -44,7 +44,7 @@ public class Place {
     @DatabaseField
     private long expires;
 
-    @DatabaseField
+    @DatabaseField()
     private String bluemapIcon;
 
     private transient NetherPortalLink netherPortalLink;

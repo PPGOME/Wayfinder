@@ -8,7 +8,7 @@ import me.ppgome.wayfinder.Cache;
 import me.ppgome.wayfinder.Wayfinder;
 import me.ppgome.wayfinder.database.place.Category;
 import me.ppgome.wayfinder.database.place.Place;
-import me.ppgome.wayfinder.text.TextUtils;
+import me.ppgome.wayfinder.utils.TextUtils;
 import org.bukkit.Location;
 
 public class BlueMapHook {

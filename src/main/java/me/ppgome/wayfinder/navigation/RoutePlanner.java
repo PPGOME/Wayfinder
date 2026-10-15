@@ -19,6 +19,7 @@ public class RoutePlanner {
     private final Wayfinder plugin;
     private final Cache cache;
     private final WConfig config;
+    private Logger log;
 
     private final static double PORTAL_COST = 20.0;
     private final static double DIRECT_BIAS = 0.9;
@@ -34,11 +35,12 @@ public class RoutePlanner {
         this.player = player;
         this.toPlace = place;
         this.playerMeta = plugin.getCache().getPlayerMeta(player.getUniqueId());
+        log = plugin.getLogger();
     }
 
     private static final class Node {
         final Location loc;
-        final Place place; // null for virtual nodes
+        final Place place;
         final List<Edge> edges = new ArrayList<>();
         Node(Location loc, Place place) { this.loc = loc; this.place = place; }
     }
@@ -63,7 +65,7 @@ public class RoutePlanner {
                 from.getWorld().getEnvironment() == World.Environment.NORMAL;
         boolean skipPortals = overworldToOverworld && !playerMeta.isEnablePortalSkipping();
 
-        plugin.getLogger().info("from=" + fmt(from) + " enabled=" + config.ENABLE_NETHER_PORTALS);
+        debugMessage("from=" + fmt(from) + " enabled=" + config.ENABLE_NETHER_PORTALS);
         Node endPlatform = null;
         if(!skipPortals) {
             if(config.ENABLE_NETHER_PORTALS) addNetherPortals(nodes);
@@ -74,17 +76,17 @@ public class RoutePlanner {
         for (Node n : nodes) {
             StringBuilder sb = new StringBuilder(fmt(n.loc) + " -> ");
             for (Edge e : n.edges) sb.append(fmt(e.to().loc)).append(" (").append(Math.round(e.cost())).append("), ");
-            plugin.getLogger().info(sb.toString());
+            debugMessage(sb.toString());
         }
-        plugin.getLogger().info("PORTAL_COST=" + PORTAL_COST);
+        debugMessage("PORTAL_COST=" + PORTAL_COST);
 
         Result result = pathfind(start, end);
-        plugin.getLogger().info("result=" + (result == null ? "null" : result.cost() + " via " + result.path().stream().map(n -> fmt(n.loc)).toList()));
+        debugMessage("result=" + (result == null ? "null" : result.cost() + " via " + result.path().stream().map(n -> fmt(n.loc)).toList()));
         if(result == null) return null;
 
         if(from.getWorld().equals(to.getWorld())) {
             double direct = from.distance(to);
-            plugin.getLogger().info("direct=" + direct + " bias threshold=" + (direct * DIRECT_BIAS));
+            debugMessage("direct=" + direct + " bias threshold=" + (direct * DIRECT_BIAS));
             if(result.cost() >= direct * DIRECT_BIAS) {
                 return new Route(List.of(new RouteWaypoint(to, toPlace, 0)), direct, Type.DIRECT);
             }
@@ -96,20 +98,19 @@ public class RoutePlanner {
 
     private void addNetherPortals(List<Node> nodes) {
 
-        Logger log = plugin.getLogger();
         int added = 0, noLoc = 0, noLink = 0, noPartner = 0;
 
         for(Place netherPortalPlace : cache.getAllNetherPortalPlaces()) {
             if(netherPortalPlace == null || netherPortalPlace.getLocation() == null) {
                 noLoc++;
-                log.info("skipped (no location): " + (netherPortalPlace == null ? "null place" : netherPortalPlace.getName()));
+                debugMessage("skipped (no location): " + (netherPortalPlace == null ? "null place" : netherPortalPlace.getName()));
                 continue;
             }
             NetherPortalLink link = netherPortalPlace.getNetherPortalLink();
             if(link == null) { noLink++; continue; }
             if(link == null || link.getPartnerLocation() == null) {
                 noPartner++;
-                log.info("skipped (no partner): " + netherPortalPlace.getName() + " at " + fmt(netherPortalPlace.getLocation()));
+                debugMessage("skipped (no partner): " + netherPortalPlace.getName() + " at " + fmt(netherPortalPlace.getLocation()));
                 continue;
             }
 
@@ -123,9 +124,9 @@ public class RoutePlanner {
             nodes.add(b);
 
             added++;
-            log.info("portal " + netherPortalPlace.getName() + ": " + fmt(netherPortalPlace.getLocation()) + " <-> " + fmt(link.getPartnerLocation()));
+            debugMessage("portal " + netherPortalPlace.getName() + ": " + fmt(netherPortalPlace.getLocation()) + " <-> " + fmt(link.getPartnerLocation()));
         }
-        log.info("nether portals: added=" + added + " noLoc=" + noLoc
+        debugMessage("nether portals: added=" + added + " noLoc=" + noLoc
                 + " noLink=" + noLink + " noPartner=" + noPartner);
     }
 
@@ -244,5 +245,9 @@ public class RoutePlanner {
         Location bed = player.getRespawnLocation();
         if (bed != null) return bed;
         return findWorld(World.Environment.NORMAL).getSpawnLocation();
+    }
+
+    private void debugMessage(String message) {
+        if(config.DEBUG) log.info(message);
     }
 }

@@ -14,7 +14,6 @@ import me.ppgome.wayfinder.guis.GuiUtils;
 //import me.ppgome.wayfinder.hooks.BlueMapHook;
 import me.ppgome.wayfinder.hooks.BlueMapHook;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;

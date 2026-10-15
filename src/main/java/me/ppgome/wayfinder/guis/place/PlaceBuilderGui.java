@@ -9,7 +9,7 @@ import me.ppgome.wayfinder.guis.AcceptsChatGui;
 import me.ppgome.wayfinder.guis.GuiUtils;
 import me.ppgome.wayfinder.guis.WGui;
 import me.ppgome.wayfinder.text.PlaceholderParser;
-import me.ppgome.wayfinder.text.TextUtils;
+import me.ppgome.wayfinder.utils.TextUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -23,6 +23,8 @@ import java.util.*;
 
 public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
 
+    // Modifiable data
+    private Place place;
     private Component name;
     private Component builder;
     private final Component defaultBuilder = Component.text("Click here to add a builder (or more)");
@@ -34,7 +36,7 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
             .asGuiItem();
     private boolean pinned;
     private long expires;
-    private Place place;
+
     private boolean suppressCloseEvent = false;
     FieldType fieldType;
     CategorizedPlaceTable categorizedPlaceTable = Wayfinder.PLUGIN.getDatabase().getCategorizedPlaceTable();
@@ -96,7 +98,7 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
         /*
         Other standard thingies
          */
-        GuiUtils.fillWhitePanesEditor(gui);
+        GuiUtils.fillWhitePanes(gui);
         gui.setCloseGuiAction(event -> {
             if(!suppressCloseEvent) {
                 cache.addEditingGui(player.getUniqueId(), this);
@@ -308,8 +310,9 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
                     // Verify the item was changed and that the place was assigned at least one category
                     if(itemStack.getType().equals(Material.GRAY_STAINED_GLASS_PANE) || categories.isEmpty()) return;
 
-                    Place checkPlace = cache.getPlace(mm.serialize(name));
-                    if(checkPlace != null && (place == null || checkPlace != place)) {
+                    String stringName = mm.serialize(name);
+                    Place checkPlace = cache.getPlace(stringName);
+                    if(!stringName.equalsIgnoreCase("nearest") && checkPlace != null && (place == null || checkPlace != place)) {
                             player.sendMessage(PlaceholderParser.of(config.PLACE_PLACE_ALREADY_EXISTS).prefix(config.PREFIX).parse());
                             return;
                     }
@@ -319,7 +322,7 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
                     if(place != null) {
                         String oldName = place.getName();
                         Set<Category> oldCategories = new HashSet<>(place.getCategories());
-                        place.setName(mm.serialize(name));
+                        place.setName(stringName);
                         place.setItemStack(itemStack);
                         place.setLocation(editingLocation);
                         if(builder != null) place.setBuilder(mm.serialize(builder));
@@ -329,7 +332,7 @@ public class PlaceBuilderGui extends WGui implements AcceptsChatGui {
                         tempPlace = place;
                         hopBackTo = lastGui;
                     } else {
-                        Place newPlace = new Place(mm.serialize(name), player.getLocation(),
+                        Place newPlace = new Place(stringName, player.getLocation(),
                                 builder.equals(defaultBuilder) ? null : mm.serialize(builder), itemStack, pinned, categories);
                         cache.addPlace(newPlace);
                         for(Category category : categories.values()) {

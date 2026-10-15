@@ -6,7 +6,7 @@
 
     <groupId>me.ppgome</groupId>
     <artifactId>wayfinder</artifactId>
-    <version>alpha-1.1.0</version>
+    <version>1.0.0-alpha.6</version>
     <packaging>jar</packaging>
 
     <name>wayfinder</name>

@@ -11,7 +11,7 @@ import me.ppgome.wayfinder.database.Warp;
 import me.ppgome.wayfinder.database.place.Place;
 import me.ppgome.wayfinder.navigation.ParticleNavigator;
 import me.ppgome.wayfinder.text.PlaceholderParser;
-import me.ppgome.wayfinder.text.TextUtils;
+import me.ppgome.wayfinder.utils.TextUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -20,13 +20,20 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class GuiUtils {
+
+    // =================================================================================================================
+    // Layout / Slots
+    // =================================================================================================================
 
     /**
      * Get the slot placement for centering items in a GUI area.
@@ -78,74 +85,231 @@ public class GuiUtils {
                 .toList();
     }
 
-    /**
-     * Insert gray panes into a GUI between two slots (inclusive).
-     * @param gui the GUI to insert panes into
-     * @param firstSlot the first slot to insert a pane into
-     * @param lastSlot the last slot to insert a pane into
-     */
-    public static void insertGrayPanes(Gui gui, int firstSlot, int lastSlot) {
-
-        GuiItem pane = PaperItemBuilder.from(Material.GRAY_STAINED_GLASS_PANE).name(Component.text(" ")).asGuiItem();
-
-        for(int i = firstSlot; i <= lastSlot; i++) {
-            if(isBorder(i)) continue;
-            gui.setItem(i, pane);
-        }
-    }
+//    /**
+//     * Insert gray panes into a GUI between two slots (inclusive).
+//     * @param gui the GUI to insert panes into
+//     * @param firstSlot the first slot to insert a pane into
+//     * @param lastSlot the last slot to insert a pane into
+//     */
+//    public static void insertGrayPanes(Gui gui, int firstSlot, int lastSlot) {
+//
+//        GuiItem pane = PaperItemBuilder.from(Material.GRAY_STAINED_GLASS_PANE).name(Component.text(" ")).asGuiItem();
+//
+//        for(int i = firstSlot; i <= lastSlot; i++) {
+//            if(isBorder(i)) continue;
+//            gui.setItem(i, pane);
+//        }
+//    }
 
     public static boolean isBorder(int slot) {
         int posInRow = slot % 9;
         return posInRow == 8 || posInRow == 0;
     }
 
+    /**
+     * All non-border slots between two slots (inclusive), in order.
+     * This is the one place the "skip the border columns" rule lives.
+     */
+
+    public static List<Integer> slotsBetween(int firstSlot, int lastSlot) {
+        List<Integer> slots = new ArrayList<>();
+        for(int i = firstSlot; i <= lastSlot; i++) {
+            if(!isBorder(i)) slots.add(i);
+        }
+        return  slots;
+    }
+
+    /**
+     * Every usable slot inside the GUI's border: skips the first row, the last row and the two edge columns.
+     * A 6-row GUI gives slots 10-43 (28 slots); a 4-row GUI gives 10-25 (14 slots).
+     */
+
+    public static List<Integer> interiorSlots(Gui gui) {
+        return slotsBetween(9, (gui.getRows() - 1) * 9 - 1);
+    }
+
+    /**
+     * Hand each item to placer along with the next free slot. Stops quietly when the slots run out,
+     * so a long list can no longer spill over borders or onto other buttons.
+     */
+    public static <T> void placeAll(Iterable<T> items, List<Integer> slots, BiConsumer<Integer, T> placer) {
+        Iterator<Integer> slotIterator = slots.iterator();
+        for (T item : items) {
+            if (!slotIterator.hasNext()) return;
+            placer.accept(slotIterator.next(), item);
+        }
+    }
+
+    // =================================================================================================================
+    // Panes
+    // =================================================================================================================
+
+    /**
+     * A blank, click-proof pane.
+     */
+    private static GuiItem pane(Material material) {
+        return PaperItemBuilder.from(material)
+                .name(Component.text(" "))
+                .asGuiItem(event -> event.setCancelled(true));
+    }
+
+    /**
+     * Insert gray panes into a GUI between two slots (inclusive), skipping border columns.
+     */
+    public static void insertGrayPanes(Gui gui, int firstSlot, int lastSlot) {
+        GuiItem pane = pane(Material.GRAY_STAINED_GLASS_PANE);
+        for (int slot : slotsBetween(firstSlot, lastSlot)) {
+            gui.setItem(slot, pane);
+        }
+    }
+
+    /**
+     * Insert gray panes into every interior slot of the GUI.
+     */
+    public static void insertGrayPanes(Gui gui) {
+        GuiItem pane = pane(Material.GRAY_STAINED_GLASS_PANE);
+        for (int slot : interiorSlots(gui)) {
+            gui.setItem(slot, pane);
+        }
+    }
+
+    /**
+     * Fill all remaining empty slots with click-proof white panes.
+     */
     public static void fillWhitePanes(Gui gui) {
-        gui.getFiller().fill(PaperItemBuilder.from(Material.WHITE_STAINED_GLASS_PANE)
-                .name(Component.text(" "))
-                .asGuiItem());
+        gui.getFiller().fill(pane(Material.WHITE_STAINED_GLASS_PANE));
     }
 
-    public static void fillWhitePanesEditor(Gui gui) {
-        gui.getFiller().fill(PaperItemBuilder.from(Material.WHITE_STAINED_GLASS_PANE)
-                .name(Component.text(" "))
-                .asGuiItem(event -> event.setCancelled(true)));
+    public static void defaultCancel(Gui gui) {
+        gui.setDefaultClickAction(event -> event.setCancelled(true));
     }
 
+    // =================================================================================================================
+    // Buttons
+    // =================================================================================================================
+
+    /**
+     * A named, coloured, non-italic button that always cancels the click before running {@code action}.
+     */
+    public static GuiItem button(Material material, String name, NamedTextColor colour,
+                                 Consumer<InventoryClickEvent> action) {
+        return PaperItemBuilder.from(material)
+                .name(TextUtils.stripDecoration(name).color(colour))
+                .asGuiItem(event -> {
+                    event.setCancelled(true);
+                    action.accept(event);
+                });
+    }
+
+    /**
+     * The item for confirming in a GUI. Used mainly for editors
+     * @param action the action to run on click
+     * @return A GuiItem for placing in a GUI
+     */
+    public static GuiItem confirm(Consumer<InventoryClickEvent> action) {
+        return button(Material.EMERALD, "Confirm!", NamedTextColor.GREEN, action);
+    }
+
+    /**
+     * The item for cancelling in a GUI. Used mainly for editors
+     * @param action the action to run on click
+     * @return A GuiItem for placing in a GUI
+     */
+    public static GuiItem cancel(Consumer<InventoryClickEvent> action) {
+        return button(Material.BARRIER, "Cancel", NamedTextColor.RED, action);
+    }
+
+    /**
+     * An on/off settings button. The name ("Enable x" / "Disable x") and its colour come from {@code enabled};
+     * the click is cancelled and then handed to {@code onToggle}, which should flip the value and rebuild the button.
+     * @param noun what is being toggled, e.g. "particle guide"
+     * @param icon a fresh ItemStack to use as the icon (its display name is overwritten)
+     * @param lore plain lore lines
+     */
+    public static GuiItem toggleButton(String noun, boolean enabled, ItemStack icon, List<String> lore,
+                                       Consumer<InventoryClickEvent> onToggle) {
+        icon.editMeta(meta -> meta.displayName(
+                TextUtils.stripDecoration((enabled ? "Disable " : "Enable ") + noun)
+                        .color(enabled ? NamedTextColor.RED : NamedTextColor.GREEN)));
+
+        List<Component> loreLines = lore.stream()
+                .map(TextUtils::stripDecoration)
+                .toList();
+
+        return PaperItemBuilder.from(icon)
+                .lore(loreLines)
+                .asGuiItem(event -> {
+                    event.setCancelled(true);
+                    onToggle.accept(event);
+                });
+    }
+
+    // =================================================================================================================
+    // Place / Warp / Home Entries
+    // =================================================================================================================
+
+    /**
+     * Shared wiring for place, warp and home buttons: shift-click opens the edit/delete screen (when allowed),
+     * anything else runs {@code onUse}.
+     * If EditOrDeleteGui has a bound on its type parameter, put the same bound on T here.
+     */
+    private static <T> void addEntryItem(WGui wGui, Gui gui, int slot, GuiItem item, T entry, Player player,
+                                         boolean canEdit, Consumer<InventoryClickEvent> onUse) {
+        gui.setItem(slot, item);
+        gui.addSlotAction(slot, event -> {
+            if (event.isShiftClick() && canEdit) {
+                wGui.openNext(player, wGui.config, wGui.cache, new EditOrDeleteGui<>(entry));
+            } else {
+                onUse.accept(event);
+            }
+        });
+    }
+
+    /**
+     * Adds a button to a GUI for teleporting to/editing a place
+     * @param wGui The GUI directory
+     * @param gui The GUI being edited
+     * @param slot The slot the item is being added to
+     * @param place The place being routed to/edited
+     * @param player The player routing to/editing the place
+     */
     public static void addPlaceItem(WGui wGui, Gui gui, int slot, Place place, Player player) {
-        gui.setItem(slot, GuiUtils.makePlaceItem(place, player));
-        gui.addSlotAction(slot, event -> {
-            if(event.isShiftClick() && player.hasPermission("wayfinder.admin.place")) {
-                wGui.openNext(player, wGui.config, wGui.cache, new EditOrDeleteGui<>(place));
+        boolean canEdit = player.hasPermission("wayfinder.admin.place");
+        addEntryItem(wGui, gui, slot, makePlaceItem(place, player), place, player, canEdit, event -> {
+            if (wGui.cache.isRouting(player.getUniqueId())) {
+                player.sendMessage(PlaceholderParser.of(wGui.config.PLACE_ALREADY_ROUTING).place(place.getName()).parse());
             } else {
-                if(!wGui.cache.isRouting(player.getUniqueId())) {
-                    new ParticleNavigator(Wayfinder.PLUGIN, player, place).startDisplaying();
-                    player.sendMessage(PlaceholderParser.of(wGui.config.PLACE_ROUTING_TO).place(place.getName()).parse());
-                    player.sendMessage(Component.text("Located at: ", NamedTextColor.GOLD).append(TextUtils.locationToComponent(place.getLocation())));
-                    player.sendMessage(Component.text("You can change the route helper (particles/arrow/both) in your place GUI's settings!", NamedTextColor.RED));
-                    wGui.gui.close(player);
-                } else {
-                    player.sendMessage(PlaceholderParser.of(wGui.config.PLACE_ALREADY_ROUTING).place(place.getName()).parse());
-                    wGui.gui.close(player);
-                }
+                new ParticleNavigator(Wayfinder.PLUGIN, player, place).startDisplaying();
             }
+            wGui.gui.close(player);
         });
     }
 
+    /**
+     * Adds a button to a GUI for teleporting to/editing a warp
+     * @param wGui The GUI directory
+     * @param gui The GUI being edited
+     * @param slot The slot the item is being added to
+     * @param warp The warp being warped to/edited
+     * @param player The player warping to/editing the warp
+     */
     public static void addWarpItem(WGui wGui, Gui gui, int slot, Warp warp, Player player) {
-        gui.setItem(slot, GuiUtils.makeWarpItem(warp));
-        gui.addSlotAction(slot, event -> {
-            if(event.isShiftClick()) {
-                wGui.openNext(player, wGui.config, wGui.cache, new EditOrDeleteGui<>(warp));
-            } else {
-                player.teleport(warp.getLocation());
-                player.sendMessage(PlaceholderParser.of(wGui.config.WARP_WARP_SUCCESS).prefix(wGui.config.PREFIX).parse());
-            }
+        addEntryItem(wGui, gui, slot, makeWarpItem(warp), warp, player, true, event -> {
+            player.teleport(warp.getLocation());
+            player.sendMessage(PlaceholderParser.of(wGui.config.WARP_WARP_SUCCESS).prefix(wGui.config.PREFIX).parse());
         });
     }
 
+    /**
+     * Adds a button to a GUI for teleporting to/editing a home
+     * @param wGui The GUI directory
+     * @param gui The GUI being edited
+     * @param slot The slot the item is being added to
+     * @param home The home being warped to/edited
+     * @param player The player warping to/editing the home
+     */
     public static void addHomeItem(WGui wGui, Gui gui, int slot, Home home, Player player) {
-        gui.setItem(slot, GuiUtils.makeHomeItem(home));
-        gui.addSlotAction(slot, event -> {
+        addEntryItem(wGui, gui, slot, makeHomeItem(home), home, player, true, event -> {
             if(event.isShiftClick()) {
                 wGui.openNext(player, wGui.config, wGui.cache, new EditOrDeleteGui<>(home));
             } else {
@@ -154,55 +318,63 @@ public class GuiUtils {
         });
     }
 
+    /**
+     * The icon + yellow, non-italic name that places, warps and homes all share.
+     */
+    private static PaperItemBuilder namedEntry(ItemStack icon, String name) {
+        return PaperItemBuilder.from(icon)
+                .name(TextUtils.stripDecoration(name).color(NamedTextColor.YELLOW));
+    }
+
+    private static Component noItalic(Component component) {
+        return component.decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE);
+    }
+
     public static GuiItem makePlaceItem(Place place, Player player) {
-        PaperItemBuilder paperItemBuilder = PaperItemBuilder.from(place.getItemStack())
-                .name(TextUtils.stripDecoration(place.getName()).color(NamedTextColor.YELLOW));
         Location placeLocation = place.getLocation();
         List<Component> loreList = new ArrayList<>();
-        if(place.getBuilder() != null) {
-            loreList.add(Component.text(place.getBuilder()));
+
+        if (place.getBuilder() != null) {
+            loreList.add(noItalic(Component.text(place.getBuilder())));
         }
-        loreList.add(TextUtils.locationToComponent(placeLocation)
-                .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));
-        if(player.getLocation().getWorld() == placeLocation.getWorld()) {
-            loreList.add(Component.text(
-                            String.format(Locale.ROOT, "%.2f", player.getLocation().distance(placeLocation))
-                                    + " blocks away", NamedTextColor.GOLD)
-                    .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));
-        } else {
-            loreList.add(Component.text("Hm... that seems out of this world!", NamedTextColor.GOLD)
-                    .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));
-        }
-        paperItemBuilder.lore(loreList);
-        return paperItemBuilder.asGuiItem();
+        loreList.add(noItalic(TextUtils.locationToComponent(placeLocation)));
+
+        String distanceText = player.getLocation().getWorld() == placeLocation.getWorld()
+                ? String.format(Locale.ROOT, "%.2f", player.getLocation().distance(placeLocation)) + " blocks away"
+                : "Hm... that seems out of this world!";
+        loreList.add(noItalic(Component.text(distanceText, NamedTextColor.GOLD)));
+
+        return namedEntry(place.getItemStack(), place.getName())
+                .lore(loreList)
+                .asGuiItem();
     }
+
 
     public static GuiItem makeWarpItem(Warp warp) {
-        return PaperItemBuilder.from(warp.getItemStack())
-                .name(TextUtils.stripDecoration(warp.getName()).color(NamedTextColor.YELLOW))
-                .asGuiItem();
+        return namedEntry(warp.getItemStack(), warp.getName()).asGuiItem();
     }
+
 
     public static GuiItem makeHomeItem(Home home) {
-        return PaperItemBuilder.from(home.getItemStack())
-                .name(TextUtils.stripDecoration(home.getName()).color(NamedTextColor.YELLOW))
-                .asGuiItem();
+        return namedEntry(home.getItemStack(), home.getName()).asGuiItem();
     }
 
-    public static void defaultCancel(Gui gui) {
-        gui.setDefaultClickAction(event -> event.setCancelled(true));
-    }
+    // =================================================================================================================
+    // Heads
+    // =================================================================================================================
 
+    /**
+     * Build a player head with a custom texture. This hits the profile API every call, so build it once and
+     * {@code clone()} it if you show it often.
+     */
     public static ItemStack getCustomTextureHead(String value, Component name) {
+        String plainName = PlainTextComponentSerializer.plainText().serialize(name);
+        String profileName = plainName.substring(0, Math.min(plainName.length(), 16)).replace(' ', 'e');
+        UUID uuid = UUID.nameUUIDFromBytes(value.getBytes(StandardCharsets.UTF_8));
+
         ItemStack head = new ItemStack(Material.PLAYER_HEAD, 1);
         head.editMeta(SkullMeta.class, skullMeta -> {
-            UUID uuid = UUID.nameUUIDFromBytes(value.getBytes(StandardCharsets.UTF_8));
-            int endIndex = Math.min(PlainTextComponentSerializer.plainText().serialize(name).length(), 16);
-            PlayerProfile profile = Bukkit.createProfile(uuid, PlainTextComponentSerializer
-                    .plainText()
-                    .serialize(name)
-                    .substring(0, endIndex)
-                    .replace(' ', 'e'));
+            PlayerProfile profile = Bukkit.createProfile(uuid, profileName);
             profile.setProperty(new ProfileProperty("textures", value));
             skullMeta.setPlayerProfile(profile);
             skullMeta.displayName(name);
@@ -210,11 +382,5 @@ public class GuiUtils {
         return head;
     }
 
-    public static GuiItem toggleSettingButton(boolean enabled, ItemStack enabledItem, ItemStack disabledItem, List<Component> loreList) {
-        return PaperItemBuilder
-                .from(enabled ?  enabledItem : disabledItem)
-                .lore(loreList)
-                .asGuiItem();
-    }
 
 }

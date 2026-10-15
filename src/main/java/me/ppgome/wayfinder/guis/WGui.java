@@ -16,6 +16,11 @@ public abstract class WGui {
     protected Player player;
     protected MiniMessage mm = MiniMessage.miniMessage();
 
+    // Used for chat data entry to determine what is being changed.
+    protected enum FieldType {
+        NAME, PRIORITY, ICON, BUILDERS, EXPIRES, PERMISSION
+    }
+
     protected abstract Gui buildGui(Player player);
 
     public void display(Player player) {

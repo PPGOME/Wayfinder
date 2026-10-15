@@ -7,7 +7,6 @@ import me.ppgome.wayfinder.WConfig;
 import me.ppgome.wayfinder.database.Warp;
 import me.ppgome.wayfinder.guis.GuiUtils;
 import me.ppgome.wayfinder.guis.WGui;
-import me.ppgome.wayfinder.guis.place.PlaceBuilderGui;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;

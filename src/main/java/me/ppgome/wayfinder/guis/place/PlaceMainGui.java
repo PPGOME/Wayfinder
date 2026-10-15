@@ -10,7 +10,7 @@ import me.ppgome.wayfinder.database.place.Place;
 import me.ppgome.wayfinder.guis.EditOrDeleteGui;
 import me.ppgome.wayfinder.guis.GuiUtils;
 import me.ppgome.wayfinder.guis.WGui;
-import me.ppgome.wayfinder.text.TextUtils;
+import me.ppgome.wayfinder.utils.TextUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
@@ -20,7 +20,12 @@ import org.bukkit.inventory.ItemStack;
 import java.util.List;
 import java.util.Map;
 
+import static me.ppgome.wayfinder.guis.GuiUtils.getCustomTextureHead;
+
 public class PlaceMainGui extends WGui {
+
+    private static final ItemStack SETTINGS_HEAD = getCustomTextureHead("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTRkNDliYWU5NWM3OTBjM2IxZmY1YjJmMDEwNTJhNzE0ZDYxODU0ODFkNWIxYzg1OTMwYjNmOTlkMjMyMTY3NCJ9fX0=",
+            Component.text("Settings").decoration(TextDecoration.ITALIC, false));
 
     //------------------------------------------------------------------------------------------------------------------
 
@@ -77,11 +82,9 @@ public class PlaceMainGui extends WGui {
         }
 
         // Place pinned items
-        int slot = (rows == 5) ? 28 : 37;
-        for(Place place : pinnedPlaces.values()) {
-            GuiUtils.addPlaceItem(this, gui, slot, place, player);
-            slot++;
-        }
+        int startingSlot = (rows == 5) ? 28 : 37;
+        GuiUtils.placeAll(pinnedPlaces.values(), GuiUtils.slotsBetween(startingSlot, startingSlot + 6),
+                (slot, place) -> GuiUtils.addPlaceItem(this, gui, slot, place, player));
 
         settingsButton();
 
@@ -107,10 +110,8 @@ public class PlaceMainGui extends WGui {
     }
 
     private void settingsButton() {
-        ItemStack buttonItem = GuiUtils.getCustomTextureHead("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTRkNDliYWU5NWM3OTBjM2IxZmY1YjJmMDEwNTJhNzE0ZDYxODU0ODFkNWIxYzg1OTMwYjNmOTlkMjMyMTY3NCJ9fX0=",
-                Component.text("Settings").decoration(TextDecoration.ITALIC, false));
         GuiItem guiItem = PaperItemBuilder
-                .from(buttonItem)
+                .from(SETTINGS_HEAD)
                 .asGuiItem(event -> openNext(player, config, cache, new PlaceSettingsGui(player)));
         gui.setItem(40, guiItem);
     }

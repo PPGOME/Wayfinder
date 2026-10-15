@@ -19,13 +19,13 @@ Ideas
 
 
 
-## Ideas/roadmap in no particular order
-- [ ] Overworld/Nether/End cross-dimension guide
+## Ideas/roadmap/known bugs in no particular order
+- [X] Overworld/Nether/End cross-dimension guide
 - [ ] Player tracking
 - [ ] Nearest of a category (maybe button in GUI as well as command?)
 - [ ] Add /tp and teleport relationships
 - [ ] Map mod compatible routeWaypoints
-- [ ] Turn player towards place
-- [ ] Give distance to place when run
-- [ ] Case-insensitive
+- [X] Turn player towards place
+- [X] Give distance to place when run
+- [X] Case-insensitive
 - [ ] Optimize the route graph by caching

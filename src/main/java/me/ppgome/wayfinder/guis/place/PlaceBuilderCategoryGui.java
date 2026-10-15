@@ -2,19 +2,16 @@ package me.ppgome.wayfinder.guis.place;
 
 import dev.triumphteam.gui.builder.item.PaperItemBuilder;
 import dev.triumphteam.gui.guis.Gui;
+import dev.triumphteam.gui.guis.GuiItem;
 import me.ppgome.wayfinder.database.place.Category;
 import me.ppgome.wayfinder.guis.GuiUtils;
 import me.ppgome.wayfinder.guis.WGui;
-import me.ppgome.wayfinder.text.TextUtils;
+import me.ppgome.wayfinder.utils.TextUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 public class PlaceBuilderCategoryGui extends WGui {
@@ -25,7 +22,7 @@ public class PlaceBuilderCategoryGui extends WGui {
 
     public PlaceBuilderCategoryGui(Component placeName, Map<String, Category> selectedCategories) {
         this.placeName = placeName;
-        this.selectedCategories = selectedCategories;
+        this.selectedCategories = new HashMap<>(selectedCategories);
     }
 
     @Override
@@ -35,7 +32,7 @@ public class PlaceBuilderCategoryGui extends WGui {
 
         gui = Gui.gui().title(Component.text("Pick categories for ").append(placeName)).rows(4).create();
 
-        GuiUtils.insertGrayPanes(gui, 10, 25);
+        GuiUtils.insertGrayPanes(gui);
 
         categoryButtons();
         confirmButton();
@@ -48,55 +45,36 @@ public class PlaceBuilderCategoryGui extends WGui {
     }
 
     /**
-     *
+     * Places the buttons for each category to the GUI
      */
     private void categoryButtons() {
-        int slot = 10;
-        for(Category category : allCategories.values()) {
-            while(GuiUtils.isBorder(slot)) {
-                slot++;
-            }
-            String catName = category.getName();
-            gui.setItem(slot, PaperItemBuilder.from(category.getItemStack())
-                    .name(Component.text(catName, categoryColour(catName))
-                            .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE))
-                            .lore(List.of(Component.text("Priority: " + category.getPriority())))
-                    .asGuiItem());
-            gui.addSlotAction(slot, event -> {
-                event.setCancelled(true);
-                if(selectedCategories.containsKey(catName)) {
-                    selectedCategories.remove(catName);
-                } else {
-                    selectedCategories.put(catName, allCategories.get(catName));
-                }
-
-                ItemStack item = gui.getGuiItem(event.getSlot()).getItemStack();
-                item.editMeta(itemMeta -> {
-                    Component metaName = itemMeta.displayName();
-                    itemMeta.displayName(metaName.color(categoryColour(PlainTextComponentSerializer.plainText().serialize(metaName))));
-                });
-
-                gui.updateItem(event.getSlot(), item);
-            });
-            slot++;
-        }
-    }
-
-    private NamedTextColor categoryColour(String name) {
-        return selectedCategories.containsKey(name) ? NamedTextColor.GREEN : NamedTextColor.RED;
+        GuiUtils.placeAll(allCategories.values(), GuiUtils.interiorSlots(gui),
+                (slot, category) -> gui.setItem(slot, categoryItem(category)));
     }
 
     /**
-     *
+     * The item that represents a category
+     * @param category The category being represented
+     * @return An item that returns a category
      */
-    private void confirmButton() {
-        gui.setItem(31, PaperItemBuilder.from(Material.EMERALD)
-                .name(TextUtils.stripDecoration("Confirm!").color(NamedTextColor.GREEN))
+    private GuiItem categoryItem(Category category) {
+        boolean selected = selectedCategories.containsKey(category.getName());
+        return PaperItemBuilder.from(category.getItemStack())
+                .name(TextUtils.stripDecoration(category.getName())
+                        .color(selected ? NamedTextColor.GREEN : NamedTextColor.RED))
+                .lore(Component.text("Priority: " + category.getPriority()))
                 .asGuiItem(event -> {
                     event.setCancelled(true);
-                    cache.removeEditingGui(player.getUniqueId());
-                    if(lastGui instanceof PlaceBuilderGui placeBuilderGui) placeBuilderGui.updateCategories(selectedCategories);
-                    this.openLast();
-                }));
+                    if (selected) selectedCategories.remove(category.getName());
+                    else selectedCategories.put(category.getName(), category);
+                    gui.updateItem(event.getSlot(), categoryItem(category));
+                });
+    }
+    private void confirmButton() {
+        gui.setItem(31, GuiUtils.confirm(event -> {
+            cache.removeEditingGui(player.getUniqueId());
+            if (lastGui instanceof PlaceBuilderGui placeBuilderGui) placeBuilderGui.updateCategories(selectedCategories);
+            openLast();
+        }));
     }
 }

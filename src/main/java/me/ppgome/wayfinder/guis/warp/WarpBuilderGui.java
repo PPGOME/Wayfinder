@@ -6,14 +6,12 @@ import dev.triumphteam.gui.guis.GuiItem;
 import me.ppgome.wayfinder.Wayfinder;
 import me.ppgome.wayfinder.database.Warp;
 import me.ppgome.wayfinder.database.WarpTable;
-import me.ppgome.wayfinder.database.place.*;
 import me.ppgome.wayfinder.guis.AcceptsChatGui;
 import me.ppgome.wayfinder.guis.GuiUtils;
 import me.ppgome.wayfinder.guis.WGui;
 import me.ppgome.wayfinder.text.PlaceholderParser;
-import me.ppgome.wayfinder.text.TextUtils;
+import me.ppgome.wayfinder.utils.TextUtils;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Location;
@@ -36,10 +34,6 @@ public class WarpBuilderGui extends WGui implements AcceptsChatGui {
     private boolean suppressCloseEvent = false;
     FieldType fieldType;
     WarpTable warpTable = Wayfinder.PLUGIN.getDatabase().getWarpTable();
-
-    enum FieldType {
-        NAME, BUILDERS, PERMISSION
-    }
 
     public WarpBuilderGui() {
         this.name = Component.text("Click here to name...");
@@ -78,7 +72,7 @@ public class WarpBuilderGui extends WGui implements AcceptsChatGui {
         /*
         Other standard thingies
          */
-        GuiUtils.fillWhitePanesEditor(gui);
+        GuiUtils.fillWhitePanes(gui);
         gui.setCloseGuiAction(event -> {
             if(!suppressCloseEvent) {
                 cache.addEditingGui(player.getUniqueId(), this);

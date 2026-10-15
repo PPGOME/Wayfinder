@@ -1,4 +1,4 @@
-package me.ppgome.wayfinder.text;
+package me.ppgome.wayfinder.utils;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

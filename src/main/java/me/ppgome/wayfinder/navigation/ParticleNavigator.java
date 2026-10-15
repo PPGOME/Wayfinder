@@ -1,5 +1,6 @@
 package me.ppgome.wayfinder.navigation;
 
+import io.papermc.paper.entity.LookAnchor;
 import me.ppgome.wayfinder.Cache;
 import me.ppgome.wayfinder.WConfig;
 import me.ppgome.wayfinder.Wayfinder;
@@ -8,7 +9,7 @@ import me.ppgome.wayfinder.database.place.Place;
 import me.ppgome.wayfinder.navigation.RoutePlanner.Route;
 import me.ppgome.wayfinder.navigation.RoutePlanner.RouteWaypoint;
 import me.ppgome.wayfinder.text.PlaceholderParser;
-import me.ppgome.wayfinder.text.TextUtils;
+import me.ppgome.wayfinder.utils.TextUtils;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -31,27 +32,30 @@ import org.joml.Vector3f;
 
 import java.util.List;
 
+import static me.ppgome.wayfinder.utils.PlaceUtils.sameWorld;
+
 public class ParticleNavigator {
 
-    // --- Trail tuning ---------------------------------------------------------------------------------------------
-    private static final long MAIN_PERIOD_TICKS = 4;      // how often the trail/boss bar refresh
-    private static final double TRAIL_SPACING = 0.75;     // blocks between trail particles
-    private static final double TRAIL_LENGTH = 12;        // how far ahead of the player the trail extends
-    private static final double TRAIL_SCROLL = 0.25;      // how far the pattern slides each refresh (flow effect)
-    private static final int BEAD_EVERY = 4;              // every Nth trail point also gets an END_ROD "bead"
+    // --- Trail tuning ------------------------------------------------------------------------------------------------
+    private static final long MAIN_PERIOD_TICKS = 4; // how often the trail/boss bar refresh
+    private static final double TRAIL_SPACING = 0.75; // blocks between trail particles
+    private static final double TRAIL_LENGTH = 12; // how far ahead of the player the trail extends
+    private static final double TRAIL_SCROLL = 0.25; // how far the pattern slides each refresh (flow effect)
+    private static final int BEAD_EVERY = 4; // every Nth trail point also gets an END_ROD "bead"
 
-    // --- Beacon tuning --------------------------------------------------------------------------------------------
+    // --- Beacon tuning -----------------------------------------------------------------------------------------------
     private static final double BEACON_MAX_DISTANCE = 48; // only draw the beacon when this close
     private static final double BEACON_HEIGHT = 20;
     private static final double VERTICAL_HINT_THRESHOLD = 3; // blocks of Y difference before we show hints/beacon
 
-    // --- Arrow tuning (adjust in game if the sprite points the wrong way) -----------------------------------------
+    // --- Arrow tuning ------------------------------------------------------------------------------------------------
     private static final long ARROW_PERIOD_TICKS = 2;
     private static final float ARROW_SCALE = 1.5f;
-    private static final float ARROW_FLAT_DEG = 90f;      // lays the sprite down so its tip points along "forward"
-    private static final float ARROW_ROLL_DEG = 45f;      // vanilla arrow sprite points diagonally up-right
-    private static final float ARROW_YAW_FIX_DEG = 0f;    // set to 180 if the arrow points backward
+    private static final float ARROW_FLAT_DEG = 90f; // lays the sprite down so its tip points along "forward"
+    private static final float ARROW_ROLL_DEG = 45f; // vanilla arrow sprite points diagonally up-right
+    private static final float ARROW_YAW_FIX_DEG = 0f; // set to 180 if the arrow points backward
     private static final double ARROW_FORWARD_OFFSET = 2.5;
+    private static final double ARROW_SPEED_OFFSET_MULTIPLIER = 4.0; // Modifies how far forward the arrow appears when going fast
     private static final double ARROW_DOWN_OFFSET = 0.7;
 
     private final Wayfinder plugin;
@@ -90,6 +94,14 @@ public class ParticleNavigator {
             // TODO: add a config message, e.g. config.PLACE_NO_ROUTE
             player.sendMessage(Component.text("No route could be found to that place.", NamedTextColor.RED));
             return;
+        }
+
+        if(sameWorld(player.getLocation(), destination.getLocation())) player.lookAt(destination.getLocation(), LookAnchor.EYES);
+        player.sendMessage(PlaceholderParser.of(config.PLACE_ROUTING_TO).place(destination.getName()).parse());
+        player.sendMessage(Component.text("Located at: ", NamedTextColor.GOLD).append(TextUtils.locationToComponent(destination.getLocation())));
+        player.sendMessage(Component.text("You can change the route helper (particles/arrow/both) in your place GUI's settings!", NamedTextColor.RED));
+        if(!cache.getPlayerMeta(player.getUniqueId()).isEnablePortalSkipping()) {
+            player.sendMessage(Component.text("You're currently avoiding portals. If you don't want this, change it in the place GUI settings.", NamedTextColor.LIGHT_PURPLE));
         }
 
         this.waypoints = route.routeWaypoints();
@@ -240,9 +252,14 @@ public class ParticleNavigator {
 
     private void updateArrow(Location target) {
         Location eye = player.getEyeLocation();
+        Vector velocity = player.getVelocity();
+
+        double speed = velocity.length();
+
+        double dynamicForwardOffset = ARROW_FORWARD_OFFSET + (speed * ARROW_SPEED_OFFSET_MULTIPLIER);
 
         Location pos = eye.clone()
-                .add(eye.getDirection().multiply(ARROW_FORWARD_OFFSET))
+                .add(eye.getDirection().multiply(dynamicForwardOffset))
                 .subtract(0, ARROW_DOWN_OFFSET, 0);
 
         Vector aim = target.clone().add(0, 1, 0).toVector().subtract(pos.toVector());
@@ -281,10 +298,6 @@ public class ParticleNavigator {
     }
 
     //------------------------------------------------------------------------------------------------------------------
-
-    private boolean sameWorld(Location a, Location b) {
-        return a.getWorld() != null && a.getWorld().equals(b.getWorld());
-    }
 
     private void stop() {
         cancelTask();

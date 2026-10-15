@@ -8,6 +8,7 @@ public class WConfig {
     private final Wayfinder plugin;
 
     public String PREFIX;
+    public boolean DEBUG;
 
     /*
     MESSAGES
@@ -87,6 +88,7 @@ public class WConfig {
         String errorMessage = "<red>The config option for this message is missing. Let an admin know!</red>";
 
         PREFIX = config.getString("prefix", "<blue><b>[</b><aqua>Wayfinder</aqua><b>] ");
+        DEBUG =  config.getBoolean("debug", false);
 
         /*
         MESSAGES

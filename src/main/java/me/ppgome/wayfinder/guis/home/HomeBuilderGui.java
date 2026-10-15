@@ -10,7 +10,7 @@ import me.ppgome.wayfinder.guis.AcceptsChatGui;
 import me.ppgome.wayfinder.guis.GuiUtils;
 import me.ppgome.wayfinder.guis.WGui;
 import me.ppgome.wayfinder.text.PlaceholderParser;
-import me.ppgome.wayfinder.text.TextUtils;
+import me.ppgome.wayfinder.utils.TextUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -61,7 +61,7 @@ public class HomeBuilderGui extends WGui implements AcceptsChatGui {
         /*
         Other standard thingies
          */
-        GuiUtils.fillWhitePanesEditor(gui);
+        GuiUtils.fillWhitePanes(gui);
         gui.setCloseGuiAction(event -> {
             if(!suppressCloseEvent) {
                 cache.addEditingGui(player.getUniqueId(), this);

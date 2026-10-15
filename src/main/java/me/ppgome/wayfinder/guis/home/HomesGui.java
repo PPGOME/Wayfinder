@@ -2,7 +2,6 @@ package me.ppgome.wayfinder.guis.home;
 
 import dev.triumphteam.gui.builder.item.PaperItemBuilder;
 import dev.triumphteam.gui.guis.Gui;
-import dev.triumphteam.gui.guis.GuiItem;
 import me.ppgome.wayfinder.database.Home;
 import me.ppgome.wayfinder.database.PlayerMeta;
 import me.ppgome.wayfinder.guis.GuiUtils;

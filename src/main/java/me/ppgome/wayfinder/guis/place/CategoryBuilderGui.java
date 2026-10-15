@@ -8,7 +8,7 @@ import me.ppgome.wayfinder.guis.AcceptsChatGui;
 import me.ppgome.wayfinder.guis.GuiUtils;
 import me.ppgome.wayfinder.guis.WGui;
 import me.ppgome.wayfinder.text.PlaceholderParser;
-import me.ppgome.wayfinder.text.TextUtils;
+import me.ppgome.wayfinder.utils.TextUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -33,9 +33,15 @@ public class CategoryBuilderGui extends WGui implements AcceptsChatGui {
     private boolean suppressCloseEvent = false;
     private FieldType fieldType;
 
-    enum FieldType {
-        NAME, PRIORITY, ICON
-    }
+    private static final List<Component> PRIORITY_LORE = List.of(
+            Component.text("When BlueMap chooses which icon to display for"),
+            Component.text("a place, higher priority always wins."),
+            Component.text("Defaults to 0.")
+    );
+    private static final List<Component> ICON_LORE = List.of(
+            Component.text("Must be a direct image URL."),
+            Component.text("This is an optional field.")
+    );
 
     public CategoryBuilderGui() {
         this.name = Component.text("Click here to name...");
@@ -45,6 +51,8 @@ public class CategoryBuilderGui extends WGui implements AcceptsChatGui {
         this.name = TextUtils.parseMiniMessage(category.getName());
         this.guiItem = PaperItemBuilder.from(category.getItemStack()).asGuiItem();
         this.category = category;
+        this.priority = category.getPriority();
+        this.iconUrl = category.getBluemapIcon();
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -107,7 +115,7 @@ public class CategoryBuilderGui extends WGui implements AcceptsChatGui {
                         cache.updateCategory(category);
                         hopBackTo = lastGui;
                     } else {
-                        cache.addCategory(new Category(mm.serialize(name), priority, itemStack));
+                        cache.addCategory(new Category(stringifiedName, priority, itemStack));
                         hopBackTo = this;
                     }
                     suppressCloseEvent = true;
@@ -126,6 +134,7 @@ public class CategoryBuilderGui extends WGui implements AcceptsChatGui {
                     WGui hopBackTo;
                     if(editing) hopBackTo = lastGui;
                     else hopBackTo = this;
+                    cache.removeEditingGui(player.getUniqueId());
                     suppressCloseEvent = true;
                     hopBackTo.openLast();
                     suppressCloseEvent = false;
@@ -134,7 +143,7 @@ public class CategoryBuilderGui extends WGui implements AcceptsChatGui {
         /*
         Other standard thingies
          */
-        GuiUtils.fillWhitePanesEditor(gui);
+        GuiUtils.fillWhitePanes(gui);
         gui.setCloseGuiAction(event -> {
             if(!suppressCloseEvent) {
                 cache.addEditingGui(player.getUniqueId(), this);
@@ -164,33 +173,21 @@ public class CategoryBuilderGui extends WGui implements AcceptsChatGui {
     public void update() {
         setNameTag();
         setBlueMapIcon();
+        setPriority();
         gui.update();
     }
 
     private void setNameTag() {
-        gui.setItem(10, PaperItemBuilder.from(Material.NAME_TAG)
-                .name(name)
-                .asGuiItem(event -> {
-                    UUID uuid = player.getUniqueId();
-                    cache.addEditingGui(uuid, this);
-                    cache.addAwaitingChat(uuid);
-                    fieldType = FieldType.NAME;
-                    gui.close(player);
-                    player.sendMessage(PlaceholderParser.of(config.PLACE_CATEGORY_EDITING_NAME).prefix(config.PREFIX).parse());
-                    event.setCancelled(true);
-                }));
+        gui.setItem(10, chatFieldButton(PaperItemBuilder.from(Material.NAME_TAG).name(name),
+                FieldType.NAME, config.PLACE_CATEGORY_EDITING_NAME));
     }
 
     private void setPriority() {
-        List<Component> itemLore = new ArrayList<>();
-        itemLore.add(Component.text("When BlueMap chooses which icon to display for"));
-        itemLore.add(Component.text("a place, higher priority always wins."));
-        if(priority != 0) {
-            itemLore.add(Component.text("Priority: " + priority,  NamedTextColor.GREEN));
-        }
+        List<Component> loreCopy =  new ArrayList<>(PRIORITY_LORE);
+        loreCopy.add(Component.text("Priority: " + priority,  NamedTextColor.GREEN));
         gui.setItem(14, PaperItemBuilder.from(Material.GOLD_INGOT)
                 .name(TextUtils.stripDecoration("Priority").color(NamedTextColor.GREEN))
-                .lore(itemLore)
+                .lore(loreCopy)
                 .asGuiItem(event -> {
                     UUID uuid = player.getUniqueId();
                     cache.addEditingGui(uuid, this);
@@ -204,22 +201,28 @@ public class CategoryBuilderGui extends WGui implements AcceptsChatGui {
 
     private void setBlueMapIcon() {
 
-        List<Component> itemLore = new ArrayList<>();
-        itemLore.add(Component.text("Must be a direct image URL."));
-        if(iconUrl != null) itemLore.add(Component.text(iconUrl, NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
+        List<Component> loreCopy =  new ArrayList<>(ICON_LORE);
+        if(iconUrl != null) loreCopy.add(Component.text(iconUrl, NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
 
-        gui.setItem(16, PaperItemBuilder.from(Material.FILLED_MAP)
-                .name(TextUtils.stripDecoration("BlueMap Icon").color(NamedTextColor.GREEN))
-                .lore(itemLore)
-                .asGuiItem(event -> {
-                    UUID uuid = player.getUniqueId();
-                    cache.addEditingGui(uuid, this);
-                    cache.addAwaitingChat(uuid);
-                    fieldType = FieldType.ICON;
-                    gui.close(player);
-                    player.sendMessage(PlaceholderParser.of(config.PLACE_CATEGORY_EDITING_ICON).prefix(config.PREFIX).parse());
-                    event.setCancelled(true);
-                }));
+        gui.setItem(16, chatFieldButton(
+                PaperItemBuilder.from(Material.FILLED_MAP)
+                        .name(TextUtils.stripDecoration("BlueMap Icon").color(NamedTextColor.GREEN))
+                        .lore(loreCopy),
+                FieldType.ICON,
+                config.PLACE_CATEGORY_EDITING_ICON
+        ));
+    }
+
+    private GuiItem chatFieldButton(PaperItemBuilder builder, FieldType type, String message) {
+        return builder.asGuiItem(event -> {
+            event.setCancelled(true);
+            UUID uuid = player.getUniqueId();
+            cache.addEditingGui(uuid, this);
+            cache.addAwaitingChat(uuid);
+            fieldType = type;
+            gui.close(player);
+            player.sendMessage(PlaceholderParser.of(message).prefix(config.PREFIX).parse());
+        });
     }
 
     //------------------------------------------------------------------------------------------------------------------

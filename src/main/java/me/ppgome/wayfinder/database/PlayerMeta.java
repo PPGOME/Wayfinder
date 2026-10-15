@@ -1,6 +1,7 @@
 package me.ppgome.wayfinder.database;
 
 import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 

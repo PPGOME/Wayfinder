@@ -28,9 +28,6 @@ public class Cache {
     private final Set<Place> netherPortalPlaces;
     private final Set<Place> endPortalPlaces;
 
-    private final HashMap<UUID, PlayerMeta> playerMetaByUuid;
-    private final HashMap<String, PlayerMeta> playerMetaByName;
-
     private final HashMap<UUID, WGui> editingGui;
     private final Set<UUID> awaitingChat;
     private final HashMap<UUID, ParticleNavigator> routing;
@@ -49,8 +46,6 @@ public class Cache {
         this.pinnedPlaces = new HashMap<>();
         this.netherPortalPlaces = new HashSet<>();
         this.endPortalPlaces = new HashSet<>();
-        this.playerMetaByUuid = new HashMap<>();
-        this.playerMetaByName = new HashMap<>();
         this.editingGui = new HashMap<>();
         this.awaitingChat = new HashSet<>();
         this.routing = new HashMap<>();
@@ -59,22 +54,12 @@ public class Cache {
 
     // Places ----------------------------------------------------------------------------------------------------------
 
-    public void addPlayerMeta(PlayerMeta playerMeta) {
-        playerMetaMap.put(playerMeta.getUuid(), playerMeta);
-    }
-
-    public PlayerMeta getPlayerMeta(UUID uuid) {
-        return playerMetaMap.get(uuid);
-    }
-
-    // Places ----------------------------------------------------------------------------------------------------------
-
     public void addPlace(Place place) {
-        places.put(place.getName(), place);
+        places.put(key(place.getName()), place);
     }
 
     public Place getPlace(String name) {
-        return places.get(name);
+        return places.get(key(name));
     }
 
     public Map<String, Place> getAllPlaces() {
@@ -82,8 +67,8 @@ public class Cache {
     }
 
     public void removePlace(String name) {
-        Place place = getPlace(name);
-        places.remove(name);
+        Place place = getPlace(key(name));
+        places.remove(key(name));
         if(place != null) {
             if(!place.getCategories().isEmpty()) {
                 for(Category category : place.getCategories()) {
@@ -97,7 +82,7 @@ public class Cache {
     // Place Categories ------------------------------------------------------------------------------------------------
 
     public void addCategory(Category category) {
-        placeCategories.put(category.getName(), category);
+        placeCategories.put(key(category.getName()), category);
         database.getCategoryTable().save(category);
     }
 
@@ -106,7 +91,7 @@ public class Cache {
     }
 
     public Category getCategory(String name) {
-        return placeCategories.get(name);
+        return placeCategories.get(key(name));
     }
 
     public Map<String, Category> getAllCategories() {
@@ -114,18 +99,18 @@ public class Cache {
     }
 
     public void removeCategory(Category category) {
-        placeCategories.remove(category.getName());
+        placeCategories.remove(key(category.getName()));
         database.getCategoryTable().delete(category);
     }
 
     // Pinned Places ---------------------------------------------------------------------------------------------------
 
     public void addPinnedPlace(Place place) {
-        pinnedPlaces.put(place.getName(), place);
+        pinnedPlaces.put(key(place.getName()), place);
     }
 
     public Place getPinnedPlace(String name) {
-        return pinnedPlaces.get(name);
+        return pinnedPlaces.get(key(name));
     }
 
     public Map<String, Place> getAllPinnedPlaces() {
@@ -133,17 +118,17 @@ public class Cache {
     }
 
     public void removePinnedPlace(String name) {
-        pinnedPlaces.remove(name);
+        pinnedPlaces.remove(key(name));
     }
 
     // Warps -----------------------------------------------------------------------------------------------------------
 
     public void addWarp(Warp warp) {
-        warps.put(warp.getName(), warp);
+        warps.put(key(warp.getName()), warp);
     }
 
     public Warp getWarp(String name) {
-        return warps.get(name);
+        return warps.get(key(name));
     }
 
     public Map<String, Warp> getAllWarps() {
@@ -151,8 +136,8 @@ public class Cache {
     }
 
     public void removeWarp(String name) {
-        Warp warp =  getWarp(name);
-        warps.remove(name);
+        Warp warp =  getWarp(key(name));
+        warps.remove(key(name));
         database.getWarpTable().delete(warp);
     }
 
@@ -186,11 +171,13 @@ public class Cache {
 
     // PlayerMeta by UUID ----------------------------------------------------------------------------------------------
 
+    public void addPlayerMeta(PlayerMeta playerMeta) {
+        playerMetaMap.put(playerMeta.getUuid(), playerMeta);
+    }
 
-
-    // PlayerMeta by Name ----------------------------------------------------------------------------------------------
-
-
+    public PlayerMeta getPlayerMeta(UUID uuid) {
+        return playerMetaMap.get(uuid);
+    }
 
     // Editing GUI -------------------------------------------=---------------------------------------------------------
 
@@ -262,6 +249,12 @@ public class Cache {
 
     public void removeBack(UUID uuid) {
         back.remove(uuid);
+    }
+
+    // Util -------------------------------------------=----------------------------------------------------------------
+
+    private static String key(String name) {
+        return name == null ? null : name.toLowerCase(Locale.ROOT);
     }
 
 }

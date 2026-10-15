@@ -1,4 +1,5 @@
 prefix: "<blue><b>[</b><aqua>Wayfinder</aqua><b>]"
+debug: false
 
 modules:
   home: true

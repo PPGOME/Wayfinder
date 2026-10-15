@@ -39,6 +39,15 @@ public class PlayerMeta {
     @DatabaseField
     private boolean wasMoved;
 
+    @DatabaseField
+    private boolean placeParticlesEnabled;
+
+    @DatabaseField
+    private boolean placeArrowEnabled;
+
+    @DatabaseField
+    private boolean enablePortalSkipping;
+
     private final HashMap<String, Home> homes;
     private final HashMap<String, Waypoint> waypoints;
 
@@ -239,4 +248,30 @@ public class PlayerMeta {
         friends.remove(blockedUuid);
     }
 
+    // Place Settings --------------------------------------------------------------------------------------------------
+
+
+    public boolean isPlaceParticlesEnabled() {
+        return placeParticlesEnabled;
+    }
+
+    public void setPlaceParticlesEnabled(boolean placeParticlesEnabled) {
+        this.placeParticlesEnabled = placeParticlesEnabled;
+    }
+
+    public boolean isPlaceArrowEnabled() {
+        return placeArrowEnabled;
+    }
+
+    public void setPlaceArrowEnabled(boolean placeArrowEnabled) {
+        this.placeArrowEnabled = placeArrowEnabled;
+    }
+
+    public boolean isEnablePortalSkipping() {
+        return enablePortalSkipping;
+    }
+
+    public void setEnablePortalSkipping(boolean enablePortalSkipping) {
+        this.enablePortalSkipping = enablePortalSkipping;
+    }
 }

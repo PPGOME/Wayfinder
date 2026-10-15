@@ -120,6 +120,8 @@ public class GuiUtils {
                 if(!wGui.cache.isRouting(player.getUniqueId())) {
                     new ParticleNavigator(Wayfinder.PLUGIN, player, place).startDisplaying();
                     player.sendMessage(PlaceholderParser.of(wGui.config.PLACE_ROUTING_TO).place(place.getName()).parse());
+                    player.sendMessage(Component.text("Located at: ", NamedTextColor.GOLD).append(TextUtils.locationToComponent(place.getLocation())));
+                    player.sendMessage(Component.text("You can change the route helper (particles/arrow/both) in your place GUI's settings!", NamedTextColor.RED));
                     wGui.gui.close(player);
                 } else {
                     player.sendMessage(PlaceholderParser.of(wGui.config.PLACE_ALREADY_ROUTING).place(place.getName()).parse());
@@ -206,6 +208,13 @@ public class GuiUtils {
             skullMeta.displayName(name);
         });
         return head;
+    }
+
+    public static GuiItem toggleSettingButton(boolean enabled, ItemStack enabledItem, ItemStack disabledItem, List<Component> loreList) {
+        return PaperItemBuilder
+                .from(enabled ?  enabledItem : disabledItem)
+                .lore(loreList)
+                .asGuiItem();
     }
 
 }

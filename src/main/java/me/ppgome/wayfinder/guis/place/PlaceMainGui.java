@@ -2,6 +2,7 @@ package me.ppgome.wayfinder.guis.place;
 
 import dev.triumphteam.gui.builder.item.PaperItemBuilder;
 import dev.triumphteam.gui.guis.Gui;
+import dev.triumphteam.gui.guis.GuiItem;
 import me.ppgome.wayfinder.Cache;
 import me.ppgome.wayfinder.WConfig;
 import me.ppgome.wayfinder.database.place.Category;
@@ -11,8 +12,10 @@ import me.ppgome.wayfinder.guis.GuiUtils;
 import me.ppgome.wayfinder.guis.WGui;
 import me.ppgome.wayfinder.text.TextUtils;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 import java.util.Map;
@@ -80,6 +83,8 @@ public class PlaceMainGui extends WGui {
             slot++;
         }
 
+        settingsButton();
+
         // Stop clicks from doing anything normally
         GuiUtils.defaultCancel(gui);
 
@@ -99,5 +104,14 @@ public class PlaceMainGui extends WGui {
         }
 
         return gui;
+    }
+
+    private void settingsButton() {
+        ItemStack buttonItem = GuiUtils.getCustomTextureHead("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTRkNDliYWU5NWM3OTBjM2IxZmY1YjJmMDEwNTJhNzE0ZDYxODU0ODFkNWIxYzg1OTMwYjNmOTlkMjMyMTY3NCJ9fX0=",
+                Component.text("Settings").decoration(TextDecoration.ITALIC, false));
+        GuiItem guiItem = PaperItemBuilder
+                .from(buttonItem)
+                .asGuiItem(event -> openNext(player, config, cache, new PlaceSettingsGui(player)));
+        gui.setItem(40, guiItem);
     }
 }

@@ -3,6 +3,7 @@ package me.ppgome.wayfinder.navigation;
 import me.ppgome.wayfinder.Cache;
 import me.ppgome.wayfinder.WConfig;
 import me.ppgome.wayfinder.Wayfinder;
+import me.ppgome.wayfinder.database.PlayerMeta;
 import me.ppgome.wayfinder.database.place.Place;
 import me.ppgome.wayfinder.navigation.RoutePlanner.Route;
 import me.ppgome.wayfinder.navigation.RoutePlanner.RouteWaypoint;
@@ -59,6 +60,8 @@ public class ParticleNavigator {
     private final Player player;
     private final Place destination;
 
+    private PlayerMeta playerMeta;
+
     private BossBar infoBar;
     private BukkitTask repeatingTask;
 
@@ -76,6 +79,7 @@ public class ParticleNavigator {
         this.config = plugin.getConfiguration();
         this.player = player;
         this.destination = destination;
+        this.playerMeta = cache.getPlayerMeta(player.getUniqueId());
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -134,12 +138,16 @@ public class ParticleNavigator {
                 infoBar.name(buildBossBar(remaining, verticalHint(playerLocation, target)));
 
                 tick++;
-                drawTrail(playerLocation, target, dust);
-                drawBeacon(playerLocation, target);
+                if(playerMeta.isPlaceParticlesEnabled()) {
+                    drawTrail(playerLocation, target, dust);
+                    drawBeacon(playerLocation, target);
+                }
             }
         }.runTaskTimer(plugin, 0, MAIN_PERIOD_TICKS);
 
-        spawnArrow();
+        if(playerMeta.isPlaceArrowEnabled()) {
+            spawnArrow();
+        }
     }
 
     //------------------------------------------------------------------------------------------------------------------

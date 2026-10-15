@@ -28,3 +28,4 @@ Ideas
 - [ ] Turn player towards place
 - [ ] Give distance to place when run
 - [ ] Case-insensitive
+- [ ] Optimize the route graph by caching

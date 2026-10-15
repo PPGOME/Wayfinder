@@ -3,6 +3,7 @@ package me.ppgome.wayfinder.navigation;
 import me.ppgome.wayfinder.Cache;
 import me.ppgome.wayfinder.WConfig;
 import me.ppgome.wayfinder.Wayfinder;
+import me.ppgome.wayfinder.database.PlayerMeta;
 import me.ppgome.wayfinder.database.place.NetherPortalLink;
 import me.ppgome.wayfinder.database.place.Place;
 import org.bukkit.Bukkit;
@@ -23,6 +24,7 @@ public class RoutePlanner {
     private final static double DIRECT_BIAS = 0.9;
 
     Player player;
+    private PlayerMeta playerMeta;
     private final Place toPlace;
 
     public RoutePlanner(Wayfinder plugin, Player player, Place place) {
@@ -31,6 +33,7 @@ public class RoutePlanner {
         this.config = plugin.getConfiguration();
         this.player = player;
         this.toPlace = place;
+        this.playerMeta = plugin.getCache().getPlayerMeta(player.getUniqueId());
     }
 
     private static final class Node {
@@ -56,9 +59,16 @@ public class RoutePlanner {
         Node end = new Node(to, null);
         List<Node> nodes = new ArrayList<>(List.of(start, end));
 
+        boolean overworldToOverworld = from.getWorld().equals(to.getWorld()) &&
+                from.getWorld().getEnvironment() == World.Environment.NORMAL;
+        boolean skipPortals = overworldToOverworld && !playerMeta.isEnablePortalSkipping();
+
         plugin.getLogger().info("from=" + fmt(from) + " enabled=" + config.ENABLE_NETHER_PORTALS);
-        if(config.ENABLE_NETHER_PORTALS) addNetherPortals(nodes);
-        Node endPlatform = addEnd(nodes);
+        Node endPlatform = null;
+        if(!skipPortals) {
+            if(config.ENABLE_NETHER_PORTALS) addNetherPortals(nodes);
+            endPlatform = addEnd(nodes);
+        }
         connectWalking(nodes);
 
         for (Node n : nodes) {

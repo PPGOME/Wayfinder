@@ -102,6 +102,8 @@ public class ParticleNavigator {
         player.sendMessage(Component.text("You can change the route helper (particles/arrow/both) in your place GUI's settings!", NamedTextColor.RED));
         if(!cache.getPlayerMeta(player.getUniqueId()).isEnablePortalSkipping()) {
             player.sendMessage(Component.text("You're currently avoiding portals. If you don't want this, change it in the place GUI settings.", NamedTextColor.LIGHT_PURPLE));
+        } else if(route.routeWaypoints().size() > 2) {
+            player.sendMessage(Component.text("This route takes you through portals. Please disable portals in the place GUI settings if you don't want this.", NamedTextColor.LIGHT_PURPLE));
         }
 
         this.waypoints = route.routeWaypoints();

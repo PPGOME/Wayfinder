@@ -4,10 +4,13 @@ import dev.triumphteam.gui.builder.item.PaperItemBuilder;
 import dev.triumphteam.gui.guis.BaseGui;
 import dev.triumphteam.gui.guis.Gui;
 import dev.triumphteam.gui.guis.GuiItem;
+import me.ppgome.wayfinder.Wayfinder;
 import me.ppgome.wayfinder.database.place.Category;
+import me.ppgome.wayfinder.database.place.Place;
 import me.ppgome.wayfinder.guis.AcceptsChatGui;
 import me.ppgome.wayfinder.guis.GuiUtils;
 import me.ppgome.wayfinder.guis.WGui;
+import me.ppgome.wayfinder.hooks.BlueMapHook;
 import me.ppgome.wayfinder.text.PlaceholderParser;
 import me.ppgome.wayfinder.utils.TextUtils;
 import net.kyori.adventure.text.Component;
@@ -32,6 +35,7 @@ public class CategoryBuilderGui extends WGui implements AcceptsChatGui {
             .asGuiItem();
     private Category category;
     private boolean suppressCloseEvent = false;
+    private final BlueMapHook blueMapHook = Wayfinder.PLUGIN.getBlueMapHook();
     private FieldType fieldType;
 
     private static final List<Component> PRIORITY_LORE = List.of(
@@ -109,11 +113,15 @@ public class CategoryBuilderGui extends WGui implements AcceptsChatGui {
                     }
 
                     if(editing) {
+                        blueMapHook.removeCategoryMarkerSet(category);
                         category.setName(stringifiedName);
                         category.setPriority(priority);
                         category.setBluemapIcon(iconUrl);
                         category.setItemStack(itemStack);
                         cache.updateCategory(category);
+                        for(Place place : category.getPlaces()) {
+                            blueMapHook.addPlaceMarker(place);
+                        }
                         hopBackTo = lastGui;
                     } else {
                         cache.addCategory(new Category(stringifiedName, priority, itemStack));

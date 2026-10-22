@@ -1,6 +1,7 @@
 package me.ppgome.wayfinder.guis.warp;
 
 import dev.triumphteam.gui.builder.item.PaperItemBuilder;
+import dev.triumphteam.gui.guis.BaseGui;
 import dev.triumphteam.gui.guis.Gui;
 import me.ppgome.wayfinder.Cache;
 import me.ppgome.wayfinder.WConfig;
@@ -28,7 +29,7 @@ public class WarpMainGui extends WGui {
     //------------------------------------------------------------------------------------------------------------------
 
     @Override
-    protected Gui buildGui(Player player) {
+    protected BaseGui buildGui(Player player) {
 
         Map<String, Warp> warpMap = cache.getAllWarps();
 

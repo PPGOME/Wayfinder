@@ -1,6 +1,7 @@
 package me.ppgome.wayfinder.guis.place.editors;
 
 import dev.triumphteam.gui.builder.item.PaperItemBuilder;
+import dev.triumphteam.gui.guis.BaseGui;
 import dev.triumphteam.gui.guis.Gui;
 import dev.triumphteam.gui.guis.GuiItem;
 import me.ppgome.wayfinder.database.place.Category;
@@ -26,7 +27,7 @@ public class PlaceBuilderCategoryGui extends WGui {
     }
 
     @Override
-    protected Gui buildGui(Player player) {
+    protected BaseGui buildGui(Player player) {
 
         this.allCategories = cache.getAllCategories();
 

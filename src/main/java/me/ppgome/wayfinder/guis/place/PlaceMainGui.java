@@ -1,6 +1,7 @@
 package me.ppgome.wayfinder.guis.place;
 
 import dev.triumphteam.gui.builder.item.PaperItemBuilder;
+import dev.triumphteam.gui.guis.BaseGui;
 import dev.triumphteam.gui.guis.Gui;
 import dev.triumphteam.gui.guis.GuiItem;
 import me.ppgome.wayfinder.Cache;
@@ -39,7 +40,7 @@ public class PlaceMainGui extends WGui {
     //------------------------------------------------------------------------------------------------------------------
 
     @Override
-    protected Gui buildGui(Player player) {
+    protected BaseGui buildGui(Player player) {
 
         Map<String, Category> categories = cache.getAllCategories();
         int numberOfCategories;

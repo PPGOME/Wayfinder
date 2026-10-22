@@ -22,10 +22,11 @@ Ideas
 ## Ideas/roadmap/known bugs in no particular order
 - [X] Overworld/Nether/End cross-dimension guide
 - [ ] Player tracking
-- [ ] Nearest of a category (maybe button in GUI as well as command?)
+- [X] Nearest of a category (maybe button in GUI as well as command?)
 - [ ] Add /tp and teleport relationships
 - [ ] Map mod compatible routeWaypoints
 - [X] Turn player towards place
 - [X] Give distance to place when run
 - [X] Case-insensitive
 - [ ] Optimize the route graph by caching
+- [ ] Add a indicator to let the player know they're routing through portals

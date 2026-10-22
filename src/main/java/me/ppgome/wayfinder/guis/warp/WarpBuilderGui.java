@@ -1,6 +1,7 @@
 package me.ppgome.wayfinder.guis.warp;
 
 import dev.triumphteam.gui.builder.item.PaperItemBuilder;
+import dev.triumphteam.gui.guis.BaseGui;
 import dev.triumphteam.gui.guis.Gui;
 import dev.triumphteam.gui.guis.GuiItem;
 import me.ppgome.wayfinder.Wayfinder;
@@ -51,7 +52,7 @@ public class WarpBuilderGui extends WGui implements AcceptsChatGui {
     }
 
     @Override
-    protected Gui buildGui(Player player) {
+    protected BaseGui buildGui(Player player) {
 
         boolean editing = warp != null;
 

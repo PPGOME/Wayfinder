@@ -1,5 +1,6 @@
 package me.ppgome.wayfinder.guis;
 
+import dev.triumphteam.gui.guis.BaseGui;
 import dev.triumphteam.gui.guis.Gui;
 import me.ppgome.wayfinder.Cache;
 import me.ppgome.wayfinder.WConfig;
@@ -9,7 +10,7 @@ import org.bukkit.entity.Player;
 
 public abstract class WGui {
 
-    protected Gui gui;
+    protected BaseGui gui;
     protected WGui lastGui;
     protected WConfig config;
     protected Cache cache;
@@ -21,7 +22,7 @@ public abstract class WGui {
         NAME, PRIORITY, ICON, BUILDERS, EXPIRES, PERMISSION
     }
 
-    protected abstract Gui buildGui(Player player);
+    protected abstract BaseGui buildGui(Player player);
 
     public void display(Player player) {
         this.player = player;

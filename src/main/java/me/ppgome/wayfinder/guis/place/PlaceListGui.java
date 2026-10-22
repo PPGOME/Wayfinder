@@ -1,6 +1,9 @@
 package me.ppgome.wayfinder.guis.place;
 
+import dev.triumphteam.gui.builder.item.ItemBuilder;
+import dev.triumphteam.gui.guis.BaseGui;
 import dev.triumphteam.gui.guis.Gui;
+import dev.triumphteam.gui.guis.PaginatedGui;
 import me.ppgome.wayfinder.Wayfinder;
 import me.ppgome.wayfinder.database.place.Category;
 import me.ppgome.wayfinder.database.place.Place;
@@ -20,6 +23,7 @@ import static me.ppgome.wayfinder.utils.PlaceUtils.findClosestPlace;
 public class PlaceListGui extends WGui {
 
     private final Category category;
+    private PaginatedGui paginatedGui;
 
     //------------------------------------------------------------------------------------------------------------------
 
@@ -30,7 +34,7 @@ public class PlaceListGui extends WGui {
     //------------------------------------------------------------------------------------------------------------------
 
     @Override
-    protected Gui buildGui(Player player) {
+    protected BaseGui buildGui(Player player) {
 
         Set<Place> placeSet = category.getPlaces();
         Map<String, Place> placeMap = new HashMap<>();
@@ -39,17 +43,23 @@ public class PlaceListGui extends WGui {
             placeMap.put(place.getName(), place);
         }
 
-        gui = Gui.gui()
+        paginatedGui = Gui.paginated()
                 .title(Component.text("Places in ")
                         .append(Component.text(category.getName())
                                 .color(NamedTextColor.BLUE)
                                 .decoration(TextDecoration.BOLD, true)))
                 .rows(6)
+                .pageSize(28)
                 .create();
 
-        GuiUtils.insertGrayPanes(gui);
-        GuiUtils.fillWhitePanes(gui);
-        GuiUtils.defaultCancel(gui);
+        gui = paginatedGui;
+
+        GuiUtils.defaultCancel(paginatedGui);
+        paginatedGui.getFiller().fillBorder(GuiUtils.pane(Material.WHITE_STAINED_GLASS_PANE));
+
+        category.getPlaces().stream()
+                        .sorted(Comparator.comparing(Place::getName))
+                                .forEach(place -> paginatedGui.addItem(GuiUtils.placeItem(this, place, player)));
 
         List<Place> places = category.getPlaces().stream()
                 .sorted(Comparator.comparing(Place::getName)).toList();
@@ -57,12 +67,32 @@ public class PlaceListGui extends WGui {
                 (slot, place) -> GuiUtils.addPlaceItem(this, gui, slot, place, player));
 
         findNearestButton();
+        previousButton();
         gui.setItem(49, GuiUtils.cancel(event -> openLast()));
+        nextButton();
 
         return gui;
     }
 
     //------------------------------------------------------------------------------------------------------------------
+
+    private void previousButton() {
+        gui.setItem(47, ItemBuilder.from(Material.ARROW)
+                .name(Component.text("Previous"))
+                .asGuiItem(event -> {
+                    paginatedGui.previous();
+                })
+        );
+    }
+
+    private void nextButton() {
+        gui.setItem(51, ItemBuilder.from(Material.ARROW)
+                .name(Component.text("Next"))
+                .asGuiItem(event -> {
+                    paginatedGui.next();
+                })
+        );
+    }
 
     private void findNearestButton() {
         gui.setItem(4, GuiUtils.button(Material.COMPASS, "Find nearest " + category.getName() + " place", NamedTextColor.BLUE,

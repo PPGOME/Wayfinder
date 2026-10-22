@@ -1,5 +1,6 @@
 package me.ppgome.wayfinder.guis.place;
 
+import dev.triumphteam.gui.guis.BaseGui;
 import dev.triumphteam.gui.guis.Gui;
 import me.ppgome.wayfinder.Wayfinder;
 import me.ppgome.wayfinder.database.PlayerMeta;
@@ -37,7 +38,7 @@ public class PlaceSettingsGui extends WGui {
     }
 
     @Override
-    protected Gui buildGui(Player player) {
+    protected BaseGui buildGui(Player player) {
         this.playerMeta = cache.getPlayerMeta(player.getUniqueId());
         this.particles = playerMeta.isPlaceParticlesEnabled();
         this.arrow = playerMeta.isPlaceArrowEnabled();

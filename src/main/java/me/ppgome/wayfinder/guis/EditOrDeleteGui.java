@@ -2,6 +2,7 @@ package me.ppgome.wayfinder.guis;
 
 import dev.triumphteam.gui.builder.item.PaperItemBuilder;
 import dev.triumphteam.gui.components.GuiType;
+import dev.triumphteam.gui.guis.BaseGui;
 import dev.triumphteam.gui.guis.Gui;
 import me.ppgome.wayfinder.database.Home;
 import me.ppgome.wayfinder.database.Warp;
@@ -25,7 +26,7 @@ public class EditOrDeleteGui<T> extends WGui {
     }
 
     @Override
-    protected Gui buildGui(Player player) {
+    protected BaseGui buildGui(Player player) {
 
         gui = Gui.gui()
                 .title(Component.text("Edit or delete?"))

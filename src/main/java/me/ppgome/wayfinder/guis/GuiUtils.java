@@ -3,6 +3,7 @@ package me.ppgome.wayfinder.guis;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
 import dev.triumphteam.gui.builder.item.PaperItemBuilder;
+import dev.triumphteam.gui.guis.BaseGui;
 import dev.triumphteam.gui.guis.Gui;
 import dev.triumphteam.gui.guis.GuiItem;
 import me.ppgome.wayfinder.Wayfinder;
@@ -124,7 +125,7 @@ public class GuiUtils {
      * A 6-row GUI gives slots 10-43 (28 slots); a 4-row GUI gives 10-25 (14 slots).
      */
 
-    public static List<Integer> interiorSlots(Gui gui) {
+    public static List<Integer> interiorSlots(BaseGui gui) {
         return slotsBetween(9, (gui.getRows() - 1) * 9 - 1);
     }
 
@@ -156,7 +157,7 @@ public class GuiUtils {
     /**
      * Insert gray panes into a GUI between two slots (inclusive), skipping border columns.
      */
-    public static void insertGrayPanes(Gui gui, int firstSlot, int lastSlot) {
+    public static void insertGrayPanes(BaseGui gui, int firstSlot, int lastSlot) {
         GuiItem pane = pane(Material.GRAY_STAINED_GLASS_PANE);
         for (int slot : slotsBetween(firstSlot, lastSlot)) {
             gui.setItem(slot, pane);
@@ -166,7 +167,7 @@ public class GuiUtils {
     /**
      * Insert gray panes into every interior slot of the GUI.
      */
-    public static void insertGrayPanes(Gui gui) {
+    public static void insertGrayPanes(BaseGui gui) {
         GuiItem pane = pane(Material.GRAY_STAINED_GLASS_PANE);
         for (int slot : interiorSlots(gui)) {
             gui.setItem(slot, pane);
@@ -176,11 +177,11 @@ public class GuiUtils {
     /**
      * Fill all remaining empty slots with click-proof white panes.
      */
-    public static void fillWhitePanes(Gui gui) {
+    public static void fillWhitePanes(BaseGui gui) {
         gui.getFiller().fill(pane(Material.WHITE_STAINED_GLASS_PANE));
     }
 
-    public static void defaultCancel(Gui gui) {
+    public static void defaultCancel(BaseGui gui) {
         gui.setDefaultClickAction(event -> event.setCancelled(true));
     }
 
@@ -253,7 +254,7 @@ public class GuiUtils {
      * anything else runs {@code onUse}.
      * If EditOrDeleteGui has a bound on its type parameter, put the same bound on T here.
      */
-    private static <T> void addEntryItem(WGui wGui, Gui gui, int slot, GuiItem item, T entry, Player player,
+    private static <T> void addEntryItem(WGui wGui, BaseGui gui, int slot, GuiItem item, T entry, Player player,
                                          boolean canEdit, Consumer<InventoryClickEvent> onUse) {
         gui.setItem(slot, item);
         gui.addSlotAction(slot, event -> {
@@ -266,6 +267,33 @@ public class GuiUtils {
     }
 
     /**
+     * A place button that carries its own click action, so it works with addItem() / pagination.
+     * @param wGui the GUI being added to
+     * @param place the place whose item is being added
+     * @param player the player viewing the GUI
+     * @return an item representing a place
+     */
+    public static GuiItem placeItem(WGui wGui, Place place, Player player) {
+        boolean canEdit = player.hasPermission("wayfinder.admin.place");
+        GuiItem item = makePlaceItem(place, player);
+
+        item.setAction(event -> {
+            event.setCancelled(true);
+            if (event.isShiftClick() && canEdit) {
+                wGui.openNext(player, wGui.config, wGui.cache, new EditOrDeleteGui<>(place));
+                return;
+            }
+            if (wGui.cache.isRouting(player.getUniqueId())) {
+                player.sendMessage(PlaceholderParser.of(wGui.config.PLACE_ALREADY_ROUTING).place(place.getName()).parse());
+            } else {
+                new ParticleNavigator(Wayfinder.PLUGIN, player, place).startDisplaying();
+            }
+            wGui.gui.close(player);
+        });
+        return item;
+    }
+
+    /**
      * Adds a button to a GUI for teleporting to/editing a place
      * @param wGui The GUI directory
      * @param gui The GUI being edited
@@ -273,7 +301,7 @@ public class GuiUtils {
      * @param place The place being routed to/edited
      * @param player The player routing to/editing the place
      */
-    public static void addPlaceItem(WGui wGui, Gui gui, int slot, Place place, Player player) {
+    public static void addPlaceItem(WGui wGui, BaseGui gui, int slot, Place place, Player player) {
         boolean canEdit = player.hasPermission("wayfinder.admin.place");
         addEntryItem(wGui, gui, slot, makePlaceItem(place, player), place, player, canEdit, event -> {
             if (wGui.cache.isRouting(player.getUniqueId())) {
@@ -293,7 +321,7 @@ public class GuiUtils {
      * @param warp The warp being warped to/edited
      * @param player The player warping to/editing the warp
      */
-    public static void addWarpItem(WGui wGui, Gui gui, int slot, Warp warp, Player player) {
+    public static void addWarpItem(WGui wGui, BaseGui gui, int slot, Warp warp, Player player) {
         addEntryItem(wGui, gui, slot, makeWarpItem(warp), warp, player, true, event -> {
             player.teleport(warp.getLocation());
             player.sendMessage(PlaceholderParser.of(wGui.config.WARP_WARP_SUCCESS).prefix(wGui.config.PREFIX).parse());
@@ -308,7 +336,7 @@ public class GuiUtils {
      * @param home The home being warped to/edited
      * @param player The player warping to/editing the home
      */
-    public static void addHomeItem(WGui wGui, Gui gui, int slot, Home home, Player player) {
+    public static void addHomeItem(WGui wGui, BaseGui gui, int slot, Home home, Player player) {
         addEntryItem(wGui, gui, slot, makeHomeItem(home), home, player, true, event -> {
             if(event.isShiftClick()) {
                 wGui.openNext(player, wGui.config, wGui.cache, new EditOrDeleteGui<>(home));

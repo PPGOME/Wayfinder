@@ -1,6 +1,7 @@
 package me.ppgome.wayfinder.guis.place;
 
 import dev.triumphteam.gui.builder.item.ItemBuilder;
+import dev.triumphteam.gui.builder.item.PaperItemBuilder;
 import dev.triumphteam.gui.guis.BaseGui;
 import dev.triumphteam.gui.guis.Gui;
 import dev.triumphteam.gui.guis.PaginatedGui;
@@ -77,7 +78,7 @@ public class PlaceListGui extends WGui {
     //------------------------------------------------------------------------------------------------------------------
 
     private void previousButton() {
-        gui.setItem(47, ItemBuilder.from(Material.ARROW)
+        gui.setItem(47, PaperItemBuilder.from(Material.ARROW)
                 .name(Component.text("Previous"))
                 .asGuiItem(event -> {
                     paginatedGui.previous();
@@ -86,7 +87,7 @@ public class PlaceListGui extends WGui {
     }
 
     private void nextButton() {
-        gui.setItem(51, ItemBuilder.from(Material.ARROW)
+        gui.setItem(51, PaperItemBuilder.from(Material.ARROW)
                 .name(Component.text("Next"))
                 .asGuiItem(event -> {
                     paginatedGui.next();

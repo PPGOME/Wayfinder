@@ -96,7 +96,9 @@ public class ParticleNavigator {
             return;
         }
 
-        if(sameWorld(player.getLocation(), destination.getLocation())) player.lookAt(destination.getLocation(), LookAnchor.EYES);
+        Location firstLoc = route.routeWaypoints().getFirst().location();
+
+        if(sameWorld(player.getLocation(), destination.getLocation())) player.lookAt(firstLoc, LookAnchor.EYES);
         player.sendMessage(PlaceholderParser.of(config.PLACE_ROUTING_TO).place(destination.getName()).parse());
         player.sendMessage(Component.text("Located at: ", NamedTextColor.GOLD).append(TextUtils.locationToComponent(destination.getLocation())));
         player.sendMessage(Component.text("You can change the route helper (particles/arrow/both) in your place GUI's settings!", NamedTextColor.RED));

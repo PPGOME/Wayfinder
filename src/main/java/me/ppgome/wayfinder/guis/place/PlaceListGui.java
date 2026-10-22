@@ -62,11 +62,6 @@ public class PlaceListGui extends WGui {
                         .sorted(Comparator.comparing(Place::getName))
                                 .forEach(place -> paginatedGui.addItem(GuiUtils.placeItem(this, place, player)));
 
-        List<Place> places = category.getPlaces().stream()
-                .sorted(Comparator.comparing(Place::getName)).toList();
-        GuiUtils.placeAll(places, GuiUtils.interiorSlots(gui),
-                (slot, place) -> GuiUtils.addPlaceItem(this, gui, slot, place, player));
-
         findNearestButton();
         previousButton();
         gui.setItem(49, GuiUtils.cancel(event -> openLast()));

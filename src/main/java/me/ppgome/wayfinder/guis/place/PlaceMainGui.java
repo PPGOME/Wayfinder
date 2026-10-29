@@ -6,6 +6,7 @@ import dev.triumphteam.gui.guis.Gui;
 import dev.triumphteam.gui.guis.GuiItem;
 import me.ppgome.wayfinder.Cache;
 import me.ppgome.wayfinder.WConfig;
+import me.ppgome.wayfinder.Wayfinder;
 import me.ppgome.wayfinder.database.place.Category;
 import me.ppgome.wayfinder.database.place.Place;
 import me.ppgome.wayfinder.guis.EditOrDeleteGui;
@@ -52,7 +53,7 @@ public class PlaceMainGui extends WGui {
 
         Map<String, Place> pinnedPlaces = cache.getAllPinnedPlaces();
 
-        int rows = (numberOfCategories > 9) ? 6 : 5;
+        int rows = (numberOfCategories > 7) ? 6 : 5;
         boolean isFiveRows = (rows == 5);
 
         gui = Gui.gui().title(Component.text("Place Categories")).rows(rows).create();
@@ -64,11 +65,18 @@ public class PlaceMainGui extends WGui {
         GuiUtils.insertGrayPanes(gui, 10, isFiveRows ? 16 : 25);
         GuiUtils.insertGrayPanes(gui, isFiveRows ? 28 : 37, isFiveRows ? 34 : 43);
 
+        int capacity = isFiveRows ? 7 : 14;
+
         if(numberOfCategories > 0) {
             // Place category items
-            int[] categorySlots = GuiUtils.getSlotPlacement(numberOfCategories, 7, isFiveRows ? 1 : 2, 10);
-
             List<Category> categoryList = GuiUtils.mapToList(categories);
+            if(categoryList.size() > capacity) {
+                categoryList = categoryList.subList(0, capacity);
+                Wayfinder.PLUGIN.getLogger().info("You have more categories than are permitted. Some are being hidden!");
+            }
+
+            int[] categorySlots = GuiUtils.getSlotPlacement(categoryList.size(), 7, isFiveRows ? 1 : 2, 10);
+
             for(int i = 0; i < categoryList.size(); i++) {
                 Category tempCat = categoryList.get(i);
                 gui.setItem(categorySlots[i],

@@ -46,29 +46,25 @@ public class GuiUtils {
      */
     public static int[] getSlotPlacement(int itemCount, int width, int height, int startSlot) {
 
-        int areaSize = width * height;
-        if (itemCount > areaSize)
+        if (itemCount > width * height)
             throw new IllegalArgumentException("Too many items for this region");
 
         int startRow = startSlot / 9;
         int startCol = startSlot % 9;
 
-        int[] areaSlots = new int[areaSize];
+        int[] result = new int[itemCount];
         int idx = 0;
 
-        for (int r = 0; r < height; r++) {
-            for (int c = 0; c < width; c++) {
+        for (int r = 0; r < height && idx < itemCount; r++) {
+            int itemsInRow = Math.min(width, itemCount - idx);
+            int leftPad = (width - itemsInRow) / 2;
+
+            for (int c = 0; c < itemsInRow; c++) {
                 int row = startRow + r;
-                int col = startCol + c;
-                areaSlots[idx++] = row * 9 + col;
+                int col = startCol + leftPad + c;
+                result[idx++] = row * 9 + col;
             }
         }
-
-        int totalPadding = areaSize - itemCount;
-        int leftPad = totalPadding / 2;
-
-        int[] result = new int[itemCount];
-        System.arraycopy(areaSlots, leftPad, result, 0, itemCount);
 
         return result;
     }
